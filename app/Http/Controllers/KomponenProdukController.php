@@ -236,3 +236,5 @@ class KomponenProdukController extends Controller
         return back()->with('success', "Berhasil memindahkan {$movedCount} produk dari \"{$source->nama_satuan}\" ke \"{$target->nama_satuan}\". Satuan \"{$source->nama_satuan}\" telah dihapus!");
     }
 }
+
+
