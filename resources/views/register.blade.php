@@ -3,100 +3,128 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Login Page</title>
-
+        <title>Daftar Akun</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Noto+Sans+Javanese:wght@400..700&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Noto+Sans+Javanese:wght@400..700&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-
         <style>
             body {
                 background-color: #F7F7F9;
                 font-family: 'Nunito', sans-serif;
             }
-
             h1, h2, h3, h4, h5, h6,
             .navbar-brand,
             .nav-link,
             .btn {
                 font-family: 'Montserrat', sans-serif;
             }
-
             .login-container {
                 min-height: 100vh;
             }
-
             .left-box {
                 background-color: #2A522A;
                 color: white;
                 border-top-right-radius: 60px;
                 border-bottom-right-radius: 60px;
             }
-
             .left-box h1 {
                 font-weight: bold;
             }
-
             .right-box {
                 background-color: white;
                 border-top-right-radius: 60px;
                 border-bottom-right-radius: 60px;
             }
-
             .form-control::placeholder {
                 font-size: 0.9rem;
             }
-
             .form-control:focus {
                 border-color: #198754 !important; /* warna border success */
                 box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, .25) !important; /* efek glow hijau */
             }
-
+            .google-icon {
+                cursor: pointer;
+            }
+            .alert {
+                margin-bottom: 1rem;
+            }
         </style>
     </head>
     <body>
         <div class="container d-flex align-items-center justify-content-center login-container">
             <div class="row w-100 shadow-lg" style="max-width: 1000px; border-radius: 20px; overflow: hidden;">
-
             <!-- KIRI -->
             <div class="col-md-6 p-5 left-box d-flex flex-column justify-content-center">
                 <h2 class="mb-2 fw-bold">Food Center</h2>
                 <p>Dinas Ketahanan Pangan Kabupaten Kutai Barat</p>
                 <img src="https://i.imgur.com/n8f8k0v.png" alt="Illustration" class="img-fluid mt-auto" style="max-height: 250px;">
             </div>
-
             <!-- KANAN -->
             <div class="col-md-6 p-5 right-box">
                 <h2 class="mb-4 fw-bold">Buat Akun</h2>
-                <form>
+
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                @if (session('success'))
+                    <div class="alert alert-success">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                <form action="{{ route('register') }}" method="POST">
+                    @csrf
                 <div class="mb-3">
-                    <input type="text" class="form-control" placeholder="Nama Lengkap">
+                    <input type="text" name="nama_lengkap" class="form-control @error('nama_lengkap') is-invalid @enderror" value="{{ old('nama_lengkap') }}" placeholder="Nama Lengkap" required>
+                    @error('nama_lengkap')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="mb-3">
-                    <input type="email" class="form-control" placeholder="Email">
+                    <input type="tel" name="no_telepon" class="form-control @error('no_telepon') is-invalid @enderror" value="{{ old('no_telepon') }}" placeholder="No Telepon">
+                    @error('no_telepon')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="mb-3">
-                    <input type="password" class="form-control" placeholder="Password">
+                    <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" placeholder="Email" required>
+                    @error('email')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="mb-3">
-                    <input type="password" class="form-control" placeholder="Konfirmasi Password">
+                    <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Password" required>
+                    @error('password')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <input type="password" name="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror" placeholder="Konfirmasi Password" required>
+                    @error('password_confirmation')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
                 <button type="submit" class="btn w-100 mb-3 text-white" style="background-color: #2A522A">Daftar</button>
-
                 <p class="text-center small text-muted">Atau Daftar dengan</p>
                 <div class="d-flex justify-content-center gap-3 mb-3">
-                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" width="24">
+                    <a href="{{ route('auth.google') }}">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" width="24" alt="Google" class="google-icon">
+                    </a>
                 </div>
-                <p class="text-center small">Sudah Punya Akun? <a href="/login" class="text-decoration-none fw-bold" style="color: #2A522A">Masuk</a></p>
+                <p class="text-center small">Sudah Punya Akun? <a href="{{ route('login') }}" class="text-decoration-none fw-bold" style="color: #2A522A">Masuk</a></p>
                 </form>
             </div>
-
             </div>
         </div>
-
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>

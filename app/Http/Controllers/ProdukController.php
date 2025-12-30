@@ -36,15 +36,6 @@ class ProdukController extends Controller
         ]);
     }
 
-    // public function dashboardProduk()
-    // {
-    //     $produk = Produk::latest()->get();
-
-    //     return view('Staff_Produk.dashboard', [
-    //         'produk' => $produk,
-    //     ]);
-    // }
-
 
     /**
      * DATA PRODUK – semua produk (pagination 10)
@@ -91,12 +82,6 @@ class ProdukController extends Controller
         ]);
     }
 
-    // public function dataProduk()
-    // {
-    //     return view('Staff_Produk.dataProduk', [
-    //         'produk' => $this->produkPaginated()
-    //     ]);
-    // }
 
     /**
      * PRODUK DISKON – tampilkan produk yang punya batch diskon
@@ -127,14 +112,117 @@ class ProdukController extends Controller
     /**
      * ARSIP – produk dengan status_tampil = 0 (disembunyikan)
      */
-    public function arsipProduk()
+    public function arsipProduk(Request $request)
     {
-        $produk = Produk::where('status_tampil', 'Diarsipkan')
-                ->with(['kategori','supplier','satuan'])
-                ->latest()->paginate(10);
+        $query = Produk::where('status_tampil', 'Diarsipkan')
+            ->with(['kategori', 'supplier', 'satuan']);
 
-        return view('Staff_Produk.arsipProduk', compact('produk'));
+        // 🔹 Filter supplier
+        if ($request->supplier && $request->supplier !== 'all') {
+            $query->whereHas('supplier', function ($q) use ($request) {
+                $q->where('nama_supplier', $request->supplier);
+            });
+        }
+
+        // 🔹 Filter kategori
+        if ($request->kategori && $request->kategori !== 'all') {
+            $query->whereHas('kategori', function ($q) use ($request) {
+                $q->where('nama_kategori', $request->kategori);
+            });
+        }
+
+        // 🔹 Search
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nama_produk', 'like', "%{$request->search}%")
+                  ->orWhere('deskripsi', 'like', "%{$request->search}%");
+            });
+        }
+
+        $produk = $query->latest()->paginate(5);
+
+        // 🔹 Dropdown supplier (PAKAI id_supplier)
+        $suppliers = Produk::where('status_tampil', 'Diarsipkan')
+            ->join('suppliers', 'produks.id_supplier', '=', 'suppliers.id')
+            ->select('suppliers.nama_supplier')
+            ->distinct()
+            ->pluck('nama_supplier');
+
+        // 🔹 Dropdown kategori (PAKAI id_kategori)
+        $kategoris = Produk::where('status_tampil', 'Diarsipkan')
+            ->join('kategoris', 'produks.id_kategori', '=', 'kategoris.id')
+            ->select('kategoris.nama_kategori')
+            ->distinct()
+            ->pluck('nama_kategori');
+
+        return view('Staff_Produk.arsipProduk', compact(
+            'produk',
+            'suppliers',
+            'kategoris'
+        ));
     }
+
+    /**
+     * Restore 1 produk
+     */
+    public function restoreProduk($id)
+    {
+        $produk = Produk::where('id', $id)
+            ->where('status_tampil', 'Diarsipkan')
+            ->firstOrFail();
+
+        $produk->update([
+            'status_tampil' => 'Ditampilkan'
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Produk berhasil ditampilkan kembali'
+        ]);
+    }
+
+    /**
+     * Restore produk terpilih
+     */
+    public function restoreSelectedProduk(Request $request)
+    {
+        $ids = $request->ids ?? [];
+
+        if (empty($ids)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada produk dipilih'
+            ]);
+        }
+
+        Produk::whereIn('id', $ids)
+            ->where('status_tampil', 'Diarsipkan')
+            ->update([
+                'status_tampil' => 'Ditampilkan'
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Produk terpilih berhasil ditampilkan'
+        ]);
+    }
+
+    /**
+     * Restore semua produk arsip
+     */
+    public function restoreAllProduk()
+    {
+        Produk::where('status_tampil', 'Diarsipkan')
+            ->update([
+                'status_tampil' => 'Ditampilkan'
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Semua produk arsip berhasil ditampilkan'
+        ]);
+    }
+
 
     /**
      * RUSAK CACAT – sementara kosong
@@ -143,15 +231,6 @@ class ProdukController extends Controller
     {
         return view('Staff_Produk.rusakCacat');
     }
-
-    // public function tambahProduk() // Metode ini redundan, lebih baik gunakan create()
-    // {
-    //     // Mendapatkan data untuk dropdown di form
-    //     $suppliers = Produk::distinct('supplier')->pluck('supplier')->filter()->sort()->all();
-    //     $kategoris = Produk::distinct('kategori')->pluck('kategori')->filter()->sort()->all();
-
-    //     return view('Staff_Produk.tambahProduk', compact('suppliers', 'kategoris'));
-    // }
 
     /**
      * create
@@ -173,92 +252,39 @@ class ProdukController extends Controller
      * @param Request $request
      * @return void
      */
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'nama_produk' => 'required',
-    //         'kategori_id' => 'required',
-    //         'satuan_id' => 'required',
-    //         'supplier_id' => 'required',
-    //     ]);
-
-    //     $produk = new Produk();
-    //     $produk->nama_produk = $request->nama_produk;
-    //     $produk->kategori_id = $request->kategori_id;
-    //     $produk->satuan_id = $request->satuan_id;
-    //     $produk->supplier_id = $request->supplier_id;
-    //     $produk->deskripsi = $request->deskripsi;
-    //     $produk->status_tampil = $request->status_tampil;
-
-    //     if ($request->hasFile('gambar')) {
-    //         $produk->gambar = $request->file('gambar')->store('produk', 'public');
-    //     }
-
-    //     $produk->save();
-
-    //     return redirect()->route('produk.data')->with('success', 'Produk ditambahkan!');
-    // }
 
     public function storeProduk(Request $request)
-    {
-        // VALIDASI
-        $request->validate([
-            'nama_produk'   => 'required|string|max:255|unique:produks,nama_produk',
-            'gambar'        => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
-            'deskripsi'     => 'required|string',
+{
+    $request->validate([
+        'nama_produk' => 'required|string|max:255',
+        'id_kategori' => 'required|exists:kategoris,id',
+        'id_satuan' => 'required|exists:satuans,id',
+        'id_supplier' => 'required|exists:suppliers,id',
+        'jumlah_satuan' => 'required|numeric|min:1',
+        'estimasi_kadaluwarsa_hari' => 'nullable|integer|min:1',
+        'status_tampil' => 'required|in:Ditampilkan,Diarsipkan',
+        'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
 
-            // ini string karena user bisa ngetik kategori baru
-            'kategoriText'  => 'required|string',
-            'satuanText'    => 'required|string',
-            'supplierText'  => 'required|string',
-
-            'status_tampil' => 'required|in:Ditampilkan,Diarsipkan',
-        ]);
-
-        // ==========================
-        // GET OR CREATE KATEGORI
-        // ==========================
-        $kategori = Kategori::firstOrCreate([
-            'nama_kategori' => $request->kategoriText
-        ]);
-
-        // ==========================
-        // GET OR CREATE SATUAN
-        // ==========================
-        $satuan = Satuan::firstOrCreate([
-            'nama_satuan' => $request->satuanText
-        ]);
-
-        // ==========================
-        // GET OR CREATE SUPPLIER
-        // ==========================
-        $supplier = Supplier::firstOrCreate([
-            'nama_supplier' => $request->supplierText
-        ]);
-
-        // ==========================
-        // UPLOAD GAMBAR
-        // ==========================
-        $path = null;
-        if ($request->hasFile('gambar')) {
-            $path = $request->file('gambar')->store('produk', 'public');
-        }
-
-        // ==========================
-        // CREATE PRODUK
-        // ==========================
-        Produk::create([
-            'nama_produk'   => $request->nama_produk,
-            'id_kategori'   => $kategori->id,
-            'id_satuan'     => $satuan->id,
-            'id_supplier'   => $supplier->id,
-            'status_tampil' => $request->status_tampil,
-            'deskripsi'     => $request->deskripsi,
-            'gambar'        => $path,
-        ]);
-
-        return redirect()->route('produk.data')->with('success', 'Produk berhasil ditambahkan!');
+    $gambarPath = null;
+    if($request->hasFile('gambar')){
+        $gambarPath = $request->file('gambar')->store('produk', 'public');
     }
+
+    $produk = Produk::create([
+        'nama_produk' => $request->nama_produk,
+        'id_kategori' => $request->id_kategori,
+        'id_satuan' => $request->id_satuan,
+        'id_supplier' => $request->id_supplier,
+        'jumlah_satuan' => $request->jumlah_satuan,
+        'estimasi_kadaluwarsa_hari' => $request->estimasi_kadaluwarsa_hari,
+        'deskripsi' => $request->deskripsi,
+        'status_tampil' => $request->status_tampil,
+        'gambar' => $gambarPath,
+    ]);
+
+    return redirect()->route('produk.data')->with('success','Produk berhasil ditambahkan');
+}
 
     /**
      * edit
@@ -293,6 +319,8 @@ class ProdukController extends Controller
             'id_kategori'   => 'required|exists:kategoris,id',
             'id_supplier'   => 'required|exists:suppliers,id',
             'id_satuan'     => 'required|exists:satuans,id',
+            'jumlah_satuan' => 'required|numeric|min:1',
+            'estimasi_kadaluwarsa_hari' => 'nullable|integer|min:1',
             'status_tampil' => 'required|in:Ditampilkan,Diarsipkan',
             'deskripsi'     => 'required|string',
         ]);
@@ -309,6 +337,8 @@ class ProdukController extends Controller
             'id_kategori'   => $request->id_kategori,
             'id_supplier'   => $request->id_supplier,
             'id_satuan'     => $request->id_satuan,
+            'jumlah_satuan' => $request->jumlah_satuan,
+            'estimasi_kadaluwarsa_hari' => $request->estimasi_kadaluwarsa_hari,
             'status_tampil' => $request->status_tampil,
             'deskripsi'     => $request->deskripsi,
             'gambar'        => $path,

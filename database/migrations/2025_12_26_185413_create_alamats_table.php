@@ -11,12 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kode_pos', function (Blueprint $table) {
+        Schema::create('alamats', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('id_user')->constrained('users')->onDelete('cascade');
             $table->foreignId('id_kecamatan')->constrained('kecamatans')->onDelete('cascade');
             $table->foreignId('id_kelurahan')->constrained('kelurahans')->onDelete('cascade');
-            $table->integer('kode_pos');
+            $table->foreignId('id_kode_pos')->constrained('kode_pos')->onDelete('cascade');
+            $table->string('nama_penerima');
+            $table->string('no_telpon');
+            $table->string('alamat_lengkap');
             $table->timestamps();
+
         });
     }
 
@@ -25,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kode_pos');
+        Schema::dropIfExists('alamats');
     }
 };

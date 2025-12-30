@@ -14,6 +14,8 @@ class Produk extends Model
         'id_satuan',
         'id_supplier',
         'nama_produk',
+        'jumlah_satuan',
+        'estimasi_kadaluwarsa_hari',
         'status_tampil',
         'deskripsi',
         'gambar',

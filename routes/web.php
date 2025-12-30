@@ -1,10 +1,19 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SocialiteController;
+use App\Http\Controllers\ProfilController;
+use App\Http\Controllers\AlamatController;
 use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\KomponenProdukController;
+use App\Http\Controllers\BatchController;
+use App\Http\Controllers\PengurusController;
+use App\Http\Controllers\OngkirDaerahController;
+use App\Http\Controllers\ManajemenUserController;
 
 Route::get('/', function () {
-    return view('User/landingPage', [
+    return view('User.landingPage', [
         'kepengurusan' => [
             [
                 'gambar' => 'images/gambar_1.jpg',
@@ -119,15 +128,15 @@ Route::get('/', function () {
 
         ]
     ]);
-});
+})->name('beranda');
 
-Route::get('/login', function () {
-    return view('login');
-});
+// Route::get('/login', function () {
+//     return view('login');
+// });
 
-Route::get('/register', function () {
-    return view('register');
-});
+// Route::get('/register', function () {
+//     return view('register');
+// });
 
 Route::get('/detail_produk', function () {
     return view('User/detailProduk', [
@@ -591,9 +600,9 @@ Route::get('/riwayat', function () {
     ]);
 });
 
-Route::get('/profil', function () {
-    return view('User/profil');
-});
+// Route::get('/profil', function () {
+//     return view('User/profil');
+// });
 
 Route::get('/pembayaran', function () {
     return view('User/pembayaran', [
@@ -971,176 +980,176 @@ Route::get('/dashboard_produk', function () {
 //     return view('Staff_Produk/tambahProduk');
 // });
 
-Route::get('/batch_stok', function () {
-    return view('Staff_Produk/batchStok', [
-        'batches' => [
-            [
-                'id' => 1,
-                'tanggal_masuk' => '2025-11-01',
-                'tanggal_kadaluarsa' => '2026-01-01', // 67 hari lagi
-                'jumlah' => 20,
-                'harga_normal' => 'Rp 75.000',
-                'diskon' => 0,
-                'harga_saat_ini' => 'Rp 75.000', // normal
-                'tanggal_perubahan_harga' => '2025-11-01',
-            ],
-            [
-                'id' => 2,
-                'tanggal_masuk' => '2025-11-03',
-                'tanggal_kadaluarsa' => '2025-12-15', // 20 hari lagi
-                'jumlah' => 15,
-                'harga_normal' => 'Rp 75.000',
-                'diskon' => 5,
-                'harga_saat_ini' => 'Rp 71.250', // diskon
-                'tanggal_perubahan_harga' => '2025-11-10',
-            ],
-            [
-                'id' => 3,
-                'tanggal_masuk' => '2025-11-05',
-                'tanggal_kadaluarsa' => '2026-02-05', // 72 hari lagi
-                'jumlah' => 10,
-                'harga_normal' => 'Rp 75.000',
-                'diskon' => 0,
-                'harga_saat_ini' => 'Rp 82.000', // NAIK
-                'tanggal_perubahan_harga' => '2025-11-15',
-            ],
-            [
-                'id' => 4,
-                'tanggal_masuk' => '2025-11-07',
-                'tanggal_kadaluarsa' => '2025-12-10', // 15 hari lagi
-                'jumlah' => 25,
-                'harga_normal' => 'Rp 78.000',
-                'diskon' => 10,
-                'harga_saat_ini' => 'Rp 70.200', // diskon
-                'tanggal_perubahan_harga' => '2025-11-12',
-            ],
-            [
-                'id' => 5,
-                'tanggal_masuk' => '2025-11-09',
-                'tanggal_kadaluarsa' => '2026-01-09', // 75 hari lagi
-                'jumlah' => 30,
-                'harga_normal' => 'Rp 75.000',
-                'diskon' => 0,
-                'harga_saat_ini' => 'Rp 75.000', // normal
-                'tanggal_perubahan_harga' => '2025-11-09',
-            ],
-            [
-                'id' => 6,
-                'tanggal_masuk' => '2025-11-11',
-                'tanggal_kadaluarsa' => '2025-12-05', // 10 hari lagi
-                'jumlah' => 18,
-                'harga_normal' => 'Rp 77.000',
-                'diskon' => 3,
-                'harga_saat_ini' => 'Rp 74.690', // diskon
-                'tanggal_perubahan_harga' => '2025-11-18',
-            ],
-            [
-                'id' => 7,
-                'tanggal_masuk' => '2025-11-12',
-                'tanggal_kadaluarsa' => '2026-02-12', // 79 hari lagi
-                'jumlah' => 22,
-                'harga_normal' => 'Rp 75.000',
-                'diskon' => 0,
-                'harga_saat_ini' => 'Rp 80.000', // NAIK
-                'tanggal_perubahan_harga' => '2025-11-20',
-            ],
-            [
-                'id' => 8,
-                'tanggal_masuk' => '2025-11-13',
-                'tanggal_kadaluarsa' => '2025-12-02', // 7 hari lagi
-                'jumlah' => 12,
-                'harga_normal' => 'Rp 79.500',
-                'diskon' => 7,
-                'harga_saat_ini' => 'Rp 73.935', // diskon
-                'tanggal_perubahan_harga' => '2025-11-22',
-            ],
-            [
-                'id' => 9,
-                'tanggal_masuk' => '2025-11-14',
-                'tanggal_kadaluarsa' => '2026-01-14', // 80 hari lagi
-                'jumlah' => 28,
-                'harga_normal' => 'Rp 75.000',
-                'diskon' => 0,
-                'harga_saat_ini' => 'Rp 75.000', // normal
-                'tanggal_perubahan_harga' => '2025-11-14',
-            ],
-            [
-                'id' => 10,
-                'tanggal_masuk' => '2025-10-30',
-                'tanggal_kadaluarsa' => '2025-11-15', // -10 hari lalu
-                'jumlah' => 16,
-                'harga_normal' => 'Rp 76.000',
-                'diskon' => 2,
-                'harga_saat_ini' => 'Rp 74.480', // diskon
-                'tanggal_perubahan_harga' => '2025-11-05',
-            ],
-            [
-                'id' => 11,
-                'tanggal_masuk' => '2025-10-28',
-                'tanggal_kadaluarsa' => '2026-01-28', // 64 hari lagi
-                'jumlah' => 35,
-                'harga_normal' => 'Rp 75.000',
-                'diskon' => 0,
-                'harga_saat_ini' => 'Rp 79.000', // NAIK
-                'tanggal_perubahan_harga' => '2025-11-01',
-            ],
-            [
-                'id' => 12,
-                'tanggal_masuk' => '2025-10-25',
-                'tanggal_kadaluarsa' => '2025-11-10', // -15 hari lalu
-                'jumlah' => 20,
-                'harga_normal' => 'Rp 77.500',
-                'diskon' => 5,
-                'harga_saat_ini' => 'Rp 73.625', // diskon
-                'tanggal_perubahan_harga' => '2025-11-08',
-            ],
-            [
-                'id' => 13,
-                'tanggal_masuk' => '2025-10-20',
-                'tanggal_kadaluarsa' => '2026-01-20', // 56 hari lagi
-                'jumlah' => 14,
-                'harga_normal' => 'Rp 75.000',
-                'diskon' => 0,
-                'harga_saat_ini' => 'Rp 75.000', // normal
-                'tanggal_perubahan_harga' => '2025-10-20',
-            ],
-            [
-                'id' => 14,
-                'tanggal_masuk' => '2025-10-15',
-                'tanggal_kadaluarsa' => '2025-11-26', // 1 hari lagi
-                'jumlah' => 26,
-                'harga_normal' => 'Rp 78.250',
-                'diskon' => 8,
-                'harga_saat_ini' => 'Rp 71.190', // diskon
-                'tanggal_perubahan_harga' => '2025-11-20',
-            ],
-            [
-                'id' => 15,
-                'tanggal_masuk' => '2025-10-10',
-                'tanggal_kadaluarsa' => '2026-02-10', // 77 hari lagi
-                'jumlah' => 19,
-                'harga_normal' => 'Rp 75.000',
-                'diskon' => 0,
-                'harga_saat_ini' => 'Rp 83.000', // NAIK
-                'tanggal_perubahan_harga' => '2025-11-15',
-            ],
-        ],
+// Route::get('/batch_stok', function () {
+//     return view('Staff_Produk/batchStok', [
+//         'batches' => [
+//             [
+//                 'id' => 1,
+//                 'tanggal_masuk' => '2025-11-01',
+//                 'tanggal_kadaluarsa' => '2026-01-01', // 67 hari lagi
+//                 'jumlah' => 20,
+//                 'harga_normal' => 'Rp 75.000',
+//                 'diskon' => 0,
+//                 'harga_saat_ini' => 'Rp 75.000', // normal
+//                 'tanggal_perubahan_harga' => '2025-11-01',
+//             ],
+//             [
+//                 'id' => 2,
+//                 'tanggal_masuk' => '2025-11-03',
+//                 'tanggal_kadaluarsa' => '2025-12-15', // 20 hari lagi
+//                 'jumlah' => 15,
+//                 'harga_normal' => 'Rp 75.000',
+//                 'diskon' => 5,
+//                 'harga_saat_ini' => 'Rp 71.250', // diskon
+//                 'tanggal_perubahan_harga' => '2025-11-10',
+//             ],
+//             [
+//                 'id' => 3,
+//                 'tanggal_masuk' => '2025-11-05',
+//                 'tanggal_kadaluarsa' => '2026-02-05', // 72 hari lagi
+//                 'jumlah' => 10,
+//                 'harga_normal' => 'Rp 75.000',
+//                 'diskon' => 0,
+//                 'harga_saat_ini' => 'Rp 82.000', // NAIK
+//                 'tanggal_perubahan_harga' => '2025-11-15',
+//             ],
+//             [
+//                 'id' => 4,
+//                 'tanggal_masuk' => '2025-11-07',
+//                 'tanggal_kadaluarsa' => '2025-12-10', // 15 hari lagi
+//                 'jumlah' => 25,
+//                 'harga_normal' => 'Rp 78.000',
+//                 'diskon' => 10,
+//                 'harga_saat_ini' => 'Rp 70.200', // diskon
+//                 'tanggal_perubahan_harga' => '2025-11-12',
+//             ],
+//             [
+//                 'id' => 5,
+//                 'tanggal_masuk' => '2025-11-09',
+//                 'tanggal_kadaluarsa' => '2026-01-09', // 75 hari lagi
+//                 'jumlah' => 30,
+//                 'harga_normal' => 'Rp 75.000',
+//                 'diskon' => 0,
+//                 'harga_saat_ini' => 'Rp 75.000', // normal
+//                 'tanggal_perubahan_harga' => '2025-11-09',
+//             ],
+//             [
+//                 'id' => 6,
+//                 'tanggal_masuk' => '2025-11-11',
+//                 'tanggal_kadaluarsa' => '2025-12-05', // 10 hari lagi
+//                 'jumlah' => 18,
+//                 'harga_normal' => 'Rp 77.000',
+//                 'diskon' => 3,
+//                 'harga_saat_ini' => 'Rp 74.690', // diskon
+//                 'tanggal_perubahan_harga' => '2025-11-18',
+//             ],
+//             [
+//                 'id' => 7,
+//                 'tanggal_masuk' => '2025-11-12',
+//                 'tanggal_kadaluarsa' => '2026-02-12', // 79 hari lagi
+//                 'jumlah' => 22,
+//                 'harga_normal' => 'Rp 75.000',
+//                 'diskon' => 0,
+//                 'harga_saat_ini' => 'Rp 80.000', // NAIK
+//                 'tanggal_perubahan_harga' => '2025-11-20',
+//             ],
+//             [
+//                 'id' => 8,
+//                 'tanggal_masuk' => '2025-11-13',
+//                 'tanggal_kadaluarsa' => '2025-12-02', // 7 hari lagi
+//                 'jumlah' => 12,
+//                 'harga_normal' => 'Rp 79.500',
+//                 'diskon' => 7,
+//                 'harga_saat_ini' => 'Rp 73.935', // diskon
+//                 'tanggal_perubahan_harga' => '2025-11-22',
+//             ],
+//             [
+//                 'id' => 9,
+//                 'tanggal_masuk' => '2025-11-14',
+//                 'tanggal_kadaluarsa' => '2026-01-14', // 80 hari lagi
+//                 'jumlah' => 28,
+//                 'harga_normal' => 'Rp 75.000',
+//                 'diskon' => 0,
+//                 'harga_saat_ini' => 'Rp 75.000', // normal
+//                 'tanggal_perubahan_harga' => '2025-11-14',
+//             ],
+//             [
+//                 'id' => 10,
+//                 'tanggal_masuk' => '2025-10-30',
+//                 'tanggal_kadaluarsa' => '2025-11-15', // -10 hari lalu
+//                 'jumlah' => 16,
+//                 'harga_normal' => 'Rp 76.000',
+//                 'diskon' => 2,
+//                 'harga_saat_ini' => 'Rp 74.480', // diskon
+//                 'tanggal_perubahan_harga' => '2025-11-05',
+//             ],
+//             [
+//                 'id' => 11,
+//                 'tanggal_masuk' => '2025-10-28',
+//                 'tanggal_kadaluarsa' => '2026-01-28', // 64 hari lagi
+//                 'jumlah' => 35,
+//                 'harga_normal' => 'Rp 75.000',
+//                 'diskon' => 0,
+//                 'harga_saat_ini' => 'Rp 79.000', // NAIK
+//                 'tanggal_perubahan_harga' => '2025-11-01',
+//             ],
+//             [
+//                 'id' => 12,
+//                 'tanggal_masuk' => '2025-10-25',
+//                 'tanggal_kadaluarsa' => '2025-11-10', // -15 hari lalu
+//                 'jumlah' => 20,
+//                 'harga_normal' => 'Rp 77.500',
+//                 'diskon' => 5,
+//                 'harga_saat_ini' => 'Rp 73.625', // diskon
+//                 'tanggal_perubahan_harga' => '2025-11-08',
+//             ],
+//             [
+//                 'id' => 13,
+//                 'tanggal_masuk' => '2025-10-20',
+//                 'tanggal_kadaluarsa' => '2026-01-20', // 56 hari lagi
+//                 'jumlah' => 14,
+//                 'harga_normal' => 'Rp 75.000',
+//                 'diskon' => 0,
+//                 'harga_saat_ini' => 'Rp 75.000', // normal
+//                 'tanggal_perubahan_harga' => '2025-10-20',
+//             ],
+//             [
+//                 'id' => 14,
+//                 'tanggal_masuk' => '2025-10-15',
+//                 'tanggal_kadaluarsa' => '2025-11-26', // 1 hari lagi
+//                 'jumlah' => 26,
+//                 'harga_normal' => 'Rp 78.250',
+//                 'diskon' => 8,
+//                 'harga_saat_ini' => 'Rp 71.190', // diskon
+//                 'tanggal_perubahan_harga' => '2025-11-20',
+//             ],
+//             [
+//                 'id' => 15,
+//                 'tanggal_masuk' => '2025-10-10',
+//                 'tanggal_kadaluarsa' => '2026-02-10', // 77 hari lagi
+//                 'jumlah' => 19,
+//                 'harga_normal' => 'Rp 75.000',
+//                 'diskon' => 0,
+//                 'harga_saat_ini' => 'Rp 83.000', // NAIK
+//                 'tanggal_perubahan_harga' => '2025-11-15',
+//             ],
+//         ],
 
-        'produk' => [
-            'id' => 'PRD001',
-            'gambar' => 'images/beras.jpg',
-            'nama_produk' => 'Beras Kutai Premium',
-            'deskripsi' => 'Beras kualitas tinggi dari hasil panen lokal.',
-            'satuan_berat' => '5 kg',
-            'harga' => 'Rp 75.000',
-            'stok' => 50,
-            'status_stok' => 'Tersedia',
-            'status_tampil' => 'Ditampilkan',
-            'supplier' => 'Bulog',
-            'kategori' => 'Beras',
-        ]
-    ]);
-});
+//         'produk' => [
+//             'id' => 'PRD001',
+//             'gambar' => 'images/beras.jpg',
+//             'nama_produk' => 'Beras Kutai Premium',
+//             'deskripsi' => 'Beras kualitas tinggi dari hasil panen lokal.',
+//             'satuan_berat' => '5 kg',
+//             'harga' => 'Rp 75.000',
+//             'stok' => 50,
+//             'status_stok' => 'Tersedia',
+//             'status_tampil' => 'Ditampilkan',
+//             'supplier' => 'Bulog',
+//             'kategori' => 'Beras',
+//         ]
+//     ]);
+// });
 
 Route::get('/detail_diskon', function () {
     return view('Staff_Produk/detailDiskon', [
@@ -1264,6 +1273,107 @@ Route::get('/detail_diskon', function () {
 });
 
 
+
+Route::controller(AuthController::class)->group(function () {
+    Route::get('/login', 'showLogin')->name('login');
+    Route::post('/login', 'login');
+
+    Route::get('/register', 'showRegister')->name('register');
+    Route::post('/register', 'register');
+
+    Route::post('/logout', 'logout')->name('logout');
+});
+
+Route::controller(SocialiteController::class)->group(function () {
+    Route::get('auth/google', 'googleLogin')->name('auth.google');
+    Route::get('auth/google-callback', 'googleAuthentication')->name('auth.google-callback');
+});
+
+// ROUTE USER (role 'user', staff, super_admin) - Prefix 'user', middleware 'auth'
+Route::prefix('user')->middleware('auth:web_user')->group(function () {
+
+    // PROFIL USER
+    Route::get('/profil', [ProfilController::class, 'userIndex'])->name('user.profil');
+        Route::put('/profil', [ProfilController::class, 'userUpdate'])->name('user.profil.update');
+        Route::put('/profil/password', [ProfilController::class, 'userUpdatePassword'])->name('user.profil.password');
+
+    // ALAMAT (CRUD)
+    Route::post('/alamat', [AlamatController::class, 'store'])->name('user.alamat.store');
+    Route::put('/alamat/{id}', [AlamatController::class, 'update'])->name('user.alamat.update');
+    Route::delete('/alamat/{id}', [AlamatController::class, 'destroy'])->name('user.alamat.destroy');
+
+    // DROPDOWN AJAX
+    Route::get('/kelurahan/{kecamatan}', [AlamatController::class, 'kelurahanByKecamatan']);
+    Route::get('/kodepos/{kelurahan}', [AlamatController::class, 'kodePosByKelurahan']);
+});
+
+Route::prefix('kurir')
+    ->middleware('auth:web_kurir')
+    ->group(function () {
+
+        // PROFIL KURIR
+        Route::get('/profil', [ProfilController::class, 'kurirIndex'])->name('kurir.profil');
+        Route::put('/profil', [ProfilController::class, 'kurirUpdate'])->name('kurir.profil.update');
+        Route::put('/profil/password', [ProfilController::class, 'kurirUpdatePassword'])->name('kurir.profil.password');
+
+        // PENGIRIMAN MASUK (DUMMY)
+        Route::get('/pengiriman_masuk', function () {
+            return view('Kurir.pengirimanMasuk', [
+                'pengiriman_masuk' => [
+                    [
+                        'id' => 1,
+                        'tanggal' => '2025-10-25',
+                        'produk' => 'Sayur Kangkung Segar',
+                        'jumlah' => '2 ikat',
+                        'ongkir' => 'Rp 5.000',
+                        'alamat' => 'Jl. Mawar No. 12, Sendawar',
+                        'gambar' => 'images/kangkung.jpg',
+                        'supplier' => 'Petani',
+                        'total_produk' => 1,
+                        'status' => 'pending',
+                    ],
+                    [
+                        'id' => 2,
+                        'tanggal' => '2025-10-24',
+                        'produk' => 'Beras Kutai Premium 5kg',
+                        'jumlah' => '1 karung',
+                        'ongkir' => 'Rp 10.000',
+                        'alamat' => 'Jl. Melati No. 8, Barong Tongkok',
+                        'gambar' => 'images/beras.jpg',
+                        'supplier' => 'Bulog',
+                        'total_produk' => 3,
+                        'status' => 'dikirim',
+                    ],
+                    [
+                        'id' => 3,
+                        'tanggal' => '2025-10-24',
+                        'produk' => 'Telur Ayam Kampung',
+                        'jumlah' => '1 rak (30 butir)',
+                        'ongkir' => 'Rp 7.000',
+                        'alamat' => 'Jl. Sawo No. 22, Linggang Bigung',
+                        'gambar' => 'images/telur_kampung.jpg',
+                        'supplier' => 'Peternak',
+                        'total_produk' => 2,
+                        'status' => 'pending',
+                    ],
+                ]
+            ]);
+        })->name('kurir.pengiriman');
+
+        // STATUS PENGIRIMAN (DUMMY)
+        Route::get('/status_pengiriman', function () {
+            return view('Kurir.statusPengiriman');
+        })->name('kurir.status');
+
+        // RIWAYAT PENGIRIMAN (DUMMY)
+        Route::get('/riwayat_pengiriman', function () {
+            return view('Kurir.riwayatPengiriman');
+        })->name('kurir.riwayat');
+    });
+
+
+
+
 Route::prefix('staff_produk')->name('produk.')->group(function () {
     Route::get('/dashboard', [ProdukController::class, 'dashboardProduk'])->name('dashboard');
     Route::get('/data', [ProdukController::class, 'dataProduk'])->name('data');
@@ -1272,15 +1382,99 @@ Route::prefix('staff_produk')->name('produk.')->group(function () {
     Route::get('/arsip', [ProdukController::class, 'arsipProduk'])->name('arsip');
     Route::get('/rusak', [ProdukController::class, 'rusakCacat'])->name('rusak');
 
-    //CRUD
+    //Produk
     Route::get('/tambah', [ProdukController::class, 'tambahProduk'])->name('tambah');
     Route::post('/store', [ProdukController::class, 'storeProduk'])->name('store');
-
     Route::get('/edit_produk/{id}', [ProdukController::class, 'edit'])->name('edit');
     Route::put('/update_produk/{id}', [ProdukController::class, 'update'])->name('update');
-
     Route::delete('/delete/{id}', [ProdukController::class, 'destroy'])->name('delete');
+
+    //Batch
+    Route::get('/produk/{id_produk}/batch', [BatchController::class, 'index'])->name('batch.index');
+    Route::post('/batch/store', [BatchController::class, 'store'])->name('batch.store');
+    Route::put('/batch/update/{id}', [BatchController::class, 'update'])->name('batch.update');
+    Route::delete('/batch/delete/{id}', [BatchController::class, 'destroy'])->name('batch.delete');
+
+    //Komponen Produk
+    Route::prefix('komponen')->name('komponen.')->group(function () {
+        Route::get('/', [KomponenProdukController::class, 'index'])->name('index');
+        // Kategori
+        Route::post('/kategori', [KomponenProdukController::class, 'storeKategori'])->name('kategori.store');
+        Route::put('/kategori/{id}', [KomponenProdukController::class, 'updateKategori'])->name('kategori.update');
+        Route::delete('/kategori/{id}', [KomponenProdukController::class, 'destroyKategori'])->name('kategori.destroy');
+        //Pindah Kategori
+        Route::post('/kategori/move', [KomponenProdukController::class, 'moveKategori'])->name('kategori.move');
+
+        //Satuan
+        Route::post('/satuan', [KomponenProdukController::class, 'storeSatuan'])->name('satuan.store');
+        Route::put('/satuan/{id}', [KomponenProdukController::class, 'updateSatuan'])->name('satuan.update');
+        Route::delete('/satuan/{id}', [KomponenProdukController::class, 'destroySatuan'])->name('satuan.destroy');
+        // Pindah Satuan
+        Route::post('/satuan/move', [KomponenProdukController::class, 'moveSatuan'])->name('satuan.move');
+
+        //Supplier
+        Route::post('/supplier', [KomponenProdukController::class, 'storeSupplier'])->name('supplier.store');
+        Route::put('/supplier/{id}', [KomponenProdukController::class, 'updateSupplier'])->name('supplier.update');
+        Route::delete('/supplier/{id}', [KomponenProdukController::class, 'destroySupplier'])->name('supplier.destroy');
+        //Pindah Supplier
+        Route::post('/supplier/move', [KomponenProdukController::class, 'moveSupplier'])->name('supplier.move');
+    });
 });
+
+Route::prefix('arsip-produk')->group(function () {
+    Route::post('/restore/{id}', [ProdukController::class, 'restoreProduk']);
+    Route::post('/restore-selected', [ProdukController::class, 'restoreSelectedProduk']);
+    Route::post('/restore-all', [ProdukController::class, 'restoreAllProduk']);
+});
+
+Route::prefix('purchasing')->name('staff_purchasing.')->group(function(){
+    Route::get('/kelola_ongkir', [OngkirDaerahController::class, 'index'])->name('ongkir.index');
+
+    // ================= KECAMATAN =================
+    Route::get('/kecamatan',[OngkirDaerahController::class,'kecamatanIndex'])->name('kecamatan.index');
+    Route::post('/kecamatan',[OngkirDaerahController::class,'kecamatanStore'])->name('kecamatan.store');
+    Route::put('/kecamatan/{id}',[OngkirDaerahController::class,'kecamatanUpdate'])->name('kecamatan.update');
+    Route::delete('/kecamatan/{id}',[OngkirDaerahController::class,'kecamatanDestroy'])->name('kecamatan.destroy');
+
+    // ================= KELURAHAN =================
+    Route::get('/kelurahan',[OngkirDaerahController::class,'kelurahanIndex'])->name('kelurahan.index');
+    Route::post('/kelurahan',[OngkirDaerahController::class,'kelurahanStore'])->name('kelurahan.store');
+    Route::put('/kelurahan/{id}',[OngkirDaerahController::class,'kelurahanUpdate'])->name('kelurahan.update');
+    Route::delete('/kelurahan/{id}',[OngkirDaerahController::class,'kelurahanDestroy'])->name('kelurahan.destroy');
+
+    // ================= KODE POS =================
+    Route::get('/kode-pos',[OngkirDaerahController::class,'kodeposIndex'])->name('kodepos.index');
+    Route::post('/kode-pos',[OngkirDaerahController::class,'kodeposStore'])->name('kodepos.store');
+    Route::put('/kode-pos/{id}',[OngkirDaerahController::class,'kodeposUpdate'])->name('kodepos.update');
+    Route::delete('/kode-pos/{id}',[OngkirDaerahController::class,'kodeposDestroy'])->name('kodepos.destroy');
+
+    // ================= AJAX / HELPER =================
+    Route::get('/kelurahan-by-kecamatan/{id}',[OngkirDaerahController::class,'getKelurahanByKecamatan'])
+        ->name('kelurahan.byKecamatan');
+});
+
+
+
+
+Route::prefix('super_admin')->name('super_admin.')->middleware('auth:web_admin') ->group(function () {
+        /* ================= DASHBOARD ================= */
+        Route::get('/dashboard', function () {
+            return view('super_admin.dashboard');
+        })->name('dashboard');
+
+        /* ================= MANAJEMEN USER ================= */
+        Route::get('/manajemen_user', [ManajemenUserController::class, 'index'])->name('user.index');
+        Route::put('/manajemen_user/{id}', [ManajemenUserController::class, 'updateRole']) ->name('user.update');
+
+        /* ================= MANAJEMEN PENGURUS ================= */
+        Route::get('/manajemen_pengurus', [PengurusController::class, 'index'])->name('pengurus.index');
+        Route::post('/manajemen_pengurus', [PengurusController::class, 'store'])->name('pengurus.store');
+        Route::put('/manajemen_pengurus/{id}', [PengurusController::class, 'update'])->name('pengurus.update');
+        Route::delete('/manajemen_pengurus/{id}', [PengurusController::class, 'destroy'])->name('pengurus.destroy');
+    });
+
+
+
 
 
 // Route::get('/diskon_produk', function () {
@@ -1867,62 +2061,7 @@ Route::get('/produk_rusak', function () {
     ]);
 });
 
-Route::get('/pengiriman_masuk', function () {
-    return view('Kurir/pengirimanMasuk', [
-        'pengiriman_masuk' => [
-            [
-                'tanggal' => '2025-10-25',
-                'produk' => 'Sayur Kangkung Segar',
-                'jumlah' => '2 ikat',
-                'ongkir' => 'Rp 5.000',
-                'alamat' => 'Jl. Mawar No. 12, Sendawar',
-                'gambar' => 'images/kangkung.jpg',
-                'supplier' => 'Petani',
-                'total_produk' => 1  // Hanya 1 produk
-            ],
-            [
-                'tanggal' => '2025-10-24',
-                'produk' => 'Beras Kutai Premium 5kg',
-                'jumlah' => '1 karung',
-                'ongkir' => 'Rp 10.000',
-                'alamat' => 'Jl. Melati No. 8, Barong Tongkok',
-                'gambar' => 'images/beras.jpg',
-                'supplier' => 'Bulog',
-                'total_produk' => 3  // Ada 3 produk total (beras + 2 lain)
-            ],
-            [
-                'tanggal' => '2025-10-24',
-                'produk' => 'Telur Ayam Kampung',
-                'jumlah' => '1 rak (30 butir)',
-                'ongkir' => 'Rp 7.000',
-                'alamat' => 'Jl. Sawo No. 22, Linggang Bigung',
-                'gambar' => 'images/telur_kampung.jpg',
-                'supplier' => 'Peternak',
-                'total_produk' => 2  // Ada 2 produk total
-            ],
-            [
-                'tanggal' => '2025-10-23',
-                'produk' => 'Sayur Bayam Segar',
-                'jumlah' => '3 ikat',
-                'ongkir' => 'Rp 4.000',
-                'alamat' => 'Jl. Kenanga No. 9, Sekolaq Darat',
-                'gambar' => 'images/bayam.jpeg',
-                'supplier' => 'Petani',
-                'total_produk' => 1  // Hanya 1 produk
-            ],
-            [
-                'tanggal' => '2025-10-22',
-                'produk' => 'Ikan Gabus Segar',
-                'jumlah' => '2 ekor (1kg)',
-                'ongkir' => 'Rp 12.000',
-                'alamat' => 'Jl. Mawar Putih No. 5, Melak',
-                'gambar' => 'images/ikan.jpeg',
-                'supplier' => 'Nelayan',
-                'total_produk' => 4  // Ada 4 produk total
-            ],
-        ]
-    ]);
-});
+
 
 Route::get('/detail_rusak', function () {
     return view('Staff_Produk/detailRusak', [
@@ -2817,192 +2956,192 @@ Route::get('/purchasing/riwayat_pesanan', function () {
     ]);
 });
 
-Route::get('/purchasing/kelola_ongkir', function () {
-    return view('Staff_Purchasing/ongkirDaerah');
-});
+// Route::get('/purchasing/kelola_ongkir', function () {
+//     return view('Staff_Purchasing/ongkirDaerah');
+// });
 
-Route::get('/super_admin/dashboard', function () {
-    return view('Super_Admin/dashboard');
-});
+// Route::get('/super_admin/dashboard', function () {
+//     return view('Super_Admin/dashboard');
+// });
 
-Route::get('/super_admin/manajemen_user', function () {
-    return view('Super_Admin/manajemenUser', [
-        'users' => [
-        // Super Admin (1)
-        [
-            'id' => 1,
-            'nama_lengkap' => 'Admin Utama',
-            'email' => 'admin@super.com',
-            'no_telpon' => '081234567890',
-            'role' => 'Super Admin',
-            'aktif' => 'Aktif'
-        ],
+// Route::get('/super_admin/manajemen_user', function () {
+//     return view('Super_Admin/manajemenUser', [
+//         'users' => [
+//         // Super Admin (1)
+//         [
+//             'id' => 1,
+//             'nama_lengkap' => 'Admin Utama',
+//             'email' => 'admin@super.com',
+//             'no_telpon' => '081234567890',
+//             'role' => 'Super Admin',
+//             'aktif' => 'Aktif'
+//         ],
 
-        // Staff Purchasing (2)
-        [
-            'id' => 2,
-            'nama_lengkap' => 'Staff Purchasing 1',
-            'email' => 'staff1@purchasing.com',
-            'no_telpon' => '081234567891',
-            'role' => 'Staff Purchasing',
-            'aktif' => 'Aktif'
-        ],
-        [
-            'id' => 3,
-            'nama_lengkap' => 'Staff Purchasing 2',
-            'email' => 'staff2@purchasing.com',
-            'no_telpon' => '081234567892',
-            'role' => 'Staff Purchasing',
-            'aktif' => 'Aktif'
-        ],
+//         // Staff Purchasing (2)
+//         [
+//             'id' => 2,
+//             'nama_lengkap' => 'Staff Purchasing 1',
+//             'email' => 'staff1@purchasing.com',
+//             'no_telpon' => '081234567891',
+//             'role' => 'Staff Purchasing',
+//             'aktif' => 'Aktif'
+//         ],
+//         [
+//             'id' => 3,
+//             'nama_lengkap' => 'Staff Purchasing 2',
+//             'email' => 'staff2@purchasing.com',
+//             'no_telpon' => '081234567892',
+//             'role' => 'Staff Purchasing',
+//             'aktif' => 'Aktif'
+//         ],
 
-        // Staff Produk (2)
-        [
-            'id' => 4,
-            'nama_lengkap' => 'Staff Produk 1',
-            'email' => 'staff1@produk.com',
-            'no_telpon' => '081234567893',
-            'role' => 'Staff Produk',
-            'aktif' => 'Aktif'
-        ],
-        [
-            'id' => 5,
-            'nama_lengkap' => 'Staff Produk 2',
-            'email' => 'staff2@produk.com',
-            'no_telpon' => '081234567894',
-            'role' => 'Staff Produk',
-            'aktif' => 'Tidak Aktif'
-        ],
+//         // Staff Produk (2)
+//         [
+//             'id' => 4,
+//             'nama_lengkap' => 'Staff Produk 1',
+//             'email' => 'staff1@produk.com',
+//             'no_telpon' => '081234567893',
+//             'role' => 'Staff Produk',
+//             'aktif' => 'Aktif'
+//         ],
+//         [
+//             'id' => 5,
+//             'nama_lengkap' => 'Staff Produk 2',
+//             'email' => 'staff2@produk.com',
+//             'no_telpon' => '081234567894',
+//             'role' => 'Staff Produk',
+//             'aktif' => 'Tidak Aktif'
+//         ],
 
-        // Kurir (5)
-        [
-            'id' => 6,
-            'nama_lengkap' => 'Kurir Ahmad',
-            'email' => 'kurir1@kurir.com',
-            'no_telpon' => '081234567895',
-            'role' => 'Kurir',
-            'aktif' => 'Aktif'
-        ],
-        [
-            'id' => 7,
-            'nama_lengkap' => 'Kurir Siti',
-            'email' => 'kurir2@kurir.com',
-            'no_telpon' => '081234567896',
-            'role' => 'Kurir',
-            'aktif' => 'Aktif'
-        ],
-        [
-            'id' => 8,
-            'nama_lengkap' => 'Kurir Budi',
-            'email' => 'kurir3@kurir.com',
-            'no_telpon' => '081234567897',
-            'role' => 'Kurir',
-            'aktif' => 'Tidak Aktif'
-        ],
-        [
-            'id' => 9,
-            'nama_lengkap' => 'Kurir Indah',
-            'email' => 'kurir4@kurir.com',
-            'no_telpon' => '081234567898',
-            'role' => 'Kurir',
-            'aktif' => 'Aktif'
-        ],
-        [
-            'id' => 10,
-            'nama_lengkap' => 'Kurir Rudi',
-            'email' => 'kurir5@kurir.com',
-            'no_telpon' => '081234567899',
-            'role' => 'Kurir',
-            'aktif' => 'Aktif'
-        ],
+//         // Kurir (5)
+//         [
+//             'id' => 6,
+//             'nama_lengkap' => 'Kurir Ahmad',
+//             'email' => 'kurir1@kurir.com',
+//             'no_telpon' => '081234567895',
+//             'role' => 'Kurir',
+//             'aktif' => 'Aktif'
+//         ],
+//         [
+//             'id' => 7,
+//             'nama_lengkap' => 'Kurir Siti',
+//             'email' => 'kurir2@kurir.com',
+//             'no_telpon' => '081234567896',
+//             'role' => 'Kurir',
+//             'aktif' => 'Aktif'
+//         ],
+//         [
+//             'id' => 8,
+//             'nama_lengkap' => 'Kurir Budi',
+//             'email' => 'kurir3@kurir.com',
+//             'no_telpon' => '081234567897',
+//             'role' => 'Kurir',
+//             'aktif' => 'Tidak Aktif'
+//         ],
+//         [
+//             'id' => 9,
+//             'nama_lengkap' => 'Kurir Indah',
+//             'email' => 'kurir4@kurir.com',
+//             'no_telpon' => '081234567898',
+//             'role' => 'Kurir',
+//             'aktif' => 'Aktif'
+//         ],
+//         [
+//             'id' => 10,
+//             'nama_lengkap' => 'Kurir Rudi',
+//             'email' => 'kurir5@kurir.com',
+//             'no_telpon' => '081234567899',
+//             'role' => 'Kurir',
+//             'aktif' => 'Aktif'
+//         ],
 
-        // User/Konsumen (5)
-        [
-            'id' => 11,
-            'nama_lengkap' => 'User Konsumen 1',
-            'email' => 'user1@konsumen.com',
-            'no_telpon' => '081234567900',
-            'role' => 'User',
-            'aktif' => 'Aktif'
-        ],
-        [
-            'id' => 12,
-            'nama_lengkap' => 'User Konsumen 2',
-            'email' => 'user2@konsumen.com',
-            'no_telpon' => '081234567901',
-            'role' => 'User',
-            'aktif' => 'Aktif'
-        ],
-        [
-            'id' => 13,
-            'nama_lengkap' => 'User Konsumen 3',
-            'email' => 'user3@konsumen.com',
-            'no_telpon' => '081234567902',
-            'role' => 'User',
-            'aktif' => 'Tidak Aktif'
-        ],
-        [
-            'id' => 14,
-            'nama_lengkap' => 'User Konsumen 4',
-            'email' => 'user4@konsumen.com',
-            'no_telpon' => '081234567903',
-            'role' => 'User',
-            'aktif' => 'Aktif'
-        ],
-        [
-            'id' => 15,
-            'nama_lengkap' => 'User Konsumen 5',
-            'email' => 'user5@konsumen.com',
-            'no_telpon' => '081234567904',
-            'role' => 'User',
-            'aktif' => 'Aktif'
-        ],
-        ]
-    ]);
-});
+//         // User/Konsumen (5)
+//         [
+//             'id' => 11,
+//             'nama_lengkap' => 'User Konsumen 1',
+//             'email' => 'user1@konsumen.com',
+//             'no_telpon' => '081234567900',
+//             'role' => 'User',
+//             'aktif' => 'Aktif'
+//         ],
+//         [
+//             'id' => 12,
+//             'nama_lengkap' => 'User Konsumen 2',
+//             'email' => 'user2@konsumen.com',
+//             'no_telpon' => '081234567901',
+//             'role' => 'User',
+//             'aktif' => 'Aktif'
+//         ],
+//         [
+//             'id' => 13,
+//             'nama_lengkap' => 'User Konsumen 3',
+//             'email' => 'user3@konsumen.com',
+//             'no_telpon' => '081234567902',
+//             'role' => 'User',
+//             'aktif' => 'Tidak Aktif'
+//         ],
+//         [
+//             'id' => 14,
+//             'nama_lengkap' => 'User Konsumen 4',
+//             'email' => 'user4@konsumen.com',
+//             'no_telpon' => '081234567903',
+//             'role' => 'User',
+//             'aktif' => 'Aktif'
+//         ],
+//         [
+//             'id' => 15,
+//             'nama_lengkap' => 'User Konsumen 5',
+//             'email' => 'user5@konsumen.com',
+//             'no_telpon' => '081234567904',
+//             'role' => 'User',
+//             'aktif' => 'Aktif'
+//         ],
+//         ]
+//     ]);
+// });
 
-Route::get('/super_admin/manajemen_pengurus', function () {
-    return view('Super_Admin/manajemenPengurus', [
-        'kepengurusan' => [
-            [
-                'gambar' => 'images/gambar_1.jpg',
-                'nama' => 'Liam Vandenberg',
-                'jabatan' => 'Kepala Dinas',
-                'deskripsi' => 'Memimpin dan mengarahkan seluruh kegiatan strategis dinas.',
-            ],
-            [
-                'gambar' => 'images/gambar_2.jpg',
-                'nama' => 'Sophia Delacroix',
-                'jabatan' => 'Sekretaris',
-                'deskripsi' => 'Mengelola dokumen dan koordinasi administrasi internal.',
-            ],
-            [
-                'gambar' => 'images/gambar_3.jpg',
-                'nama' => 'Matteo Alvarez',
-                'jabatan' => 'Kabid Ketersediaan Pangan',
-                'deskripsi' => 'Mengatur ketersediaan logistik pangan secara tepat waktu.',
-            ],
-            [
-                'gambar' => 'images/gambar_4.jpg',
-                'nama' => 'Amelia Rothschild',
-                'jabatan' => 'Analis Pangan',
-                'deskripsi' => 'Menganalisis data untuk perencanaan dan evaluasi pangan.',
-            ],
-            [
-                'gambar' => 'images/gambar_5.jpg',
-                'nama' => 'Noah Leclerc',
-                'jabatan' => 'Staff IT & Administrasi',
-                'deskripsi' => 'Mengelola sistem digital dan data administrasi dinas.',
-            ],
-            [
-                'gambar' => 'images/gambar_6.jpg',
-                'nama' => 'Elena Novikova',
-                'jabatan' => 'Kabid Konsumsi dan Keamanan Pangan',
-                'deskripsi' => 'Menjamin keamanan dan kualitas pangan bagi konsumen.',
-            ],
-        ]
-    ]);
-});
+// Route::get('/super_admin/manajemen_pengurus', function () {
+//     return view('Super_Admin/manajemenPengurus', [
+//         'kepengurusan' => [
+//             [
+//                 'gambar' => 'images/gambar_1.jpg',
+//                 'nama' => 'Liam Vandenberg',
+//                 'jabatan' => 'Kepala Dinas',
+//                 'deskripsi' => 'Memimpin dan mengarahkan seluruh kegiatan strategis dinas.',
+//             ],
+//             [
+//                 'gambar' => 'images/gambar_2.jpg',
+//                 'nama' => 'Sophia Delacroix',
+//                 'jabatan' => 'Sekretaris',
+//                 'deskripsi' => 'Mengelola dokumen dan koordinasi administrasi internal.',
+//             ],
+//             [
+//                 'gambar' => 'images/gambar_3.jpg',
+//                 'nama' => 'Matteo Alvarez',
+//                 'jabatan' => 'Kabid Ketersediaan Pangan',
+//                 'deskripsi' => 'Mengatur ketersediaan logistik pangan secara tepat waktu.',
+//             ],
+//             [
+//                 'gambar' => 'images/gambar_4.jpg',
+//                 'nama' => 'Amelia Rothschild',
+//                 'jabatan' => 'Analis Pangan',
+//                 'deskripsi' => 'Menganalisis data untuk perencanaan dan evaluasi pangan.',
+//             ],
+//             [
+//                 'gambar' => 'images/gambar_5.jpg',
+//                 'nama' => 'Noah Leclerc',
+//                 'jabatan' => 'Staff IT & Administrasi',
+//                 'deskripsi' => 'Mengelola sistem digital dan data administrasi dinas.',
+//             ],
+//             [
+//                 'gambar' => 'images/gambar_6.jpg',
+//                 'nama' => 'Elena Novikova',
+//                 'jabatan' => 'Kabid Konsumsi dan Keamanan Pangan',
+//                 'deskripsi' => 'Menjamin keamanan dan kualitas pangan bagi konsumen.',
+//             ],
+//         ]
+//     ]);
+// });
 
 Route::get('/super_admin/manajemen_kurir', function () {
     return view('Super_Admin/manajemenKurir',[

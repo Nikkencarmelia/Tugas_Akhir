@@ -5,16 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Kecamatan extends Model
+class Kurir extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'nama_kecamatan',
-        'ongkir_minimal',
+        'id_user',
+        'jenis_kendaraan',
+        'status_antar',
     ];
 
-    public function kelurahan(){
-        return $this->hasMany(Kelurahan::class,'id_kecamatan');
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user');
     }
 }

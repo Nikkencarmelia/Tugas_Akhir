@@ -21,6 +21,13 @@ class Batch extends Model
         'keterangan_harga',
     ];
 
+    protected $casts = [
+        'tgl_masuk' => 'date',
+        'tgl_kadaluwarsa' => 'date',
+        'tgl_perubahan_harga' => 'date',
+    ];
+
+
     public function produk()
     {
         return $this->belongsTo(Produk::class, 'id_produk');

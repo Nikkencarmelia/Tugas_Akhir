@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>Arsip Produk</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
@@ -90,33 +91,32 @@
             <h1 class="dashboard-title"><i class="bi bi-archive-fill"></i> Arsip Produk</h1>
 
             <div class="d-flex gap-2 flex-wrap align-items-center">
-
                 <p class="mb-0 fw-bold text-muted d-flex align-items-center me-2">
                     Status Tampil: <span class="badge-status badge-diarsipkan ms-2">Diarsipkan</span>
                 </p>
 
-                <select id="filter-supplier" class="form-select" style="width: 150px;">
-                    <option value="all">Semua Supplier</option>
-                    {{-- Opsi akan diisi oleh JavaScript dari data produk --}}
-                </select>
+                <form method="GET" id="filter-form" class="d-flex gap-2">
+                    <select name="supplier" id="filter-supplier" class="form-select" style="width: 150px;">
+                        <option value="all">Semua Supplier</option>
+                        @foreach($suppliers as $supplier)
+                            <option value="{{ $supplier }}" {{ request('supplier') == $supplier ? 'selected' : '' }}>{{ $supplier }}</option>
+                        @endforeach
+                    </select>
 
-                <select id="filter-kategori" class="form-select" style="width: 150px;">
-                    <option value="all">Semua Kategori</option>
-                    {{-- Opsi akan diisi oleh JavaScript dari data produk --}}
-                </select>
+                    <select name="kategori" id="filter-kategori" class="form-select" style="width: 150px;">
+                        <option value="all">Semua Kategori</option>
+                        @foreach($kategoris as $kategori)
+                            <option value="{{ $kategori }}" {{ request('kategori') == $kategori ? 'selected' : '' }}>{{ $kategori }}</option>
+                        @endforeach
+                    </select>
 
-                <form id="search-form" class="d-flex" role="search" style="width: 300px;">
-                    <div class="input-group search-wrapper w-100">
-                        <input type="text" id="search-input" class="form-control" placeholder="Cari ID, nama, deskripsi..." aria-label="Search">
+                    <div class="input-group search-wrapper" style="width: 300px;">
+                        <input type="text" name="search" id="search-input" class="form-control" placeholder="Cari ID, nama, deskripsi..." value="{{ request('search') }}" aria-label="Search">
                         <button class="input-group-text border-start-0" type="submit">
                             <i class="bi bi-search text-muted"></i>
                         </button>
                     </div>
                 </form>
-
-                <a href="/data_produk" class="btn-add" title="Kembali ke Daftar Produk Aktif">
-                    <i class="bi bi-arrow-left"></i> Kembali
-                </a>
             </div>
         </div>
 
@@ -138,7 +138,46 @@
                         </tr>
                     </thead>
                     <tbody id="product-table-body">
-                        {{-- Konten diisi oleh JavaScript --}}
+                        @forelse($produk as $p)
+                            <tr>
+                                <td class="text-center">
+                                    <input type="checkbox" class="product-checkbox" data-id="{{ $p->id }}">
+                                </td>
+                                <td>{{ $p->id }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="img-container">
+                                            <img src="{{ asset('storage/' . $p->gambar) }}" alt="{{ $p->nama_produk }}">
+                                            <span class="badge-supplier">{{ $p->supplier->nama_supplier ?? '-' }}</span>
+                                        </div>
+                                        <div class="product-info">
+                                            <span>{{ $p->nama_produk }}</span>
+                                            <small>{{ Str::limit($p->deskripsi, 40) }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge-kategori">{{ $p->kategori->nama_kategori ?? '-' }}</span></td>
+                                <td>
+                                    {{ $p->jumlah_satuan ?? '-' }} {{ $p->satuan->nama_satuan ?? '' }}
+                                </td>
+                                <td>
+                                    <button class="btn-action btn-detail" data-bs-toggle="modal" data-bs-target="#detailModal"
+                                            data-produk='@json($p)' title="Lihat Detail">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <a href="{{ route('produk.batch.index', $p->id) }}" class="btn-action btn-batch" title="Kelola Batch">
+                                        <i class="bi bi-layers"></i>
+                                    </a>
+                                    <button class="btn-pulihkan btn btn-sm btn-outline-success" data-id="{{ $p->id }}" data-name="{{ $p->nama_produk }}" title="Pulihkan Produk ke Ditampilkan">
+                                        <i class="bi bi-upload"></i> Tampilkan Arsip
+                                    </button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">Tidak ada produk diarsipkan yang sesuai dengan kriteria filter/pencarian.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -153,12 +192,15 @@
                     <i class="bi bi-arrow-clockwise"></i> Tampilkan yang Dipilih
                 </button>
                 <button id="btn-restore-all" class="btn btn-restore-all">
-                    <i class="bi bi-upload"></i> Tampilkan Semua Arsip
+                    <i class="bi bi-upload"></i> Tampilkan Semua Arsip ({{ $produk->total() }})
                 </button>
             </div>
         </div>
+
         <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-center mt-3"></ul>
+            <div class="d-flex justify-content-center mt-3">
+                {{ $produk->appends(request()->query())->links() }}
+            </div>
         </nav>
     </div>
 
@@ -180,16 +222,24 @@
                             <p id="detailDeskripsi" class="text-muted"></p>
                             <div class="row">
                                 <div class="col-6">
-                                    <p class="mb-1"><strong>Supplier:</strong> <span id="detailSupplier" class="badge-status"></span></p>
+                                    <p class="mb-1"><strong>Supplier:</strong> <span id="detailSupplier" class="badge-kategori"></span></p>
                                     <p class="mb-1"><strong>Satuan:</strong> <span id="detailSatuan"></span></p>
                                 </div>
                                 <div class="col-6">
                                     <p class="mb-1"><strong>Kategori:</strong> <span id="detailKategori" class="badge-kategori"></span></p>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <p class="mb-1"><strong>Jumlah Batch:</strong> <span id="detailJumlahBatch" class="fw-bold text-primary"></span></p>
+                                </div>
+                            </div>
                             <hr>
                             <p class="mb-1">
                                 <strong>Status Tampil:</strong> <span id="detailStatusTampil" class="badge-status"></span>
+                            </p>
+                            <p>
+                                <strong>Status Stok:</strong> <span id="detailStatusStok" class="badge-status"></span>
                             </p>
                         </div>
                     </div>
@@ -198,94 +248,56 @@
         </div>
     </div>
 
+    {{-- MODAL KONFIRMASI --}}
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">Konfirmasi Aksi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmMessage">Apakah Anda yakin?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-success" id="confirmYes">Tampilkan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-    // --- KONFIGURASI DAN DATA ---
-    const tableBody = document.getElementById('product-table-body');
+    // CSRF Token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-    // PENTING: Mengambil data dari PHP/Laravel yang disalurkan melalui Blade
-    // Pastikan variabel '$produk' dikirim dari Controller/web.php
-    const produkData = @json($produk);
-    const perPage = 5;
-    let currentPage = 1;
-
-    // Elemen aksi massal baru
+    // Elemen
     const checkAll = document.getElementById('check-all-products');
     const btnRestoreSelected = document.getElementById('btn-restore-selected');
     const btnRestoreAll = document.getElementById('btn-restore-all');
     const selectionStatus = document.getElementById('selection-status');
+    const tableBody = document.getElementById('product-table-body');
+    const filterForm = document.getElementById('filter-form');
+    const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    const confirmMessageEl = document.getElementById('confirmMessage');
+    const confirmYesBtn = document.getElementById('confirmYes');
 
-    // Variabel untuk menyimpan ID produk yang dipilih (di seluruh halaman)
     let selectedProductIds = new Set();
+    let currentConfirmCallback = null;
 
-    // Elemen filter dan search
-    const filterSupplier = document.getElementById('filter-supplier');
-    const filterKategori = document.getElementById('filter-kategori');
+    // Live search debounce
+    let searchTimeout;
     const searchInput = document.getElementById('search-input');
-    const searchForm = document.getElementById('search-form');
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            filterForm.submit();
+        }, 500); // Debounce 500ms
+    });
 
-    let filteredData = [];
-
-    // ----------------------------------------------------------------------
-    // --- FUNGSI UTAMA UNTUK FILTER, SEARCH, DAN RENDER ---
-    // ----------------------------------------------------------------------
-
-    function applyFiltersAndSearch() {
-        currentPage = 1;
-        // 1. Filter default: Hanya produk yang status_tampil = 'Diarsipkan'
-        let dataToProcess = produkData.filter(p => p.status_tampil === 'Diarsipkan');
-
-        const supplierVal = filterSupplier.value;
-        const kategoriVal = filterKategori.value;
-        const searchTerm = searchInput.value.toLowerCase().trim();
-
-        dataToProcess = dataToProcess.filter(p => {
-            const matchSupplier = supplierVal === 'all' || p.supplier === supplierVal;
-            const matchKategori = kategoriVal === 'all' || p.kategori === kategoriVal;
-
-            const matchSearch = p.id.toString().toLowerCase().includes(searchTerm) ||
-                                p.nama_produk.toLowerCase().includes(searchTerm) ||
-                                p.deskripsi.toLowerCase().includes(searchTerm);
-
-            return matchSupplier && matchKategori && matchSearch;
-        });
-
-        filteredData = dataToProcess;
-        renderTable(currentPage);
-        updateActionBar();
-    }
-
-    function populateSupplierFilter() {
-        // Ambil semua supplier dari SEMUA data
-        const suppliers = [...new Set(produkData.map(p => p.supplier))].sort();
-        filterSupplier.innerHTML = '<option value="all">Semua Supplier</option>';
-
-        suppliers.forEach(supplier => {
-            if (supplier) {
-                const option = document.createElement('option');
-                option.value = supplier;
-                option.textContent = supplier;
-                filterSupplier.appendChild(option);
-            }
-        });
-    }
-
-    function populateKategoriFilter() {
-        // Ambil semua kategori dari SEMUA data
-        const categories = [...new Set(produkData.map(p => p.kategori))].sort();
-        filterKategori.innerHTML = '<option value="all">Semua Kategori</option>';
-
-        categories.forEach(kategori => {
-            if (kategori) {
-                const option = document.createElement('option');
-                option.value = kategori;
-                option.textContent = kategori;
-                filterKategori.appendChild(option);
-            }
-        });
-    }
-
+    // Fungsi colorize badges dinamis
     function colorizeSingle(badgeEl, text) {
         if (!badgeEl || !text) return;
         const colorPairs = [
@@ -311,282 +323,175 @@
         });
     }
 
-    function renderTable(page = 1) {
-        tableBody.innerHTML = '';
-        const totalItems = filteredData.length;
-        const totalPages = Math.ceil(totalItems / perPage);
-        const start = (page - 1) * perPage;
-        const end = start + perPage;
-        const items = filteredData.slice(start, end);
-
-        if (items.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">Tidak ada produk diarsipkan yang sesuai dengan kriteria filter/pencarian.</td></tr>`;
-        }
-
-        items.forEach((p) => {
-            const isChecked = selectedProductIds.has(p.id);
-
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="text-center">
-                    <input type="checkbox" class="product-checkbox" data-id="${p.id}" ${isChecked ? 'checked' : ''}>
-                </td>
-                <td>${p.id}</td>
-                <td>
-                    <div class="d-flex align-items-center">
-                        <div class="img-container">
-                            <img src="${p.gambar}" alt="${p.nama_produk}">
-                            <span class="badge-supplier">${p.supplier}</span>
-                        </div>
-                        <div class="product-info">
-                            <span>${p.nama_produk}</span>
-                            <small>${p.deskripsi.substring(0, 40)}${p.deskripsi.length > 40 ? '...' : ''}</small>
-                        </div>
-                    </div>
-                </td>
-                <td><span class="badge-kategori">${p.kategori}</span></td>
-                <td>${p.satuan_berat}</td>
-                <td>
-                    <button class="btn-action btn-detail" data-id="${p.id}" title="Lihat Detail"><i class="bi bi-eye"></i></button>
-                    <a href="/batch_stok" class="btn-action btn-batch"><i class="bi bi-layers"></i></a>
-                    <button class="btn-pulihkan btn btn-sm btn-outline-success" data-id="${p.id}" data-name="${p.nama_produk}" title="Pulihkan Produk ke Ditampilkan">
-                        <i class="bi bi-upload"></i> Tampilkan Arsip
-                    </button>
-                </td>
-            `;
-            tableBody.appendChild(row);
-        });
-
-        colorizeBadges();
-        renderPagination(totalPages);
-
-        // Sinkronisasi status 'Pilih Semua'
-        const displayedIds = items.map(p => p.id);
-        const allChecked = displayedIds.length > 0 && displayedIds.every(id => selectedProductIds.has(id));
-        checkAll.checked = allChecked;
-
-        updateActionBar();
-    }
-
-    // ----------------------------------------------------------------------
-    // --- FUNGSI SELEKSI & AKSI MASSAL BARU ---
-    // ----------------------------------------------------------------------
-
+    // Update action bar
     function updateActionBar() {
         const count = selectedProductIds.size;
         selectionStatus.textContent = `${count} Produk dipilih`;
         btnRestoreSelected.disabled = count === 0;
-
-        // Tampilkan jumlah total produk diarsipkan di tombol "Tampilkan Semua"
-        btnRestoreAll.innerHTML = `<i class="bi bi-upload"></i> Tampilkan Semua Arsip (${filteredData.length})`;
+        btnRestoreAll.innerHTML = `<i class="bi bi-upload"></i> Tampilkan Semua Arsip ({{ $produk->total() }})`;
     }
 
-    // Handler untuk checkbox individu
+    // Checkbox handlers
     function handleCheckboxChange(e) {
         const id = parseInt(e.target.dataset.id);
-        if (e.target.checked) {
-            selectedProductIds.add(id);
-        } else {
-            selectedProductIds.delete(id);
-        }
+        if (e.target.checked) selectedProductIds.add(id);
+        else selectedProductIds.delete(id);
         updateActionBar();
-
-        // Perbarui status 'Pilih Semua' di header
-        const displayedIds = filteredData.slice((currentPage - 1) * perPage, currentPage * perPage).map(p => p.id);
-        const allChecked = displayedIds.length > 0 && displayedIds.every(id => selectedProductIds.has(id));
-        checkAll.checked = allChecked;
+        syncCheckAll();
     }
 
-    // Handler untuk checkbox 'Pilih Semua' di header
     function handleCheckAllChange(e) {
         const isChecked = e.target.checked;
-        const checkboxes = document.querySelectorAll('.product-checkbox');
-
-        checkboxes.forEach(cb => {
+        document.querySelectorAll('.product-checkbox').forEach(cb => {
             cb.checked = isChecked;
             const id = parseInt(cb.dataset.id);
-            if (isChecked) {
-                selectedProductIds.add(id);
-            } else {
-                selectedProductIds.delete(id);
-            }
+            if (isChecked) selectedProductIds.add(id);
+            else selectedProductIds.delete(id);
         });
         updateActionBar();
     }
 
-
-    // Aksi Massal: Tampilkan Produk yang Dipilih
-    function restoreSelectedProducts() {
-        const ids = Array.from(selectedProductIds);
-        if (ids.length === 0) return;
-
-        if (confirm(`SIMULASI: Anda akan memulihkan ${ids.length} produk terpilih ke status 'Ditampilkan'. Lanjutkan?`)) {
-            console.log(`[SIMULASI] Mengirim permintaan PULIHKAN massal untuk ID: ${ids.join(', ')}`);
-
-            // SIMULASI BERHASIL: Ubah status di data lokal
-            ids.forEach(id => {
-                const produk = produkData.find(p => p.id === id);
-                if (produk) {
-                    produk.status_tampil = 'Ditampilkan';
-                }
-            });
-
-            // Kosongkan seleksi dan refresh
-            selectedProductIds.clear();
-            checkAll.checked = false;
-            applyFiltersAndSearch();
-            alert(`${ids.length} produk berhasil dipulihkan dan kini Ditampilkan.`);
-        }
+    function syncCheckAll() {
+        const checkboxes = document.querySelectorAll('.product-checkbox');
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        checkAll.checked = allChecked && checkboxes.length > 0;
     }
 
-    // Aksi Massal: Tampilkan Semua Produk Arsip
-    function restoreAllProducts() {
-        const totalCount = filteredData.length;
-        if (totalCount === 0) return;
-
-        if (confirm(`SIMULASI: Anda akan memulihkan SEMUA ${totalCount} produk di arsip ke status 'Ditampilkan'. Lanjutkan?`)) {
-            console.log(`[SIMULASI] Mengirim permintaan PULIHKAN SEMUA (${totalCount}) produk arsip.`);
-
-            // SIMULASI BERHASIL: Ubah status di data lokal
-            filteredData.forEach(p => {
-                const produk = produkData.find(item => item.id === p.id);
-                if (produk) {
-                    produk.status_tampil = 'Ditampilkan';
-                }
-            });
-
-            // Kosongkan seleksi dan refresh
-            selectedProductIds.clear();
-            checkAll.checked = false;
-            applyFiltersAndSearch();
-            alert(`${totalCount} produk berhasil dipulihkan semua dan kini Ditampilkan.`);
-        }
-    }
-
-    // ----------------------------------------------------------------------
-    // --- LOGIKA PENDUKUNG (COLORIZE & PAGINATION) ---
-    // ----------------------------------------------------------------------
-
-    function renderPagination(totalPages) {
-        const pagination = document.querySelector('.pagination');
-        pagination.innerHTML = '';
-
-        const prev = document.createElement('li');
-        prev.className = 'page-item' + (currentPage === 1 ? ' disabled' : '');
-        prev.innerHTML = `<a class="page-link" href="#" aria-label="Previous">«</a>`;
-        prev.addEventListener('click', e => {
-            e.preventDefault();
-            if(currentPage > 1) {
-                currentPage--;
-                renderTable(currentPage);
-                window.scrollTo(0, 0);
+    // Fetch helper
+    async function sendRestoreRequest(url, data = null) {
+        try {
+            const options = {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: data ? JSON.stringify(data) : null
+            };
+            const response = await fetch(url, options);
+            if (!response.ok) throw new Error('Gagal');
+            const result = await response.json();
+            if (result.success) {
+                location.reload();
+                return true;
+            } else {
+                alert(result.message || 'Gagal memulihkan.');
+                return false;
             }
-        });
-        pagination.appendChild(prev);
-
-        for(let i = 1; i <= totalPages; i++){
-            const li = document.createElement('li');
-            li.className = 'page-item' + (i === currentPage ? ' active' : '');
-            li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-            li.addEventListener('click', e => {
-                e.preventDefault();
-                currentPage = i;
-                renderTable(currentPage);
-                window.scrollTo(0, 0);
-            });
-            pagination.appendChild(li);
-        }
-
-        const next = document.createElement('li');
-        next.className = 'page-item' + (currentPage === totalPages ? ' disabled' : '');
-        next.innerHTML = `<a class="page-link" href="#" aria-label="Next">»</a>`;
-        next.addEventListener('click', e => {
-            e.preventDefault();
-            if(currentPage < totalPages) {
-                currentPage++;
-                renderTable(currentPage);
-                window.scrollTo(0, 0);
-            }
-        });
-        pagination.appendChild(next);
-    }
-
-    function handleRestore(productId, productName) {
-        if (confirm(`SIMULASI: Pulihkan produk "${productName}" (ID: ${productId}) dan kembalikan ke status 'Ditampilkan'?`)) {
-            console.log(`[SIMULASI] Mengirim permintaan PULIHKAN produk ID: ${productId}`);
-
-            const index = produkData.findIndex(p => p.id == productId);
-            if (index !== -1) {
-                produkData[index].status_tampil = 'Ditampilkan';
-                selectedProductIds.delete(productId);
-            }
-
-            applyFiltersAndSearch();
-            alert(`Produk "${productName}" berhasil dipulihkan dan kini Ditampilkan.`);
+        } catch (error) {
+            alert('Kesalahan koneksi.');
+            return false;
         }
     }
 
+    // Fungsi konfirmasi modal
+    function showConfirmModal(message, callback) {
+        confirmMessageEl.textContent = message;
+        currentConfirmCallback = callback;
+        confirmModal.show();
+    }
 
-    // ----------------------------------------------------------------------
-    // --- EVENT LISTENERS (FINAL) ---
-    // ----------------------------------------------------------------------
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // 1. Inisialisasi Filter & Render Awal
-        populateSupplierFilter();
-        populateKategoriFilter();
-        filterSupplier.addEventListener('change', applyFiltersAndSearch);
-        filterKategori.addEventListener('change', applyFiltersAndSearch);
-        searchForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            applyFiltersAndSearch();
-        });
-        applyFiltersAndSearch();
-
-        // 2. Event Listener untuk Checkbox di Header
-        checkAll.addEventListener('change', handleCheckAllChange);
-
-        // 3. Event Listener untuk Aksi Massal
-        btnRestoreSelected.addEventListener('click', restoreSelectedProducts);
-        btnRestoreAll.addEventListener('click', restoreAllProducts);
+    // Event listener untuk tombol konfirmasi
+    confirmYesBtn.addEventListener('click', () => {
+        if (currentConfirmCallback) {
+            currentConfirmCallback();
+        }
+        confirmModal.hide();
+        currentConfirmCallback = null;
     });
 
+    // Restore actions dengan modal
+    async function restoreSelectedProducts() {
+        const ids = Array.from(selectedProductIds);
+        if (ids.length === 0) return;
+        showConfirmModal(`Anda akan memulihkan ${ids.length} produk terpilih ke status 'Ditampilkan'. Lanjutkan?`, async () => {
+            await sendRestoreRequest('/arsip-produk/restore-selected', { ids });
+        });
+    }
 
-    // Event listener untuk tombol Aksi di tabel (Detail, Pulihkan Individu, Checkbox)
-    tableBody.addEventListener('click', function(e){
-        const restoreBtn = e.target.closest('.btn-pulihkan');
-        const detailBtn = e.target.closest('.btn-detail');
-        const checkbox = e.target.closest('.product-checkbox');
+    async function restoreAllProducts() {
+        const total = {{ $produk->total() }};
+        showConfirmModal(`Anda akan memulihkan SEMUA ${total} produk di arsip ke status 'Ditampilkan'. Lanjutkan?`, async () => {
+            const ids = @json($produk->pluck('id')->toArray());
+            await sendRestoreRequest('/arsip-produk/restore-all', { ids });
+        });
+    }
 
-        if (restoreBtn) {
-            const productId = parseInt(restoreBtn.dataset.id);
-            const productName = restoreBtn.dataset.name;
-            handleRestore(productId, productName);
-        } else if (checkbox) {
-            handleCheckboxChange(e);
-        } else if (detailBtn) {
-            const productId = detailBtn.dataset.id;
-            const produk = produkData.find(p => p.id == productId);
-            if (!produk) return;
+    async function handleRestore(id, name) {
+        showConfirmModal(`Apakah anda yakin produk "${name}" akan dikembalikan ke status 'Ditampilkan'?`, async () => {
+            await sendRestoreRequest(`/arsip-produk/restore/${id}`);
+        });
+    }
 
-            // Isi data Modal
-            document.getElementById('detailGambar').src = produk.gambar;
-            document.getElementById('detailNama').textContent = produk.nama_produk;
-            document.getElementById('detailDeskripsi').textContent = produk.deskripsi;
-            document.getElementById('detailSupplier').textContent = produk.supplier ?? 'Tidak ada';
-            document.getElementById('detailSatuan').textContent = produk.satuan_berat;
+    /* ================= DETAIL MODAL ================= */
+    const detailModal = document.getElementById('detailModal');
+    detailModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const produkData = JSON.parse(button.getAttribute('data-produk'));
 
-            const detailKategoriEl = document.getElementById('detailKategori');
-            detailKategoriEl.textContent = produk.kategori;
-            colorizeSingle(detailKategoriEl, produk.kategori.toLowerCase());
+        document.getElementById('detailGambar').src =
+            produkData.gambar ? `/storage/${produkData.gambar}` : '';
+        document.getElementById('detailNama').textContent =
+            produkData.nama_produk ?? '-';
+        document.getElementById('detailDeskripsi').textContent =
+            produkData.deskripsi ?? '-';
 
-            const statusTampilEl = document.getElementById('detailStatusTampil');
-            statusTampilEl.textContent = produk.status_tampil;
-            statusTampilEl.className = 'badge-status badge-' + produk.status_tampil.toLowerCase().replace(/ /g,'_');
+        const supplierEl = document.getElementById('detailSupplier');
+        supplierEl.textContent = produkData.supplier?.nama_supplier ?? 'Tidak ada';
+        colorizeSingle(supplierEl, (produkData.supplier?.nama_supplier ?? '').toLowerCase());
 
-            const modal = new bootstrap.Modal(document.getElementById('detailModal'));
-            modal.show();
+        document.getElementById('detailSatuan').textContent =
+            (produkData.jumlah_satuan || 0) + ' ' + (produkData.satuan?.nama_satuan ?? '-');
+
+        const kategoriEl = document.getElementById('detailKategori');
+        kategoriEl.textContent =
+            produkData.kategori?.nama_kategori ?? '-';
+
+        if (produkData.kategori?.nama_kategori) {
+            colorizeSingle(
+                kategoriEl,
+                produkData.kategori.nama_kategori.toLowerCase()
+            );
         }
+
+        document.getElementById('detailJumlahBatch').textContent =
+            produkData.batch ? produkData.batch.length : 0;
+
+        const statusTampilEl = document.getElementById('detailStatusTampil');
+        statusTampilEl.textContent = produkData.status_tampil ?? '-';
+        statusTampilEl.className =
+            'badge-status badge-' +
+            (produkData.status_tampil ?? '')
+            .toLowerCase().replace(/ /g, '_');
+
+        const statusStokEl = document.getElementById('detailStatusStok');
+        statusStokEl.textContent = produkData.status_stok ?? '-';
+        statusStokEl.className =
+            'badge-status badge-' +
+            (produkData.status_stok ?? '')
+            .toLowerCase().replace(/_| /g, '-');
+    });
+
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', () => {
+        colorizeBadges(); // Colorize badges awal
+        updateActionBar();
+        checkAll.addEventListener('change', handleCheckAllChange);
+        btnRestoreSelected.addEventListener('click', restoreSelectedProducts);
+        btnRestoreAll.addEventListener('click', restoreAllProducts);
+        tableBody.addEventListener('change', e => {
+            if (e.target.classList.contains('product-checkbox')) handleCheckboxChange(e);
+        });
+        tableBody.addEventListener('click', e => {
+            const restoreBtn = e.target.closest('.btn-pulihkan');
+            if (restoreBtn) {
+                const id = parseInt(restoreBtn.dataset.id);
+                const name = restoreBtn.dataset.name;
+                handleRestore(id, name);
+            }
+        });
+        syncCheckAll();
     });
     </script>
     @endsection

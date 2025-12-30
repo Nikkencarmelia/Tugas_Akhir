@@ -202,6 +202,14 @@
                 border-radius: .4rem;
                 line-height: 1;
             }
+            .badge-kategori {
+                font-size: .7rem;
+                font-weight: 600;
+                padding: .3rem .55rem;
+                border-radius: .4rem;
+                line-height: 1;
+                display: inline-block;
+            }
             .product-info {
                 margin-left: .75rem;
             }
@@ -248,6 +256,30 @@
             .badge-tersedia {
                 background: #DBEAFE;
                 color: #1E40AF;
+            }
+            /* Action Buttons */
+            .btn-action {
+                border: none;
+                border-radius: .4rem;
+                width: 32px;
+                height: 32px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: .85rem;
+                margin-right: .25rem;
+                transition: .25s ease;
+                text-decoration: none;
+            }
+            .btn-action:hover {
+                transform: scale(1.1);
+            }
+            .btn-detail {
+                background: var(--primary-green);
+            }
+            .btn-batch {
+                background: #10B981;
             }
             .view-all-btn {
                 background: var(--primary-green);
@@ -360,10 +392,10 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Produk</th>
+                                    <th>Kategori</th>
                                     <th>Satuan</th>
-                                    <th>Harga Normal</th>
-                                    <th>Stok</th>
                                     <th>Status</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -379,30 +411,42 @@
                                 @else
                                     @foreach($produkBaru as $p)
                                         @php
-                                            $statusStokClass = strtolower(str_replace(' ', '-', $p->status_stok ?? 'tersedia'));
-                                            $statusTampilClass = strtolower(str_replace(' ', '_', $p->status_tampil ?? 'draft'));
-                                            $stockStyle = ($p->stok ?? 0) == 0 ? 'font-weight: 700; color: #991B1B;' : '';
+                                            $statusTampilClass = strtolower(str_replace([' ', '_'], '_', $p->status_tampil ?? 'draft'));
+                                            $statusStokClass = $p->status_stok ? strtolower(str_replace([' ', '_'], '-', $p->status_stok)) : null;
                                         @endphp
                                         <tr>
                                             <td>{{ $p->id }}</td>
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     <div class="img-container">
-                                                        <img src="{{ asset($p->gambar ?? 'images/default.png') }}" alt="{{ $p->nama_produk }}">
-                                                        <span class="badge-supplier">{{ $p->supplier ?? 'N/A' }}</span>
+                                                        <img src="{{ asset('storage/' . ($p->gambar ?? 'images/default.png')) }}" alt="{{ $p->nama_produk }}">
+                                                        <span class="badge-supplier">{{ $p->supplier->nama_supplier ?? 'N/A' }}</span>
                                                     </div>
                                                     <div class="product-info">
                                                         <span>{{ $p->nama_produk }}</span>
-                                                        <small>{{ Str::limit($p->deskripsi ?? 'Tidak ada deskripsi', 40) }}</small>
+                                                        <small>{{ Str::limit($p->deskripsi ?? 'Tidak ada deskripsi.', 40) }}</small>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>{{ $p->satuan_berat }}</td>
-                                            <td>{{ $p->harga }}</td>
-                                            <td style="{{ $stockStyle }}">{{ $p->stok }}</td>
+                                            <td><span class="badge-kategori">{{ $p->kategori->nama_kategori ?? '-' }}</span></td>
+                                            <td>{{ $p->jumlah_satuan ?? 0 }} {{ $p->satuan->nama_satuan ?? '-' }}</td>
                                             <td>
                                                 <span class="badge-status badge-{{ $statusTampilClass }}">{{ $p->status_tampil }}</span>
-                                                <span class="badge-status badge-{{ $statusStokClass }}">{{ ucfirst($p->status_stok ?? 'Tersedia') }}</span>
+                                                @if($statusStokClass)
+                                                    <span class="badge-status badge-{{ $statusStokClass }}">{{ ucfirst($p->status_stok) }}</span>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <button class="btn-action btn-detail" data-bs-toggle="modal" data-bs-target="#detailModal"
+                                                        data-produk='@json($p)' title="Lihat Detail">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+
+                                                <a href="{{ route('produk.batch.index', $p->id) }}" class="btn-action btn-batch" title="Kelola Batch">
+                                                    <i class="bi bi-layers"></i>
+                                                </a>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -418,11 +462,54 @@
                     </a>
                 </div>
             </div>
+
+            <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="detailModalLabel">Detail Produk</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <img id="detailGambar" src="" class="img-fluid rounded" alt="Produk" style="max-height: 300px; object-fit: cover; width: 100%;">
+                                </div>
+                                <div class="col-md-8">
+                                    <h4 id="detailNama" class="mb-3"></h4>
+                                    <p id="detailDeskripsi" class="text-muted"></p>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <p class="mb-1"><strong>Supplier:</strong> <span id="detailSupplier" class="badge-kategori"></span></p>
+                                            <p class="mb-1"><strong>Satuan:</strong> <span id="detailSatuan"></span></p>
+                                        </div>
+                                        <div class="col-6">
+                                            <p class="mb-1"><strong>Kategori:</strong> <span id="detailKategori" class="badge-kategori"></span></p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <p class="mb-1"><strong>Jumlah Batch:</strong> <span id="detailJumlahBatch" class="fw-bold text-primary"></span></p>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <p class="mb-1">
+                                        <strong>Status Tampil:</strong> <span id="detailStatusTampil" class="badge-status"></span>
+                                    </p>
+                                    <p>
+                                        <strong>Status Stok:</strong> <span id="detailStatusStok" class="badge-status"></span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <script>
             function colorizeBadges() {
-                const badges = document.querySelectorAll('.badge-supplier');
+                const badges = document.querySelectorAll('.badge-supplier, .badge-kategori');
                 const colorPairs = [
                     { bg: "#BAE6FD", text: "#0369A1" }, { bg: "#FEF9C3", text: "#A16207" },
                     { bg: "#FBCFE8", text: "#9D174D" }, { bg: "#A7F3D0", text: "#065F46" },
@@ -439,6 +526,80 @@
                     badge.style.color = color.text;
                 });
             }
+
+            /* ================= DETAIL MODAL ================= */
+            const detailModal = document.getElementById('detailModal');
+            detailModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const produkData = JSON.parse(button.getAttribute('data-produk'));
+
+                document.getElementById('detailGambar').src =
+                    produkData.gambar ? `/storage/${produkData.gambar}` : '';
+                document.getElementById('detailNama').textContent =
+                    produkData.nama_produk ?? '-';
+                document.getElementById('detailDeskripsi').textContent =
+                    produkData.deskripsi ?? '-';
+
+                const supplierEl = document.getElementById('detailSupplier');
+                supplierEl.textContent = produkData.supplier?.nama_supplier ?? 'Tidak ada';
+                colorizeSingle(supplierEl, (produkData.supplier?.nama_supplier ?? '').toLowerCase());
+
+                document.getElementById('detailSatuan').textContent =
+                    (produkData.jumlah_satuan || 0) + ' ' + (produkData.satuan?.nama_satuan ?? '-');
+
+                const kategoriEl = document.getElementById('detailKategori');
+                kategoriEl.textContent =
+                    produkData.kategori?.nama_kategori ?? '-';
+
+                if (produkData.kategori?.nama_kategori) {
+                    colorizeSingle(
+                        kategoriEl,
+                        produkData.kategori.nama_kategori.toLowerCase()
+                    );
+                }
+
+                document.getElementById('detailJumlahBatch').textContent =
+                    produkData.batch ? produkData.batch.length : 0;
+
+                const statusTampilEl = document.getElementById('detailStatusTampil');
+                statusTampilEl.textContent = produkData.status_tampil ?? '-';
+                statusTampilEl.className =
+                    'badge-status badge-' +
+                    (produkData.status_tampil ?? '')
+                    .toLowerCase().replace(/ /g, '_');
+
+                const statusStokEl = document.getElementById('detailStatusStok');
+                statusStokEl.textContent = produkData.status_stok ?? '-';
+                statusStokEl.className =
+                    'badge-status badge-' +
+                    (produkData.status_stok ?? '')
+                    .toLowerCase().replace(/_| /g, '-');
+            });
+
+            function colorizeSingle(badgeEl, text){
+                if(!badgeEl || !text) return;
+
+                const colorPairs=[
+                    {bg:"#BAE6FD",text:"#0369A1"},
+                    {bg:"#FEF9C3",text:"#A16207"},
+                    {bg:"#FBCFE8",text:"#9D174D"},
+                    {bg:"#A7F3D0",text:"#065F46"},
+                    {bg:"#DDD6FE",text:"#5B21B6"},
+                    {bg:"#FECACA",text:"#991B1B"},
+                    {bg:"#FDE68A",text:"#B45309"},
+                    {bg:"#F5D0FE",text:"#86198F"}
+                ];
+
+                let hash=0;
+                for(let i=0;i<text.length;i++){
+                    hash=text.charCodeAt(i)+((hash<<5)-hash);
+                }
+
+                const color=colorPairs[Math.abs(hash)%colorPairs.length];
+                badgeEl.style.backgroundColor=color.bg;
+                badgeEl.style.color=color.text;
+            }
+
             document.addEventListener('DOMContentLoaded', colorizeBadges);
         </script>
 

@@ -227,16 +227,16 @@
             }
 
             .toggle-password {
-    position: absolute;
-    right: 15px;
-    top: 70%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #6c757d;
-}
-.toggle-password:hover {
-    color: #198754;
-}
+                position: absolute;
+                right: 15px;
+                top: 70%;
+                transform: translateY(-50%);
+                cursor: pointer;
+                color: #6c757d;
+            }
+            .toggle-password:hover {
+                color: #198754;
+            }
 
             @media (max-width: 768px) {
                 .profile-header, .profile-section, .modal-body {
@@ -286,41 +286,71 @@
 
             <div class="profile-header">
                 <div class="profile-icon"><i class="fas fa-user"></i></div>
-                <h1 class="profile-name">John Doe</h1>
-                <p class="profile-email">johndoe@example.com</p>
+                <h1 class="profile-name">{{ $user->nama_lengkap }}</h1>
+                <p class="profile-email">{{ $user->email }}</p>
                 <div class="profile-nav">
-                    <a href="#info" class="nav-link-profile active" data-section="info"><i class="fas fa-user"></i> Informasi Pribadi</a>
-                    <a href="#alamat" class="nav-link-profile" data-section="alamat"><i class="fas fa-map-marker-alt"></i> Alamat</a>
-                    <a href="#password" class="nav-link-profile" data-section="password"><i class="fas fa-lock"></i> Ubah Password</a>
+                    <a href="{{ route('user.profil') }}" class="nav-link-profile {{ $activeTab == 'info' ? 'active' : '' }}" data-section="info"><i class="fas fa-user"></i> Informasi Pribadi</a>
+                    <a href="{{ route('user.profil', ['tab' => 'alamat']) }}" class="nav-link-profile {{ $activeTab == 'alamat' ? 'active' : '' }}" data-section="alamat"><i class="fas fa-map-marker-alt"></i> Alamat</a>
+                    <a href="{{ route('user.profil', ['tab' => 'password']) }}" class="nav-link-profile {{ $activeTab == 'password' ? 'active' : '' }}" data-section="password"><i class="fas fa-lock"></i> Ubah Password</a>
                     <button class="btn btn-outline-secondary btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
                 </div>
             </div>
 
             <!-- ===================== INFORMASI PRIBADI ===================== -->
-            <div id="info" class="profile-section active">
+            <div id="info" class="profile-section {{ $activeTab == 'info' ? 'active' : '' }}">
                 <h2 class="section-title"><i class="fas fa-user-circle me-2"></i>Informasi Pribadi</h2>
-                <form class="form-section">
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                <form class="form-section" action="{{ route('user.profil.update') }}" method="POST">
+                    @csrf
+                    @method('PUT')
                     <div class="mb-3">
                         <label for="namaLengkap" class="form-label">Nama Lengkap</label>
-                        <input type="text" class="form-control" id="namaLengkap" value="Nikken Carmelia">
+                        <input type="text" class="form-control @error('nama_lengkap') is-invalid @enderror" id="namaLengkap" name="nama_lengkap" value="{{ old('nama_lengkap', $user->nama_lengkap) }}" required>
+                        @error('nama_lengkap')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" value="nikken@mail.com">
+                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $user->email) }}" required>
+                        @error('email')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label for="telepon" class="form-label">Nomor Telepon</label>
-                        <input type="tel" class="form-control" id="telepon" value="08123456789">
+                        <input type="tel" class="form-control @error('no_telepon') is-invalid @enderror" id="telepon" name="no_telepon" value="{{ old('no_telepon', $user->no_telepon) }}">
+                        @error('no_telepon')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="text-center mt-4">
-                        <button type="button" class="btn btn-success text-white btn-save"><i class="fas fa-save me-1"></i> Simpan Perubahan</button>
+                        <button type="submit" class="btn btn-success text-white btn-save"><i class="fas fa-save me-1"></i> Simpan Perubahan</button>
                     </div>
                 </form>
             </div>
 
             <!-- ===================== ALAMAT PENGIRIMAN ===================== -->
-            <div id="alamat" class="profile-section">
+            <div id="alamat" class="profile-section {{ $activeTab == 'alamat' ? 'active' : '' }}">
                 <h2 class="section-title"><i class="fas fa-map-marker-alt me-2"></i>Alamat Pengiriman</h2>
+
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
                 <!-- Tombol Tambah Alamat -->
                 <div class="text-end mb-3">
@@ -331,29 +361,28 @@
 
                 <!-- Daftar Alamat -->
                 <div class="list-group">
-                    <div class="list-group-item d-flex justify-content-between align-items-start">
-                        <div>
-                            <h6 class="mb-1 fw-bold">Nikken Carmelia</h6>
-                            <p class="mb-1">Jl. Pahlawan No. 45, RT 03 RW 02, Kel. Melak Ulu, Kec. Melak, 75711</p>
-                            <small>Telp: 08123456789</small>
+                    @forelse($alamats as $alamat)
+                        <div class="list-group-item d-flex justify-content-between align-items-start" data-id="{{ $alamat->id }}">
+                            <div>
+                                <h6 class="mb-1 fw-bold">{{ $alamat->nama_penerima }}</h6>
+                                <p class="mb-1">{{ $alamat->alamat_lengkap }}, {{ $alamat->kelurahan->nama_kelurahan ?? '' }}, {{ $alamat->kecamatan->nama_kecamatan ?? '' }}, {{ $alamat->kodePos->kode_pos ?? '' }}</p>
+                                <small>Telp: {{ $alamat->no_telpon }}</small>
+                            </div>
+                            <div>
+                                <button class="btn btn-outline-success btn-sm me-1 edit-alamat" data-bs-toggle="modal" data-bs-target="#editAlamatModal" data-id="{{ $alamat->id }}" data-nama="{{ $alamat->nama_penerima }}" data-telp="{{ $alamat->no_telpon }}" data-kec="{{ $alamat->id_kecamatan }}" data-kel="{{ $alamat->id_kelurahan }}" data-kp="{{ $alamat->id_kode_pos }}" data-alamat="{{ $alamat->alamat_lengkap }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-danger btn-sm delete-alamat" data-id="{{ $alamat->id }}" data-nama="{{ $alamat->nama_penerima }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div>
-                            <button class="btn btn-outline-success btn-sm me-1"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-outline-danger btn-sm"><i class="fas fa-trash"></i></button>
+                    @empty
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-map-marker-alt fa-3x mb-3"></i>
+                            <p>Belum ada alamat. Tambahkan alamat pertama Anda!</p>
                         </div>
-                    </div>
-
-                    <div class="list-group-item d-flex justify-content-between align-items-start">
-                        <div>
-                            <h6 class="mb-1 fw-bold">Citra Anggraini</h6>
-                            <p class="mb-1">Jl. Mawar No. 12, RT 01 RW 01, Kel. Simpang Raya, Kec. Barong Tongkok, 75712</p>
-                            <small>Telp: 08129876543</small>
-                        </div>
-                        <div>
-                            <button class="btn btn-outline-success btn-sm me-1"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-outline-danger btn-sm"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
+                    @endforelse
                 </div>
             </div>
 
@@ -366,62 +395,72 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
 
-                        <div class="modal-body">
-                            <form>
+                        <form id="formTambahAlamat" method="POST" action="{{ route('user.alamat.store') }}">
+                            @csrf
+                            <div class="modal-body">
                                 <div class="mb-3">
                                     <label for="namaPenerima" class="form-label">Nama Penerima</label>
-                                    <input type="text" class="form-control" id="namaPenerima" placeholder="Masukkan nama penerima">
+                                    <input type="text" class="form-control @error('nama_penerima') is-invalid @enderror" id="namaPenerima" name="nama_penerima" placeholder="Masukkan nama penerima" value="{{ old('nama_penerima') }}" required>
+                                    @error('nama_penerima')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="noTelp" class="form-label">Nomor Telepon</label>
-                                    <input type="tel" class="form-control" id="noTelp" placeholder="Masukkan nomor telepon penerima">
+                                    <input type="tel" class="form-control @error('no_telpon') is-invalid @enderror" id="noTelp" name="no_telpon" placeholder="Masukkan nomor telepon penerima" value="{{ old('no_telpon') }}" required>
+                                    @error('no_telpon')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="kecamatan" class="form-label">Kecamatan</label>
-                                    <select class="form-select" id="kecamatan">
+                                    <select class="form-select @error('id_kecamatan') is-invalid @enderror" id="kecamatan" name="id_kecamatan" required>
                                         <option selected disabled>Pilih Kecamatan</option>
-                                        <option value="barong-tongkok">Barong Tongkok</option>
-                                        <option value="melak">Melak</option>
-                                        <option value="damai">Damai</option>
-                                        <option value="linggang-bigung">Linggang Bigung</option>
+                                        @foreach($kecamatans as $kec)
+                                            <option value="{{ $kec->id }}" {{ old('id_kecamatan') == $kec->id ? 'selected' : '' }}>{{ $kec->nama_kecamatan }}</option>
+                                        @endforeach
                                     </select>
+                                    @error('id_kecamatan')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="kelurahan" class="form-label">Kelurahan</label>
-                                    <select class="form-select" id="kelurahan">
+                                    <select class="form-select @error('id_kelurahan') is-invalid @enderror" id="kelurahan" name="id_kelurahan" required disabled>
                                         <option selected disabled>Pilih Kelurahan</option>
-                                        <option value="simpang-raya">Simpang Raya</option>
-                                        <option value="melak-ulu">Melak Ulu</option>
-                                        <option value="linggang-melapeh">Linggang Melapeh</option>
-                                        <option value="barong-loko">Barong Loko</option>
                                     </select>
+                                    @error('id_kelurahan')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="kodePos" class="form-label">Kode Pos</label>
-                                    <select class="form-select" id="kodePos">
+                                    <select class="form-select @error('id_kode_pos') is-invalid @enderror" id="kodePos" name="id_kode_pos" required disabled>
                                         <option selected disabled>Pilih Kode Pos</option>
-                                        <option value="75711">75711</option>
-                                        <option value="75712">75712</option>
-                                        <option value="75713">75713</option>
-                                        <option value="75714">75714</option>
                                     </select>
+                                    @error('id_kode_pos')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="alamatLengkap" class="form-label">Alamat Lengkap</label>
-                                    <textarea class="form-control" id="alamatLengkap" rows="3" placeholder="Contoh: Jl. Mawar No. 12, RT 01 RW 01"></textarea>
+                                    <textarea class="form-control @error('alamat_lengkap') is-invalid @enderror" id="alamatLengkap" name="alamat_lengkap" rows="3" placeholder="Contoh: Jl. Mawar No. 12, RT 01 RW 01" required>{{ old('alamat_lengkap') }}</textarea>
+                                    @error('alamat_lengkap')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
-                            </form>
-                        </div>
+                            </div>
 
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Batal</button>
-                            <button type="button" class="btn btn-success text-white">Simpan Alamat</button>
-                        </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-success text-white">Simpan Alamat</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -435,59 +474,56 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
 
-                        <div class="modal-body">
-                            <form id="formEditAlamat">
-                            <div class="mb-3">
-                                <label for="editNamaPenerima" class="form-label">Nama Penerima</label>
-                                <input type="text" class="form-control" id="editNamaPenerima">
+                        <form id="formEditAlamat" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" id="editAlamatId" name="id">
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="editNamaPenerima" class="form-label">Nama Penerima</label>
+                                    <input type="text" class="form-control" id="editNamaPenerima" name="nama_penerima" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="editNoTelp" class="form-label">Nomor Telepon</label>
+                                    <input type="tel" class="form-control" id="editNoTelp" name="no_telpon" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="editKecamatan" class="form-label">Kecamatan</label>
+                                    <select class="form-select" id="editKecamatan" name="id_kecamatan" required>
+                                        <option disabled>Pilih Kecamatan</option>
+                                        @foreach($kecamatans as $kec)
+                                            <option value="{{ $kec->id }}">{{ $kec->nama_kecamatan }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="editKelurahan" class="form-label">Kelurahan</label>
+                                    <select class="form-select" id="editKelurahan" name="id_kelurahan" required disabled>
+                                        <option disabled>Pilih Kelurahan</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="editKodePos" class="form-label">Kode Pos</label>
+                                    <select class="form-select" id="editKodePos" name="id_kode_pos" required disabled>
+                                        <option disabled>Pilih Kode Pos</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="editAlamatLengkap" class="form-label">Alamat Lengkap</label>
+                                    <textarea class="form-control" id="editAlamatLengkap" name="alamat_lengkap" rows="3" required></textarea>
+                                </div>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="editNoTelp" class="form-label">Nomor Telepon</label>
-                                <input type="tel" class="form-control" id="editNoTelp">
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-success text-white" id="btnSimpanEdit">Simpan Perubahan</button>
                             </div>
-
-                            <div class="mb-3">
-                                <label for="editKecamatan" class="form-label">Kecamatan</label>
-                                <select class="form-select" id="editKecamatan">
-                                <option value="barong-tongkok">Barong Tongkok</option>
-                                <option value="melak">Melak</option>
-                                <option value="damai">Damai</option>
-                                <option value="linggang-bigung">Linggang Bigung</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="editKelurahan" class="form-label">Kelurahan</label>
-                                <select class="form-select" id="editKelurahan">
-                                <option value="simpang-raya">Simpang Raya</option>
-                                <option value="melak-ulu">Melak Ulu</option>
-                                <option value="linggang-melapeh">Linggang Melapeh</option>
-                                <option value="barong-loko">Barong Loko</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="editKodePos" class="form-label">Kode Pos</label>
-                                <select class="form-select" id="editKodePos">
-                                <option value="75711">75711</option>
-                                <option value="75712">75712</option>
-                                <option value="75713">75713</option>
-                                <option value="75714">75714</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="editAlamatLengkap" class="form-label">Alamat Lengkap</label>
-                                <textarea class="form-control" id="editAlamatLengkap" rows="3"></textarea>
-                            </div>
-                            </form>
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Batal</button>
-                            <button type="button" class="btn btn-success text-white" id="btnSimpanEdit">Simpan Perubahan</button>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -495,44 +531,68 @@
             <!-- ===================== MODAL KONFIRMASI HAPUS ALAMAT ===================== -->
             <div class="modal fade" id="konfirmasiHapusModal" tabindex="-1" aria-labelledby="konfirmasiHapusLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content border-success">
-                        <div class="modal-header bg-success text-white">
+                    <div class="modal-content border-danger">
+                        <div class="modal-header bg-danger text-white">
                             <h5 class="modal-title" id="konfirmasiHapusLabel"><i class="fas fa-trash-alt me-2"></i>Konfirmasi Hapus</h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
 
                         <div class="modal-body">
-                            Apakah kamu yakin ingin menghapus alamat ini? Tindakan ini tidak bisa dibatalkan.
+                            Apakah kamu yakin ingin menghapus alamat <strong id="namaAlamatHapus"></strong>? Tindakan ini tidak bisa dibatalkan.
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-                            <button type="button" class="btn btn-success text-white" id="btnKonfirmasiHapus">Hapus</button>
+                            <form id="formHapusAlamat" method="POST" style="display: inline;">
+                                @csrf
+                                @method('DELETE')
+                                <input type="hidden" id="hapusAlamatId" name="id">
+                                <button type="submit" class="btn btn-danger text-white" id="btnKonfirmasiHapus">Hapus</button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
 
-
             <!-- ===================== UBAH PASSWORD ===================== -->
-            <div id="password" class="profile-section">
+            <div id="password" class="profile-section {{ $activeTab == 'password' ? 'active' : '' }}">
                 <h2 class="section-title"><i class="fas fa-lock me-2"></i>Ubah Password</h2>
-                <form class="form-section">
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                <form id="passwordForm" class="form-section" action="{{ route('user.profil.password') }}" method="POST">
+                    @csrf
+                    @method('PUT')
                     <div class="mb-3 position-relative">
                         <label for="passwordLama" class="form-label">Password Lama</label>
-                        <input type="password" class="form-control pe-5" id="passwordLama">
-                        <i class="fas fa-eye toggle-password" data-target="passwordLama"></i>
+                        <input type="password" class="form-control pe-5 @error('password_lama') is-invalid @enderror" id="passwordLama" name="password_lama" value="{{ old('password_lama') }}" required>
+                        @error('password_lama')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <i class="fas fa-eye-slash toggle-password" data-target="passwordLama"></i>
                     </div>
 
                     <div class="mb-3 position-relative">
                         <label for="passwordBaru" class="form-label">Password Baru</label>
-                        <input type="password" class="form-control pe-5" id="passwordBaru">
-                        <i class="fas fa-eye toggle-password" data-target="passwordBaru"></i>
+                        <input type="password" class="form-control pe-5 @error('password_baru') is-invalid @enderror" id="passwordBaru" name="password_baru" value="{{ old('password_baru') }}" required minlength="6">
+                        @error('password_baru')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <i class="fas fa-eye-slash toggle-password" data-target="passwordBaru"></i>
                     </div>
 
                     <div class="mb-3 position-relative">
                         <label for="konfirmasiPassword" class="form-label">Konfirmasi Password Baru</label>
-                        <input type="password" class="form-control pe-5" id="konfirmasiPassword">
-                        <i class="fas fa-eye toggle-password" data-target="konfirmasiPassword"></i>
+                        <input type="password" class="form-control pe-5 @error('password_baru_confirmation') is-invalid @enderror" id="konfirmasiPassword" name="password_baru_confirmation" value="{{ old('password_baru_confirmation') }}" required>
+                        @error('password_baru_confirmation')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <i class="fas fa-eye-slash toggle-password" data-target="konfirmasiPassword"></i>
                     </div>
 
                     <div class="text-center mt-4">
@@ -562,170 +622,288 @@
                 </div>
             </div>
 
+            <!-- ===================== MODAL KONFIRMASI LOGOUT ===================== -->
+            <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-success">
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title" id="logoutLabel"><i class="fas fa-sign-out-alt me-2"></i>Konfirmasi Logout</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Apakah kamu yakin ingin logout? Kamu akan keluar dari akun ini.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                            <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+                                @csrf
+                                <button type="submit" class="btn btn-success text-white">Ya, Logout</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-            // === TOAST SETUP (global) ===
-            function showToast(message, type = 'success') {
-                const toastContainer = document.createElement('div');
-                toastContainer.className = `toast align-items-center text-white bg-${type} border-0 position-fixed top-0 end-0 m-3`;
-                toastContainer.style.zIndex = 2000;
-                toastContainer.innerHTML = `
-                <div class="d-flex">
-                    <div class="toast-body fw-semibold">${message}</div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
-                `;
-                document.body.appendChild(toastContainer);
-                const toast = new bootstrap.Toast(toastContainer, { delay: 2000 });
-                toast.show();
-                toastContainer.addEventListener('hidden.bs.toast', () => toastContainer.remove());
-            }
-
-            // === TOMBOL SIMPAN & PASSWORD ===
-            document.querySelectorAll('.btn-save').forEach(btn => {
-                btn.addEventListener('click', () => {
-                if (btn.textContent.includes('Simpan')) {
-                    showToast('Perubahan berhasil disimpan!');
-                } else if (btn.textContent.includes('Password')) {
-                    // buka konfirmasi ubah password
-                    const modalKonfirmasi = new bootstrap.Modal(document.getElementById('konfirmasiPasswordModal'));
-                    modalKonfirmasi.show();
-                }
-                });
-            });
-
-            // === KONFIRMASI UBAH PASSWORD ===
-            const btnKonfirmasiUbahPassword = document.getElementById('btnKonfirmasiUbahPassword');
-            if (btnKonfirmasiUbahPassword) {
-                btnKonfirmasiUbahPassword.addEventListener('click', () => {
-                const modalEl = document.getElementById('konfirmasiPasswordModal');
-                const modal = bootstrap.Modal.getInstance(modalEl);
-                modal.hide();
-
-                document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
-                document.body.classList.remove('modal-open');
-                document.body.style = '';
-
-                showToast('Password berhasil diubah!', 'success');
-                });
-            }
-
-            // === TOMBOL SIMPAN ALAMAT BARU ===
-            const btnAlamat = document.querySelector('.modal-footer .btn-success');
-            if (btnAlamat) {
-                btnAlamat.addEventListener('click', () => {
-                const modalEl = btnAlamat.closest('.modal');
-                const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                modal.hide();
-
-                // Hapus backdrop biar layar gak gelap
-                document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
-                document.body.classList.remove('modal-open');
-                document.body.style = '';
-                showToast('Alamat baru berhasil ditambahkan!');
-                });
-            }
-
-            // === EDIT ALAMAT ===
-            document.querySelectorAll('.btn-outline-success').forEach(btn => {
-                if (btn.querySelector('.fa-edit')) {
-                btn.addEventListener('click', () => {
-                    const parent = btn.closest('.list-group-item');
-                    const nama = parent.querySelector('h6').textContent.trim();
-                    const alamat = parent.querySelector('p').textContent.trim();
-                    const telp = parent.querySelector('small').textContent.replace('Telp: ', '').trim();
-
-                    document.getElementById('editNamaPenerima').value = nama;
-                    document.getElementById('editNoTelp').value = telp;
-                    document.getElementById('editAlamatLengkap').value = alamat;
-
-                    const modalEdit = new bootstrap.Modal(document.getElementById('editAlamatModal'));
-                    modalEdit.show();
-                });
-                }
-            });
-
-            // === SIMPAN EDIT ALAMAT ===
-            const btnSimpanEdit = document.getElementById('btnSimpanEdit');
-            if (btnSimpanEdit) {
-                btnSimpanEdit.addEventListener('click', () => {
-                const modalEl = document.getElementById('editAlamatModal');
-                const modal = bootstrap.Modal.getInstance(modalEl);
-                modal.hide();
-
-                document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
-                document.body.classList.remove('modal-open');
-                document.body.style = '';
-                showToast('Alamat berhasil diperbarui!');
-                });
-            }
-
-            // === HAPUS ALAMAT (PAKAI KONFIRMASI MODAL) ===
-            let alamatYangAkanDihapus = null;
-            document.querySelectorAll('.btn-outline-danger').forEach(btn => {
-                btn.addEventListener('click', () => {
-                alamatYangAkanDihapus = btn.closest('.list-group-item');
-                const modalHapus = new bootstrap.Modal(document.getElementById('konfirmasiHapusModal'));
-                modalHapus.show();
-                });
-            });
-
-            const btnKonfirmasiHapus = document.getElementById('btnKonfirmasiHapus');
-            if (btnKonfirmasiHapus) {
-                btnKonfirmasiHapus.addEventListener('click', () => {
-                const modalEl = document.getElementById('konfirmasiHapusModal');
-                const modal = bootstrap.Modal.getInstance(modalEl);
-                modal.hide();
-
-                if (alamatYangAkanDihapus) {
-                    alamatYangAkanDihapus.remove();
-                    alamatYangAkanDihapus = null;
+                // === TOAST SETUP (global) ===
+                function showToast(message, type = 'success') {
+                    const toastContainer = document.createElement('div');
+                    toastContainer.className = `toast align-items-center text-white bg-${type} border-0 position-fixed top-0 end-0 m-3`;
+                    toastContainer.style.zIndex = 2000;
+                    toastContainer.innerHTML = `
+                    <div class="d-flex">
+                        <div class="toast-body fw-semibold">${message}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                    `;
+                    document.body.appendChild(toastContainer);
+                    const toast = new bootstrap.Toast(toastContainer, { delay: 2000 });
+                    toast.show();
+                    toastContainer.addEventListener('hidden.bs.toast', () => toastContainer.remove());
                 }
 
-                document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
-                document.body.classList.remove('modal-open');
-                document.body.style = '';
+                // Show toast from session
+                @if(session('success'))
+                    showToast('{{ session('success') }}');
+                @endif
 
-                showToast('Alamat berhasil dihapus!', 'danger');
+                // === TOMBOL SIMPAN & PASSWORD ===
+                document.querySelectorAll('.btn-save').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        if (btn.textContent.includes('Password')) {
+                            // buka konfirmasi ubah password
+                            const modalKonfirmasi = new bootstrap.Modal(document.getElementById('konfirmasiPasswordModal'));
+                            modalKonfirmasi.show();
+                        }
+                    });
                 });
-            }
 
-            // === GANTI TAB PROFIL ===
-            document.querySelectorAll('.nav-link-profile').forEach(link => {
-                link.addEventListener('click', e => {
-                e.preventDefault();
-                document.querySelectorAll('.nav-link-profile').forEach(l => l.classList.remove('active'));
-                link.classList.add('active');
-                document.querySelectorAll('.profile-section').forEach(s => s.classList.remove('active'));
-                document.getElementById(link.dataset.section).classList.add('active');
-                });
-            });
+                // === KONFIRMASI UBAH PASSWORD ===
+                const btnKonfirmasiUbahPassword = document.getElementById('btnKonfirmasiUbahPassword');
+                if (btnKonfirmasiUbahPassword) {
+                    btnKonfirmasiUbahPassword.addEventListener('click', () => {
+                        const modalEl = document.getElementById('konfirmasiPasswordModal');
+                        const modal = bootstrap.Modal.getInstance(modalEl);
+                        modal.hide();
 
-            // === TOGGLE PASSWORD ===
-            document.querySelectorAll('.toggle-password').forEach(icon => {
-                icon.addEventListener('click', () => {
-                const input = document.getElementById(icon.dataset.target);
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.classList.replace('fa-eye', 'fa-eye-slash');
-                } else {
-                    input.type = 'password';
-                    icon.classList.replace('fa-eye-slash', 'fa-eye');
+                        document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+                        document.body.classList.remove('modal-open');
+                        document.body.style = '';
+
+                        const form = document.getElementById('passwordForm');
+                        form.submit();
+                    });
                 }
-                });
-            });
 
-            // === LOGOUT ===
-            window.logout = function() {
-                if (confirm('Yakin logout?')) window.location.href = '/login';
-            };
+                // Fungsi helper untuk mengaktifkan select dengan force reflow (tanpa delay)
+                function enableSelect(selectId) {
+                    const $select = $(`#${selectId}`);
+                    $select.prop('disabled', false);
+                    // Force reflow untuk update visual segera
+                    $select[0].offsetHeight;
+                    $select.trigger('change');
+                }
+
+                // === AJAX DROPDOWN UNTUK TAMBAH ALAMAT ===
+                $('#kecamatan').change(function() {
+                    const kecId = $(this).val();
+                    if (kecId) {
+                        $.get(`/user/kelurahan/${kecId}`, function(data) {
+                            $('#kelurahan').html('<option disabled selected>Pilih Kelurahan</option>');
+                            data.forEach(function(kel) {
+                                $('#kelurahan').append(`<option value="${kel.id}">${kel.nama_kelurahan}</option>`);
+                            });
+                            enableSelect('kelurahan');
+                            $('#kodePos').html('<option disabled selected>Pilih Kode Pos</option>').prop('disabled', true);
+                        });
+                    } else {
+                        $('#kelurahan').html('<option disabled selected>Pilih Kelurahan</option>').prop('disabled', true);
+                        $('#kodePos').html('<option disabled selected>Pilih Kode Pos</option>').prop('disabled', true);
+                    }
+                });
+
+                $('#kelurahan').change(function() {
+                    const kelId = $(this).val();
+                    if (kelId) {
+                        $.get(`/user/kodepos/${kelId}`, function(data) {
+                            $('#kodePos').html('<option disabled selected>Pilih Kode Pos</option>');
+                            data.forEach(function(kp) {
+                                $('#kodePos').append(`<option value="${kp.id}">${kp.kode_pos}</option>`);
+                            });
+                            enableSelect('kodePos');
+                        });
+                    } else {
+                        $('#kodePos').html('<option disabled selected>Pilih Kode Pos</option>').prop('disabled', true);
+                    }
+                });
+
+                // === AJAX DROPDOWN UNTUK EDIT ALAMAT ===
+                $('#editKecamatan').change(function() {
+                    const kecId = $(this).val();
+                    if (kecId) {
+                        $.get(`/user/kelurahan/${kecId}`, function(data) {
+                            $('#editKelurahan').html('<option disabled selected>Pilih Kelurahan</option>');
+                            data.forEach(function(kel) {
+                                $('#editKelurahan').append(`<option value="${kel.id}">${kel.nama_kelurahan}</option>`);
+                            });
+                            enableSelect('editKelurahan');
+                            $('#editKodePos').html('<option disabled selected>Pilih Kode Pos</option>').prop('disabled', true);
+                        });
+                    } else {
+                        $('#editKelurahan').html('<option disabled selected>Pilih Kelurahan</option>').prop('disabled', true);
+                        $('#editKodePos').html('<option disabled selected>Pilih Kode Pos</option>').prop('disabled', true);
+                    }
+                });
+
+                $('#editKelurahan').change(function() {
+                    const kelId = $(this).val();
+                    if (kelId) {
+                        $.get(`/user/kodepos/${kelId}`, function(data) {
+                            $('#editKodePos').html('<option disabled selected>Pilih Kode Pos</option>');
+                            data.forEach(function(kp) {
+                                $('#editKodePos').append(`<option value="${kp.id}">${kp.kode_pos}</option>`);
+                            });
+                            enableSelect('editKodePos');
+                        });
+                    } else {
+                        $('#editKodePos').html('<option disabled selected>Pilih Kode Pos</option>').prop('disabled', true);
+                    }
+                });
+
+                // === EDIT ALAMAT ===
+                document.querySelectorAll('.edit-alamat').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.dataset.id;
+                        const nama = btn.dataset.nama;
+                        const telp = btn.dataset.telp;
+                        const kec = btn.dataset.kec;
+                        const kel = btn.dataset.kel;
+                        const kp = btn.dataset.kp;
+                        const alamat = btn.dataset.alamat;
+
+                        document.getElementById('editAlamatId').value = id;
+                        document.getElementById('editNamaPenerima').value = nama;
+                        document.getElementById('editNoTelp').value = telp;
+                        document.getElementById('editKecamatan').value = kec;
+                        document.getElementById('editAlamatLengkap').value = alamat;
+
+                        // Load kelurahan berdasarkan kecamatan
+                        if (kec) {
+                            $.get(`/user/kelurahan/${kec}`, function(data) {
+                                $('#editKelurahan').html('<option disabled selected>Pilih Kelurahan</option>');
+                                data.forEach(function(kelData) {
+                                    const selected = kelData.id == kel ? 'selected' : '';
+                                    $('#editKelurahan').append(`<option value="${kelData.id}" ${selected}>${kelData.nama_kelurahan}</option>`);
+                                });
+                                enableSelect('editKelurahan');
+
+                                // Load kode pos berdasarkan kelurahan
+                                if (kel) {
+                                    $.get(`/user/kodepos/${kel}`, function(kpData) {
+                                        $('#editKodePos').html('<option disabled selected>Pilih Kode Pos</option>');
+                                        kpData.forEach(function(kpItem) {
+                                            const selected = kpItem.id == kp ? 'selected' : '';
+                                            $('#editKodePos').append(`<option value="${kpItem.id}" ${selected}>${kpItem.kode_pos}</option>`);
+                                        });
+                                        enableSelect('editKodePos');
+                                    });
+                                }
+                            });
+                        }
+
+                        // Set action form
+                        document.getElementById('formEditAlamat').action = `/user/alamat/${id}`;
+                    });
+                });
+
+                // Reset modal edit saat close
+                const editModal = document.getElementById('editAlamatModal');
+                editModal.addEventListener('hidden.bs.modal', function() {
+                    document.getElementById('formEditAlamat').action = '';
+                    document.getElementById('formEditAlamat').reset();
+                    $('#editKelurahan').prop('disabled', true).html('<option disabled selected>Pilih Kelurahan</option>');
+                    $('#editKodePos').prop('disabled', true).html('<option disabled selected>Pilih Kode Pos</option>');
+                });
+
+                // === SIMPAN EDIT ALAMAT ===
+                const btnSimpanEdit = document.getElementById('btnSimpanEdit');
+                if (btnSimpanEdit) {
+                    btnSimpanEdit.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        document.getElementById('formEditAlamat').submit();
+                    });
+                }
+
+                // === HAPUS ALAMAT DENGAN MODAL KONFIRMASI ===
+                let alamatIdToDelete = null;
+                document.querySelectorAll('.delete-alamat').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        alamatIdToDelete = btn.dataset.id;
+                        document.getElementById('namaAlamatHapus').textContent = btn.dataset.nama;
+                        document.getElementById('hapusAlamatId').value = alamatIdToDelete;
+                        document.getElementById('formHapusAlamat').action = `/user/alamat/${alamatIdToDelete}`;
+                        const modalHapus = new bootstrap.Modal(document.getElementById('konfirmasiHapusModal'));
+                        modalHapus.show();
+                    });
+                });
+
+                // === GANTI TAB PROFIL ===
+                document.querySelectorAll('.nav-link-profile').forEach(link => {
+                    link.addEventListener('click', e => {
+                        e.preventDefault();
+                        const tab = link.dataset.section;
+                        // Update URL tanpa reload
+                        const url = new URL(window.location);
+                        url.searchParams.set('tab', tab);
+                        window.history.pushState({}, '', url);
+
+                        // Switch class active
+                        document.querySelectorAll('.nav-link-profile').forEach(l => l.classList.remove('active'));
+                        link.classList.add('active');
+                        document.querySelectorAll('.profile-section').forEach(s => s.classList.remove('active'));
+                        document.getElementById(tab).classList.add('active');
+                    });
+                });
+
+                // Load initial tab dari URL/query param (override session kalau ada)
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlTab = urlParams.get('tab');
+                if (urlTab) {
+                    document.querySelectorAll('.nav-link-profile').forEach(l => l.classList.remove('active'));
+                    const activeLink = document.querySelector(`[data-section="${urlTab}"]`);
+                    if (activeLink) activeLink.classList.add('active');
+                    document.querySelectorAll('.profile-section').forEach(s => s.classList.remove('active'));
+                    const activeSection = document.getElementById(urlTab);
+                    if (activeSection) activeSection.classList.add('active');
+                }
+
+                // === TOGGLE PASSWORD ===
+                document.querySelectorAll('.toggle-password').forEach(icon => {
+                    icon.addEventListener('click', () => {
+                        const input = document.getElementById(icon.dataset.target);
+                        if (input.type === 'password') {
+                            input.type = 'text';
+                            icon.classList.replace('fa-eye-slash', 'fa-eye');
+                        } else {
+                            input.type = 'password';
+                            icon.classList.replace('fa-eye', 'fa-eye-slash');
+                        }
+                    });
+                });
+
+                // === LOGOUT ===
+                window.logout = function() {
+                    const modalLogout = new bootstrap.Modal(document.getElementById('logoutModal'));
+                    modalLogout.show();
+                };
             });
         </script>
-
 
         @endsection
     </body>

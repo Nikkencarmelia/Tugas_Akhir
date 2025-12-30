@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('id_satuan')->constrained('satuans')->onDelete('cascade');
             $table->foreignId('id_supplier')->constrained('suppliers')->onDelete('cascade');
             $table->string('nama_produk');
+            $table->integer('jumlah_satuan');
+            $table->integer('estimasi_kadaluwarsa_hari')->nullable();
             $table->enum('status_tampil', ['Ditampilkan', 'Diarsipkan'])->default('Ditampilkan');
             $table->string('deskripsi');
             $table->string('gambar');

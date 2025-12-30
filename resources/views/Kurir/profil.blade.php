@@ -286,65 +286,89 @@
 
             <div class="profile-header">
                 <div class="profile-icon"><i class="fas fa-truck"></i></div>
-                <h1 class="profile-name">Ahmad Santoso</h1>
-                <p class="profile-email">ahmad.santoso@email.com</p>
+                <h1 class="profile-name">{{ $user->nama_lengkap ?? 'Nama Pengguna' }}</h1>
+                <p class="profile-email">{{ $user->email ?? 'email@example.com' }}</p>
                 <div class="profile-nav">
-                    <a href="#info" class="nav-link-profile active" data-section="info"><i class="fas fa-user"></i> Informasi Pribadi</a>
-                    <a href="#password" class="nav-link-profile" data-section="password"><i class="fas fa-lock"></i> Ubah Password</a>
+                    <a href="#info" class="nav-link-profile {{ ($activeTab ?? 'info') == 'info' ? 'active' : '' }}" data-section="info"><i class="fas fa-user"></i> Informasi Pribadi</a>
+                    <a href="#password" class="nav-link-profile {{ ($activeTab ?? 'info') == 'password' ? 'active' : '' }}" data-section="password"><i class="fas fa-lock"></i> Ubah Password</a>
                     <button class="btn btn-outline-secondary btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
                 </div>
             </div>
 
             <!-- ===================== INFORMASI PRIBADI ===================== -->
-            <div id="info" class="profile-section active">
+            <div id="info" class="profile-section {{ ($activeTab ?? 'info') == 'info' ? 'active' : '' }}">
                 <h2 class="section-title"><i class="fas fa-user-circle me-2"></i>Informasi Pribadi</h2>
-                <form class="form-section">
+                <form method="POST" action="{{ route('kurir.profil.update') }}" class="form-section">
+                    @csrf
+                    @method('PUT')
                     <div class="mb-3">
                         <label for="namaLengkap" class="form-label">Nama Lengkap</label>
-                        <input type="text" class="form-control" id="namaLengkap" value="Ahmad Santoso">
+                        <input type="text" class="form-control {{ $errors->has('nama_lengkap') ? 'is-invalid' : '' }}" id="namaLengkap" name="nama_lengkap" value="{{ old('nama_lengkap', $user->nama_lengkap ?? '') }}" required>
+                        @error('nama_lengkap')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" value="ahmad.santoso@email.com">
+                        <input type="email" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" id="email" name="email" value="{{ old('email', $user->email ?? '') }}" required>
+                        @error('email')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label for="telepon" class="form-label">Nomor Telepon</label>
-                        <input type="tel" class="form-control" id="telepon" value="081234567890">
+                        <input type="tel" class="form-control {{ $errors->has('no_telepon') ? 'is-invalid' : '' }}" id="telepon" name="no_telepon" value="{{ old('no_telepon', $user->no_telepon ?? '') }}">
+                        @error('no_telepon')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label for="kendaraan" class="form-label">Kendaraan</label>
-                        <select class="form-select" id="kendaraan">
-                            <option value="Motor" selected>Motor</option>
-                            <option value="Mobil">Mobil</option>
-                            <option value="Truk">Truk</option>
+                        <select class="form-select {{ $errors->has('jenis_kendaraan') ? 'is-invalid' : '' }}" id="kendaraan" name="jenis_kendaraan" required>
+                            <option value="motor" {{ ($kurir->jenis_kendaraan ?? '') == 'motor' ? 'selected' : '' }}>Motor</option>
+                            <option value="mobil" {{ ($kurir->jenis_kendaraan ?? '') == 'mobil' ? 'selected' : '' }}>Mobil</option>
                         </select>
+                        @error('jenis_kendaraan')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="text-center mt-4">
-                        <button type="button" class="btn btn-success text-white btn-save"><i class="fas fa-save me-1"></i> Simpan Perubahan</button>
+                        <button type="submit" class="btn btn-success text-white btn-save"><i class="fas fa-save me-1"></i> Simpan Perubahan</button>
                     </div>
                 </form>
             </div>
 
             <!-- ===================== UBAH PASSWORD ===================== -->
-            <div id="password" class="profile-section">
+            <div id="password" class="profile-section {{ ($activeTab ?? 'info') == 'password' ? 'active' : '' }}">
                 <h2 class="section-title"><i class="fas fa-lock me-2"></i>Ubah Password</h2>
-                <div class="form-section">
+                <form id="passwordForm" method="POST" action="{{ route('kurir.profil.password') }}" class="form-section">
+                    @csrf
+                    @method('PUT')
                     <div class="mb-3 position-relative">
                         <label for="passwordLama" class="form-label">Password Lama</label>
-                        <input type="password" class="form-control pe-5" id="passwordLama">
+                        <input type="password" class="form-control pe-5 {{ $errors->has('password_lama') ? 'is-invalid' : '' }}" id="passwordLama" name="password_lama" required>
                         <i class="fas fa-eye toggle-password" data-target="passwordLama"></i>
+                        @error('password_lama')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="mb-3 position-relative">
                         <label for="passwordBaru" class="form-label">Password Baru</label>
-                        <input type="password" class="form-control pe-5" id="passwordBaru">
+                        <input type="password" class="form-control pe-5 {{ $errors->has('password_baru') ? 'is-invalid' : '' }}" id="passwordBaru" name="password_baru" required minlength="6">
                         <i class="fas fa-eye toggle-password" data-target="passwordBaru"></i>
+                        @error('password_baru')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="mb-3 position-relative">
                         <label for="konfirmasiPassword" class="form-label">Konfirmasi Password Baru</label>
-                        <input type="password" class="form-control pe-5" id="konfirmasiPassword">
+                        <input type="password" class="form-control pe-5 {{ $errors->has('password_baru_confirmation') ? 'is-invalid' : '' }}" id="konfirmasiPassword" name="password_baru_confirmation" required>
                         <i class="fas fa-eye toggle-password" data-target="konfirmasiPassword"></i>
+                        @error('password_baru_confirmation')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="text-center mt-4">
@@ -352,7 +376,7 @@
                             <i class="fas fa-key me-1"></i> Ubah Password
                         </button>
                     </div>
-                </div>
+                </form>
             </div>
 
             <!-- ===================== MODAL KONFIRMASI UBAH PASSWORD ===================== -->
@@ -374,57 +398,58 @@
                 </div>
             </div>
 
+            <!-- ===================== MODAL KONFIRMASI LOGOUT ===================== -->
+            <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-success">
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title" id="logoutLabel"><i class="fas fa-sign-out-alt me-2"></i>Konfirmasi Logout</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Apakah kamu yakin ingin logout? Kamu akan keluar dari akun ini.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                            <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+                                @csrf
+                                <button type="submit" class="btn btn-success text-white">Ya, Logout</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
+
+        @if(session('success'))
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const toast = new bootstrap.Toast(document.getElementById('toastSuccess'));
+                    document.getElementById('toastMessage').textContent = '{{ session('success') }}';
+                    toast.show();
+                });
+            </script>
+        @endif
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                console.log('DOM loaded, checking buttons...'); // Debug: Cek apakah JS jalan
 
-                // === TOAST SETUP (global) ===
-                function showToast(message, type = 'success') {
-                    const toastContainer = document.createElement('div');
-                    toastContainer.className = `toast align-items-center text-white bg-${type} border-0 position-fixed top-0 end-0 m-3`;
-                    toastContainer.style.zIndex = 2000;
-                    toastContainer.innerHTML = `
-                    <div class="d-flex">
-                        <div class="toast-body fw-semibold">${message}</div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                    </div>
-                    `;
-                    document.body.appendChild(toastContainer);
-                    const toast = new bootstrap.Toast(toastContainer, { delay: 2000 });
-                    toast.show();
-                    toastContainer.addEventListener('hidden.bs.toast', () => toastContainer.remove());
-                }
-
-                // === TOMBOL SIMPAN & PASSWORD ===
-                // Untuk tombol Simpan Perubahan (info pribadi)
-                const btnSimpanInfo = document.querySelector('#info .btn-save');
-                if (btnSimpanInfo) {
-                    btnSimpanInfo.addEventListener('click', () => {
-                        console.log('Simpan info clicked'); // Debug
-                        showToast('Perubahan berhasil disimpan!');
-                    });
-                }
-
-                // Untuk tombol Ubah Password
+                // === KONFIRMASI UBAH PASSWORD ===
                 const btnUbahPassword = document.getElementById('btnUbahPassword');
                 if (btnUbahPassword) {
                     btnUbahPassword.addEventListener('click', (e) => {
-                        e.preventDefault(); // Prevent default kalau ada form
-                        console.log('Ubah Password clicked'); // Debug
+                        e.preventDefault();
                         // buka konfirmasi ubah password
                         const modalKonfirmasi = new bootstrap.Modal(document.getElementById('konfirmasiPasswordModal'));
                         modalKonfirmasi.show();
                     });
                 }
 
-                // === KONFIRMASI UBAH PASSWORD ===
                 const btnKonfirmasiUbahPassword = document.getElementById('btnKonfirmasiUbahPassword');
                 if (btnKonfirmasiUbahPassword) {
                     btnKonfirmasiUbahPassword.addEventListener('click', () => {
-                        console.log('Confirm password change clicked'); // Debug
                         const modalEl = document.getElementById('konfirmasiPasswordModal');
                         const modal = bootstrap.Modal.getInstance(modalEl);
                         modal.hide();
@@ -433,7 +458,7 @@
                         document.body.classList.remove('modal-open');
                         document.body.style = '';
 
-                        showToast('Password berhasil diubah!', 'success');
+                        document.getElementById('passwordForm').submit();
                     });
                 }
 
@@ -464,7 +489,8 @@
 
                 // === LOGOUT ===
                 window.logout = function() {
-                    if (confirm('Yakin logout?')) window.location.href = '/login';
+                    const modalLogout = new bootstrap.Modal(document.getElementById('logoutModal'));
+                    modalLogout.show();
                 };
             });
         </script>

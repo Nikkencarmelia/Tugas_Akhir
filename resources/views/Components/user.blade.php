@@ -147,14 +147,27 @@
                     <ul class="navbar-nav ms-auto align-items-center gap-2">
                         <li class="nav-item"><a class="nav-link" href="/">Beranda</a></li>
                         <li class="nav-item"><a class="nav-link" href="/produk">Produk</a></li>
+
+                        @auth
                         <li class="nav-item"><a class="nav-link" href="/riwayat">Riwayat</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/profil">Profil</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('user.profil') }}">Profil</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/keranjang">
                                 <i class="fa-solid fa-cart-shopping"></i>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <form method="POST" action="{{ route('logout') }}" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-secondary" style="border-radius: 20px; padding: 8px 16px; font-weight: 500;">Logout</button>
+                            </form>
+                        </li>
+                        @endauth
+                        @guest
                         <li class="nav-item"><a href="/login" class="btn btn-login">Login</a></li>
+                        @endguest
                     </ul>
                 </div>
             </div>

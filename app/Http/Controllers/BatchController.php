@@ -5,177 +5,164 @@ namespace App\Http\Controllers;
 use App\Models\Produk;
 use App\Models\Batch;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class BatchController extends Controller
 {
-    private function batch()
+    public function index($id_produk)
     {
-        return Batch::with('produk')->latest()->paginate(10);
-    }
+        $produk = Produk::with(['kategori','supplier','satuan'])->findOrFail($id_produk);
 
-    private function batchDiskon()
-    {
-        return Batch::with('produk')
-            ->where('keterangan_harga', 'diskon')
+        $batches = Batch::where('id_produk', $id_produk)
             ->latest()
-            ->paginate(10);
+            ->get()
+            ->map(function ($batch) {
+
+                // FORMAT TANGGAL
+                $batch->tgl_masuk_format = Carbon::parse($batch->tgl_masuk)->format('d/m/Y');
+                $batch->tgl_kadaluarsa_format = Carbon::parse($batch->tgl_kadaluarsa)->format('d/m/Y');
+
+                // SISA HARI
+                $today = Carbon::today();
+                $exp = Carbon::parse($batch->tgl_kadaluarsa)->startOfDay();
+                $diff = $today->diffInDays($exp, false);
+
+                if ($diff < 0) {
+                    $batch->sisa_text = abs($diff).' hari lalu';
+                    $batch->sisa_color = 'text-danger';
+                } elseif ($diff === 0) {
+                    $batch->sisa_text = 'Hari ini';
+                    $batch->sisa_color = 'text-warning';
+                } elseif ($diff <= 7) {
+                    $batch->sisa_text = $diff.' hari lagi';
+                    $batch->sisa_color = 'text-warning';
+                } else {
+                    $batch->sisa_text = $diff.' hari lagi';
+                    $batch->sisa_color = 'text-success';
+                }
+
+                // FORMAT HARGA
+                $batch->harga_normal_rp = 'Rp '.number_format($batch->harga_normal,0,',','.');
+                $batch->harga_saat_ini_rp = 'Rp '.number_format($batch->harga_saat_ini,0,',','.');
+
+                // KETERANGAN HARGA
+                if ($batch->harga_saat_ini < $batch->harga_normal) {
+                    $pct = round((($batch->harga_normal - $batch->harga_saat_ini) / $batch->harga_normal) * 100);
+                    $batch->keterangan = "Diskon {$pct}%";
+                } elseif ($batch->harga_saat_ini > $batch->harga_normal) {
+                    $pct = round((($batch->harga_saat_ini - $batch->harga_normal) / $batch->harga_normal) * 100);
+                    $batch->keterangan = "Naik {$pct}%";
+                } else {
+                    $batch->keterangan = 'Normal';
+                }
+
+                // STATUS STOK
+                if ($batch->stok <= 0) {
+                    $batch->status_stok_text = 'Habis';
+                    $batch->status_stok_badge = 'badge-habis';
+                } elseif ($batch->stok <= 10) {
+                    $batch->status_stok_text = 'Menipis';
+                    $batch->status_stok_badge = 'badge-menipis';
+                } else {
+                    $batch->status_stok_text = 'Tersedia';
+                    $batch->status_stok_badge = 'badge-tersedia';
+                }
+
+                return $batch;
+            });
+
+        $total_stok = $batches->sum('stok');
+        $status_stok = $total_stok <= 0 ? 'Habis' : ($total_stok <= 10 ? 'Menipis' : 'Tersedia');
+
+        // DEFAULT UNTUK FORM
+        $default_kadaluarsa = $produk->estimasi_kadaluwarsa_hari
+            ? Carbon::today()->addDays($produk->estimasi_kadaluwarsa_hari)->format('Y-m-d')
+            : '';
+
+        return view('Staff_Produk.batchStok', compact(
+            'produk',
+            'batches',
+            'total_stok',
+            'status_stok',
+            'default_kadaluarsa'
+        ));
     }
 
-    public function batchStok()
-    {
-        return view('Staff_Produk.batchStok', [
-            'produk' => $this->batch()
-        ]);
-    }
-
-    public function detailDiskon()
-    {
-        return view('Staff_Produk.detailDiskon', [
-            'produk' => $this->batchDiskon()
-        ]);
-    }
-
-    /**
-    * create
-    *
-    * @return void
-    */
-    public function createBatch()
-    {
-    // Ambil semua produk
-    $produk = Produk::all();
-
-    // Kirim ke view
-    return view('Staff_Produk.batch.create', compact('produk'));
-    }
-
-    /**
-    * store
-    *
-    * @param Request $request
-    * @return void
-    */
     public function store(Request $request)
-    {
-        $this->validate($request, [
-            'tgl_masuk' => 'required',
-            'stok' => 'required',
-            'status_stok' => 'nullable',
-            'harga_normal' => 'required',
-            'harga_saat_ini' => 'required',
-            'tgl_perubahan_harga' => 'nullable',
-            'tgl_kadaluwarsa' => 'required',
-            'keterangan_harga' => 'nullable',
-            'id_produk' => 'required'
-        ]);
+{
+    $request->validate([
+        'id_produk' => 'required|exists:produks,id',
+        'stok' => 'required|integer|min:1',
+        'tgl_masuk' => 'nullable|date',
+        'harga_normal' => 'required|integer|min:0',
+        'harga_saat_ini' => 'required|integer|min:0',
+    ]);
 
-        // 1. Status stok otomatis
-        if ($request->stok == 0) {
-            $status_stok = 'habis';
-        } elseif ($request->stok <= 15) {
-            $status_stok = 'menipis';
-        } else {
-            $status_stok = 'tersedia';
-        }
+    $produk = Produk::findOrFail($request->id_produk);
 
-        // 2. Untuk data baru, tanggal perubahan harga = tanggal masuk
-        $tgl_perubahan_harga = $request->tgl_masuk;
-
-        // 3. Keterangan harga
-        if ($request->harga_saat_ini == $request->harga_normal) {
-            $keterangan_harga = 'normal';
-        } elseif ($request->harga_saat_ini > $request->harga_normal) {
-            $keterangan_harga = 'harga naik';
-        } else {
-            $keterangan_harga = 'diskon';
-        }
-
-
-        Batch::create([
-            'tgl_masuk' => $request->tgl_masuk,
-            'stok' => $request->stok,
-            'status_stok' => $status_stok,
-            'harga_normal' => $request->harga_normal,
-            'harga_saat_ini' => $request->harga_saat_ini,
-            'tgl_perubahan_harga' => $tgl_perubahan_harga,
-            'tgl_kadaluwarsa' => $request->tgl_kadaluwarsa,
-            'keterangan_harga' => $keterangan_harga,
-            'id_produk' => $request->id_produk
-        ]);
-
-        try{
-            return redirect()->route('batch.view');
-        }catch(Exception $e){
-            return redirect()->route('batch.view');
-        }
+    if (!$produk->estimasi_kadaluwarsa_hari || $produk->estimasi_kadaluwarsa_hari < 1) {
+        return back()->with('error', 'Produk belum punya estimasi kadaluarsa.');
     }
 
-    /**
-    * update
-    *
-    * @param mixed $request
-    * @param int $id
-    * @return void
-    */
+    // ✅ tanggal masuk
+    $tglMasuk = $request->tgl_masuk
+        ? Carbon::parse($request->tgl_masuk)
+        : Carbon::today();
+
+    // ✅ HITUNG ULANG DI BACKEND (TANPA PERCAYA FORM)
+    $tglKadaluwarsa = $tglMasuk->copy()->addDays($produk->estimasi_kadaluwarsa_hari);
+
+    Batch::create([
+        'id_produk' => $produk->id,
+        'tgl_masuk' => $tglMasuk,
+        'tgl_kadaluwarsa' => $tglKadaluwarsa,
+        'stok' => $request->stok,
+        'harga_normal' => $request->harga_normal,
+        'harga_saat_ini' => $request->harga_saat_ini,
+        'tgl_perubahan_harga' => now(),
+        'status_stok' => $this->hitungStatusStok($request->stok),
+        'keterangan_harga' => 'normal',
+    ]);
+
+    return back()->with('success', 'Batch berhasil ditambahkan');
+}
+
+
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'tgl_masuk' => 'required|date',
+            'tgl_kadaluwarsa' => 'required|date|after_or_equal:tgl_masuk',
+            'stok' => 'required|integer|min:1',
+            'harga_normal' => 'required|integer|min:0',
+            'harga_saat_ini' => 'required|integer|min:0',
+        ]);
+
         $batch = Batch::findOrFail($id);
 
-        $this->validate($request, [
-            'stok' => 'required',
-            'harga_normal' => 'required',
-            'harga_saat_ini' => 'required',
-            'tgl_kadaluwarsa' => 'required'
-        ]);
-
-        // Status stok otomatis
-        if ($request->stok == 0) {
-            $status_stok = 'habis';
-        } elseif ($request->stok <= 15) {
-            $status_stok = 'menipis';
-        } else {
-            $status_stok = 'tersedia';
-        }
-
-        // Kalau harga berubah → tanggal perubahan harga = hari ini
-        $tgl_perubahan_harga =
-            $request->harga_saat_ini != $batch->harga_saat_ini
-            ? now()
-            : $batch->tgl_perubahan_harga;
-
-        // Keterangan harga
-        if ($request->harga_saat_ini == $request->harga_normal) {
-            $keterangan_harga = 'normal';
-        } elseif ($request->harga_saat_ini > $request->harga_normal) {
-            $keterangan_harga = 'harga naik';
-        } else {
-            $keterangan_harga = 'diskon';
-        }
-
         $batch->update([
+            'tgl_masuk' => $request->tgl_masuk,
+            'tgl_kadaluwarsa' => $request->tgl_kadaluwarsa,
             'stok' => $request->stok,
-            'status_stok' => $status_stok,
             'harga_normal' => $request->harga_normal,
             'harga_saat_ini' => $request->harga_saat_ini,
-            'tgl_perubahan_harga' => $tgl_perubahan_harga,
-            'tgl_kadaluwarsa' => $request->tgl_kadaluwarsa,
-            'keterangan_harga' => $keterangan_harga
+            'tgl_perubahan_harga' => now(),
+            'status_stok' => $this->hitungStatusStok($request->stok),
         ]);
 
-        return redirect()->route('batch.view')->with('success', 'Batch berhasil diperbarui!');
+        return back()->with('success', 'Batch berhasil diupdate');
     }
 
-    /**
-    * destroy
-    *
-    * @param int $id
-    * @return void
-    */
     public function destroy($id)
     {
-        $batch = Batch::find($id);
-        $batch->delete();
-        return redirect()->route('batch.view')->with(['success' => 'Batch Berhasil Dihapus!']);
+        Batch::findOrFail($id)->delete();
+        return back()->with('success', 'Batch berhasil dihapus');
     }
 
+    private function hitungStatusStok($stok)
+    {
+        if ($stok <= 0) return 'habis';
+        if ($stok <= 10) return 'menipis';
+        return 'tersedia';
+    }
 }

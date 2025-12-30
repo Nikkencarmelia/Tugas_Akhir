@@ -19,7 +19,6 @@
             }
 
             .cart-header h3 {
-
                 font-weight: 700;
                 margin: 0;
                 display: flex;
@@ -27,10 +26,52 @@
                 gap: 0.5rem;
             }
 
+            .header-left {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .cart-actions {
+                display: flex;
+                gap: 0.25rem;
+            }
+
+            .cart-actions .btn {
+                border-radius: 12px;
+                font-size: 12px;
+                padding: 6px 12px;
+                font-weight: 500;
+                line-height: 1.2;
+                min-width: auto;
+            }
+
+            .cart-actions .btn-outline-success {
+                border-color: #198754;
+                color: #198754;
+            }
+
+            .cart-actions .btn-outline-success:hover {
+                background: #198754;
+                color: white;
+            }
+
+            .cart-actions .btn-outline-danger {
+                border-color: #dc3545;
+                color: #dc3545;
+            }
+
+            .cart-actions .btn-outline-danger:hover {
+                background: #dc3545;
+                color: white;
+            }
+
             .search-wrapper {
                 border: 1px solid #ced4da; /* abu tipis bawaan Bootstrap */
                 border-radius: 0.375rem;
                 transition: all 0.2s ease;
+                flex: 1;
+                max-width: 300px;
             }
 
             .search-wrapper:focus-within {
@@ -257,6 +298,22 @@
                     gap: 1rem;
                 }
 
+                .header-left {
+                    width: 100%;
+                    justify-content: space-between;
+                }
+
+                .cart-actions {
+                    order: 3;
+                    width: 100%;
+                    justify-content: flex-start;
+                }
+
+                .search-wrapper {
+                    max-width: none;
+                    order: 2;
+                }
+
                 .checkout-box {
                     margin-top: 2rem;
                     position: static;
@@ -274,8 +331,14 @@
                 <div class="col-lg-8">
 
                     <div class="cart-header">
-                        <h3>Keranjang Saya</h3>
-                        <form class="d-flex" role="search" style="width: 350px;">
+                        <div class="header-left">
+                            <h3>Keranjang Saya</h3>
+                            <div class="cart-actions">
+                                <button id="selectAll" class="btn btn-outline-success">Pilih Semua</button>
+                                <button id="deleteAll" class="btn btn-outline-danger">Hapus Semua</button>
+                            </div>
+                        </div>
+                        <form class="d-flex search-form" role="search">
                             <div class="input-group search-wrapper">
                                 <input type="text" class="form-control" placeholder="Cari produk..." aria-label="Search">
                                 <button class="input-group-text border-start-0" type="submit">
@@ -402,6 +465,22 @@
             // Update total kalau user ubah angka qty manual
             document.querySelectorAll('.qty-input').forEach(input => {
                 input.addEventListener('input', updateTotal);
+            });
+
+            // Button Pilih Semua
+            document.getElementById('selectAll').addEventListener('click', function() {
+                document.querySelectorAll('input[type="checkbox"]').forEach(chk => {
+                    chk.checked = true;
+                });
+                updateTotal();
+            });
+
+            // Button Hapus Semua (uncheck semua, sehingga tidak terhitung di checkout)
+            document.getElementById('deleteAll').addEventListener('click', function() {
+                document.querySelectorAll('input[type="checkbox"]').forEach(chk => {
+                    chk.checked = false;
+                });
+                updateTotal();
             });
 
             // Inisialisasi subtotal awal

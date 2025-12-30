@@ -22,7 +22,6 @@
         .dashboard-container { padding: 1.5rem; max-width: 1200px; margin: auto; }
         .dashboard-title { font-size: 1.6rem; font-weight: 700; color: var(--green-primary); display: flex; align-items: center; gap: .5rem; }
 
-        /* Detail Produk */
         .product-detail-card { background: var(--white); border-radius: .8rem; border: 1px solid var(--border-color); box-shadow: 0 2px 8px var(--shadow); overflow: hidden; margin-bottom: 2rem; }
         .product-detail-header { background: var(--green-soft); padding: 1.5rem; border-bottom: 1px solid var(--border-color); position: relative; }
         .btn-add-top { position: absolute; right: 1.5rem; top: 1.4rem; background: var(--green-primary); color: white; border-radius: .5rem; padding: .45rem .9rem; font-weight: 600; border: none; }
@@ -35,23 +34,20 @@
             font-size: .8rem; padding: .4rem .7rem; border-radius: .5rem; font-weight: 600;
         }
 
-        /* Batch Header */
         .batch-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; background: var(--white); padding: 1.5rem 2rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         .batch-header h3 { color: #2a522a; margin: 0; display: flex; align-items: center; gap: .5rem; }
         .batch-search {
-    width: 500px !important; /* Atau 180px, jangan 10px ya, biar nggak sempit banget */
-    max-width: 500px !important;
-}
+            width: 500px !important;
+            max-width: 500px !important;
+        }
 
-        /* Table - Perbaikan Tampilan */
         .table-card { background: var(--white); border-radius: .8rem; border: 1px solid var(--border-color); box-shadow: 0 2px 8px var(--shadow); overflow: hidden; }
-        .table { table-layout: fixed; } /* Fixed layout untuk distribusi kolom merata */
-        .table th, .table td { font-size: .8rem; padding: .5rem .25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } /* Compact padding, ellipsis untuk overflow */
+        .table { table-layout: fixed; }
+        .table th, .table td { font-size: .8rem; padding: .5rem .25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .table th { background: var(--green-soft); color: var(--green-text); font-weight: 600; font-size: .75rem; text-transform: uppercase; border-bottom: 2px solid var(--border-color); }
         .table td { vertical-align: middle; border-top: 1px solid var(--border-color); color: var(--text-dark); }
         .table tbody tr:hover { background-color: #F3F4F6; }
         .harga-normal { font-weight: 600; color: var(--text-dark); font-size: .8rem; }
-        /* Kolom spesifik width */
         .col-batch { width: 8%; }
         .col-tgl-masuk { width: 10%; }
         .col-tgl-exp { width: 10%; }
@@ -59,10 +55,16 @@
         .col-harga-normal { width: 9%; }
         .col-harga-saat { width: 9%; }
         .col-tgl-perubahan { width: 10%; }
-        .col-ket-harga { width: 12%; } /* Lebih lebar untuk keterangan, tapi ellipsis */
+        .col-ket-harga { width: 12%; }
         .col-stok { width: 6%; text-align: center; }
         .col-status-stok { width: 8%; }
-        .col-aksi { width: 10%; position: relative; } /* Tambah relative untuk dropdown */
+        .col-aksi {
+            width: 10%;
+            position: relative;
+            overflow: visible !important; /* Fix: Izinkan overflow agar dropdown muncul keluar dari sel tabel */
+            padding-right: 0.5rem; /* Tambahan: Sedikit padding ekstra untuk ruang button */
+        }
+        .table td.col-aksi { overflow: visible !important; } /* Override khusus untuk td.col-aksi */
 
         .btn-table-action { border: none; border-radius: .4rem; padding: .35rem .7rem; font-size: .85rem; font-weight: 500; transition: all .3s ease; margin-right: .25rem; white-space: nowrap; }
         .btn-table-warning { background: #F59E0B; color: white; }
@@ -72,18 +74,19 @@
         .btn-table-danger { background: #EF4444; color: white; }
         .btn-table-danger:hover { background: #dc2626; }
 
-        .dropdown-menu { min-width: 140px; z-index: 1070 !important; position: absolute; } /* Naikkan z-index lebih tinggi, absolute untuk positioning */
+        .dropdown-menu { min-width: 140px; z-index: 1070 !important; position: absolute; }
         .dropdown-item { padding: .5rem .75rem; font-size: .85rem; }
         .dropdown-item:hover { background-color: #f8f9fa; }
         .dropdown-divider { margin: 0; }
 
-        /* Status Badges */
         .badge-status { padding: .25rem .6rem; font-size: .7rem; border-radius: 1rem; font-weight: 600; display: inline-block; margin-right: .25rem; line-height: 1.5; }
         .badge-tersedia { background: #DBEAFE; color: #1E40AF; }
         .badge-menipis { background: #FEF3C7; color: #92400E; }
         .badge-habis { background: #FEE2E2; color: #991B1B; }
+        .badge-ditampilkan { background: #DCFCE7; color: #166534; }
+        .badge-diarsipkan { background: #E5E7EB; color: #374151; }
+        .badge-draft { background: #F3E8FF; color: #7E22CE; }
 
-        /* Prettier Badges for Harga Keterangan - Compact */
         .badge-harga-normal, .badge-harga-diskon, .badge-harga-naik {
             font-size: .65rem; padding: .25rem .5rem; border-radius: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; display: block;
         }
@@ -120,24 +123,21 @@
             box-shadow: 0 2px 4px rgba(16, 185, 129, 0.4);
         }
 
-        /* Modal Rusak */
         .modal-rusak .form-control { border-radius: .5rem; }
         .modal-rusak .form-label { font-weight: 600; }
         .modal-rusak input[type="file"] { border: 1px solid var(--border-color); border-radius: .5rem; padding: .5rem; }
 
-        /* Fix dropdown di table-responsive */
-        .table-responsive { overflow: visible; } /* Ubah overflow agar dropdown bisa keluar */
-        .col-aksi .dropdown-menu { margin-top: 0; } /* Hilangkan margin atas */
+        .table-responsive { overflow: visible; }
+        .col-aksi .dropdown-menu { margin-top: 0; }
 
         @media (max-width: 768px) {
             .batch-header { flex-direction: column; gap: 1rem; text-align: center; }
-            .batch-search {
-                width: 100% !important;
-            }
+            .batch-search { width: 100% !important; }
             .table th, .table td { font-size: .75rem; padding: .4rem .2rem; }
             .dropdown-menu { min-width: 100px; }
             .badge-harga-normal, .badge-harga-diskon, .badge-harga-naik { max-width: 80px; font-size: .6rem; }
             .product-detail-body .row { flex-direction: column; }
+            .col-aksi { padding-right: 0.25rem; } /* Adjust untuk mobile */
         }
     </style>
 </head>
@@ -147,7 +147,6 @@
 
 <div class="dashboard-container">
 
-    <!-- DETAIL PRODUK -->
     <div class="product-detail-card">
         <div class="product-detail-header">
             <h4 class="dashboard-title"><i class="bi bi-box-seam"></i> Detail Produk</h4>
@@ -159,23 +158,55 @@
         <div class="product-detail-body">
             <div class="row align-items-start">
                 <div class="col-md-4">
-                    <img src="{{ $produk['gambar'] }}" alt="Produk">
+                    <img src="{{ asset('storage/'.$produk->gambar) }}" alt="Produk">
                 </div>
+
                 <div class="col-md-8">
-                    <h4 class="fw-bold">{{ $produk['nama_produk'] }}</h4>
-                    <p class="text-muted">{{ $produk['deskripsi'] }}</p>
+                    <h4 class="fw-bold">{{ $produk->nama_produk }}</h4>
+                    <p class="text-muted">{{ $produk->deskripsi }}</p>
 
                     <div class="row mt-3">
                         <div class="col-6">
-                            <p><strong>Supplier:</strong> <span class="badge-supplier">{{ $produk['supplier'] }}</span></p>
-                            <p><strong>Kategori:</strong> <span class="badge-kategori">{{ $produk['kategori'] }}</span></p>
-                            <p><strong>Satuan:</strong> {{ $produk['satuan_berat'] }}</p>
+                            <p>
+                                <strong>Supplier:</strong>
+                                <span class="badge-supplier">
+                                    {{ $produk->supplier->nama_supplier ?? '-' }}
+                                </span>
+                            </p>
+
+                            <p>
+                                <strong>Kategori:</strong>
+                                <span class="badge-kategori">
+                                    {{ $produk->kategori->nama_kategori ?? '-' }}
+                                </span>
+                            </p>
+
+                            <p>
+                                <strong>Satuan:</strong>
+                                {{ $produk->jumlah_satuan }} {{ $produk->satuan->nama_satuan ?? '-' }}
+                            </p>
                         </div>
+
                         <div class="col-6">
-                            <p><strong>Total Stok:</strong> <span class="fw-bold">{{ $produk['stok'] }}</span></p>
-                            <p><strong>Status:</strong>
-                                <span class="badge-status badge-{{ strtolower(str_replace(' ', '-', $produk['status_tampil'])) }}">{{ $produk['status_tampil'] }}</span>
-                                <span class="badge-status badge-{{ strtolower(str_replace([' ', '_'], '-', $produk['status_stok'])) }}">{{ $produk['status_stok'] }}</span>
+                            <p>
+                                <strong>Total Stok:</strong>
+                                <span class="fw-bold">
+                                    {{ $total_stok }}
+                                </span>
+                            </p>
+
+                            <p>
+                                <strong>Status Tampil:</strong>
+                                <span class="badge-status badge-{{ strtolower(str_replace([' ', '_'], '-', $produk->status_tampil ?? 'draft')) }}">
+                                    {{ $produk->status_tampil }}
+                                </span>
+                            </p>
+
+                            <p>
+                                <strong>Status Stok:</strong>
+                                <span class="badge-status badge-{{ strtolower(str_replace([' ', '_'], '-', $status_stok ?? 'tersedia')) }}">
+                                    {{ $status_stok ?? 'Tersedia' }}
+                                </span>
                             </p>
                         </div>
                     </div>
@@ -185,26 +216,25 @@
         </div>
     </div>
 
-    <!-- LIST BATCH -->
     <div class="batch-header">
-    <div>
-        <h3><i class="bi bi-layers"></i> Daftar Batch <span class="badge bg-success ms-2">{{ count($batches) }}</span></h3>
-        <small class="text-muted">Kelola batch stok produk</small>
-    </div>
+        <div>
+            <h3><i class="bi bi-layers"></i> Daftar Batch <span class="badge bg-success ms-2">{{ count($batches) }}</span></h3>
+            <small class="text-muted">Kelola batch stok produk</small>
+        </div>
 
-    <div class="input-group batch-search">
-        <input type="text" class="form-control" id="batchSearch" placeholder="Cari batch...">
-        <button class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
+        <div class="input-group batch-search">
+            <input type="text" class="form-control" id="batchSearch" placeholder="Cari batch...">
+            <button class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
+        </div>
     </div>
-</div>
 
     <div class="table-card">
         <div class="table-responsive">
-            <table class="table align-middle table-sm" id="batchTable"> <!-- Tambah table-sm untuk compact -->
+            <table class="table align-middle table-sm" id="batchTable">
                 <thead>
                     <tr>
                         <th class="col-batch">Batch</th>
-                        <th class="col-tgl-masuk">Tgl. Masuk</th> <!-- Singkatkan header -->
+                        <th class="col-tgl-masuk">Tgl. Masuk</th>
                         <th class="col-tgl-exp">Tgl. Kadaluarsa</th>
                         <th class="col-sisa-hari">Sisa Hari</th>
                         <th class="col-harga-normal">Harga Normal</th>
@@ -218,71 +248,37 @@
                 </thead>
                 <tbody>
                     @forelse($batches as $batch)
-                        @php
-                            $masuk = \Carbon\Carbon::createFromFormat('Y-m-d', $batch['tanggal_masuk']);
-                            $exp = \Carbon\Carbon::createFromFormat('Y-m-d', $batch['tanggal_kadaluarsa']);
-                            $now = \Carbon\Carbon::now()->startOfDay();
-                            $sisaHariRaw = $exp->startOfDay()->diffInDays($now, false);
-                            $sisaHari = $sisaHariRaw;
-                            if ($sisaHari > 0) {
-                                $sisaHari += 1; // Inclusive untuk "hari lagi"
-                            }
-                            if (abs($sisaHariRaw) > 1000) {
-                                $sisaText = 'Invalid';
-                                $textColor = 'text-danger';
-                            } else {
-                                if ($sisaHariRaw < 0) {
-                                    $sisaText = abs($sisaHariRaw) . ' lalu';
-                                    $textColor = 'text-danger';
-                                } elseif ($sisaHariRaw <= 7) {
-                                    $sisaText = $sisaHari . ' lagi';
-                                    $textColor = 'text-warning';
-                                } else {
-                                    $sisaText = $sisaHari . ' lagi';
-                                    $textColor = 'text-success';
-                                }
-                            }
-
-                            $normal_num = (int)str_replace(['Rp ', '.'], '', $batch['harga_normal']);
-                            $saat_ini_num = (int)str_replace(['Rp ', '.'], '', $batch['harga_saat_ini']);
-                            $is_diskon = $saat_ini_num < $normal_num && $batch['diskon'] > 0;
-                            $is_naik = $saat_ini_num > $normal_num;
-                            $keterangan = $is_diskon ? 'Diskon ' . $batch['diskon'] . '%' : ($is_naik ? 'Naik ' . round((($saat_ini_num - $normal_num) / $normal_num) * 100) . '%' : 'Normal'); // Singkatkan teks
-
-                            $statusStok = $batch['jumlah'] == 0 ? 'Habis' : ($batch['jumlah'] <= 10 ? 'Menipis' : 'Tersedia');
-                            $badgeStok = $batch['jumlah'] == 0 ? 'badge-habis' : ($batch['jumlah'] <= 10 ? 'badge-menipis' : 'badge-tersedia');
-                        @endphp
                         <tr>
-                            <td class="col-batch">Batch {{ $batch['id'] }}</td>
-                            <td class="col-tgl-masuk">{{ $masuk->format('d/m/Y') }}</td>
-                            <td class="col-tgl-exp">{{ $exp->format('d/m/Y') }}</td>
-                            <td class="col-sisa-hari fw-bold {{ $textColor }}">{{ $sisaText }}</td>
-                            <td class="col-harga-normal {{ $is_diskon ? 'text-decoration-line-through text-muted' : '' }}">{{ $batch['harga_normal'] }}</td>
-                            <td class="col-harga-saat fw-bold {{ $is_diskon ? 'text-success' : ($is_naik ? 'text-danger' : '') }}">{{ $batch['harga_saat_ini'] }}</td>
-                            <td class="col-tgl-perubahan">{{ \Carbon\Carbon::createFromFormat('Y-m-d', $batch['tanggal_perubahan_harga'])->format('d/m/Y') }}</td>
-                            <td class="col-ket-harga" title="{{ $keterangan }}"> <!-- Tooltip untuk full teks -->
-                                @if($is_diskon)
-                                    <span class="badge-harga-diskon">{{ $keterangan }}</span>
-                                @elseif($is_naik)
-                                    <span class="badge-harga-naik">{{ $keterangan }}</span>
+                            <td class="col-batch">Batch {{ $batch->id }}</td>
+                            <td class="col-tgl-masuk">{{ $batch->tgl_masuk_format }}</td>
+                            <td class="col-tgl-exp">{{ $batch->tgl_kadaluarsa_format }}</td>
+                            <td class="col-sisa-hari fw-bold {{ $batch->sisa_color }}">{{ $batch->sisa_text }}</td>
+                            <td class="col-harga-normal {{ $batch->harga_saat_ini < $batch->harga_normal ? 'text-decoration-line-through text-muted' : '' }}">{{ $batch->harga_normal_rp }}</td>
+                            <td class="col-harga-saat fw-bold {{ $batch->harga_saat_ini < $batch->harga_normal ? 'text-success' : ($batch->harga_saat_ini > $batch->harga_normal ? 'text-danger' : '') }}">{{ $batch->harga_saat_ini_rp }}</td>
+                            <td class="col-tgl-perubahan">{{ $batch->tgl_perubahan_format }}</td>
+                            <td class="col-ket-harga" title="{{ $batch->keterangan }}">
+                                @if($batch->harga_saat_ini < $batch->harga_normal)
+                                    <span class="badge-harga-diskon">{{ $batch->keterangan }}</span>
+                                @elseif($batch->harga_saat_ini > $batch->harga_normal)
+                                    <span class="badge-harga-naik">{{ $batch->keterangan }}</span>
                                 @else
-                                    <span class="badge-harga-normal">{{ $keterangan }}</span>
+                                    <span class="badge-harga-normal">{{ $batch->keterangan }}</span>
                                 @endif
                             </td>
-                            <td class="col-stok">{{ $batch['jumlah'] }}</td>
-                            <td class="col-status-stok"><span class="badge-status {{ $badgeStok }}">{{ $statusStok }}</span></td>
+                            <td class="col-stok">{{ $batch->stok }}</td>
+                            <td class="col-status-stok"><span class="badge-status {{ $batch->status_stok_badge }}">{{ $batch->status_stok_text }}</span></td>
                             <td class="col-aksi">
                                 <div class="dropdown">
-                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton{{ $batch['id'] }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton{{ $batch->id }}" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem; min-width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
                                         <i class="bi bi-three-dots-vertical"></i>
                                     </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ $batch['id'] }}">
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ $batch->id }}">
                                         <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#discountModal"><i class="bi bi-percent"></i> Kasih Diskon</a></li>
                                         <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#hargaModal"><i class="bi bi-arrow-up"></i> Naikkan Harga</a></li>
                                         <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#rusakModal"><i class="bi bi-exclamation-triangle"></i> Produk Rusak</a></li>
-                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editBatchModal" onclick="editBatch({{ $batch['id'] }}, '{{ $batch['tanggal_masuk'] }}', '{{ $batch['tanggal_kadaluarsa'] }}', {{ $batch['jumlah'] }}, '{{ $batch['harga_normal'] }}', '{{ $batch['harga_saat_ini'] }}')"><i class="bi bi-pencil"></i> Edit</a></li>
+                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editBatchModal" onclick="editBatch({{ $batch->id }}, '{{ $batch->tgl_masuk }}', '{{ $batch->tgl_kadaluarsa }}', {{ $batch->stok }}, '{{ $batch->harga_normal_rp }}', '{{ $batch->harga_saat_ini_rp }}')"><i class="bi bi-pencil"></i> Edit</a></li>
                                         <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item text-danger" href="#" onclick="confirmDelete({{ $batch['id'] }})"><i class="bi bi-trash"></i> Hapus</a></li>
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="confirmDelete({{ $batch->id }})"><i class="bi bi-trash"></i> Hapus</a>
                                     </ul>
                                 </div>
                             </td>
@@ -297,7 +293,6 @@
         </div>
     </div>
 
-    <!-- Pagination -->
     <nav aria-label="Batch pagination" class="mt-4">
         <ul class="pagination justify-content-center">
             <li class="page-item disabled">
@@ -314,7 +309,6 @@
 
 </div>
 
-<!-- MODAL TAMBAH BATCH -->
 <div class="modal fade" id="addBatchModal">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content p-2">
@@ -324,26 +318,40 @@
             </div>
 
             <div class="modal-body">
-                <form id="addBatchForm">
+                <form action="{{ route('produk.batch.store') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="id_produk" value="{{ $produk->id }}">
+
                     <div class="mb-3">
                         <label class="form-label">Tanggal Masuk</label>
-                        <input type="date" class="form-control">
+                        <input type="date" id="tgl_masuk_add" name="tgl_masuk" class="form-control" value="{{ now()->format('Y-m-d') }}">
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">Tanggal Kadaluarsa</label>
-                        <input type="date" class="form-control">
+                        <input
+                            type="date"
+                            id="tgl_kadaluarsa_add"
+                            name="tgl_kadaluwarsa"
+                            class="form-control"
+                            value="{{ old('tgl_kadaluwarsa', $default_kadaluarsa) }}"
+                        >
+                        <small class="text-muted">Otomatis berdasarkan tanggal masuk + {{ $produk->estimasi_kadaluwarsa_hari ?? 0 }} hari</small>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">Jumlah Stok</label>
-                        <input type="number" min="1" class="form-control">
+                        <input type="number" name="stok" min="1" class="form-control" required>
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label">Harga Normal (Rp)</label>
-                        <input type="number" min="0" class="form-control">
+                        <label class="form-label">Harga Normal</label>
+                        <input type="number" name="harga_normal" min="0" class="form-control" required>
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label">Harga Saat Ini (Rp)</label>
-                        <input type="number" min="0" class="form-control">
+                        <label class="form-label">Harga Saat Ini</label>
+                        <input type="number" name="harga_saat_ini" min="0" class="form-control" required>
                     </div>
 
                     <button class="btn btn-success w-100">Tambah Batch</button>
@@ -354,7 +362,6 @@
     </div>
 </div>
 
-<!-- MODAL EDIT BATCH -->
 <div class="modal fade" id="editBatchModal">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content p-2">
@@ -364,27 +371,29 @@
             </div>
 
             <div class="modal-body">
-                <form id="editBatchForm">
+                <form id="editBatchForm" method="POST">
+                    @csrf
+                    @method('PUT')
                     <input type="hidden" id="editBatchId" name="id">
                     <div class="mb-3">
                         <label class="form-label">Tanggal Masuk</label>
-                        <input type="date" class="form-control" id="editTanggalMasuk" name="tanggal_masuk">
+                        <input type="date" class="form-control" id="editTanggalMasuk" name="tgl_masuk" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Tanggal Kadaluarsa</label>
-                        <input type="date" class="form-control" id="editTanggalKadaluarsa" name="tanggal_kadaluarsa">
+                        <input type="date" class="form-control" id="editTanggalKadaluarsa" name="tgl_kadaluarsa" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Jumlah Stok</label>
-                        <input type="number" min="1" class="form-control" id="editJumlah" name="jumlah">
+                        <input type="number" min="1" class="form-control" id="editStok" name="stok" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Harga Normal (Rp)</label>
-                        <input type="number" min="0" class="form-control" id="editHargaNormal" name="harga_normal">
+                        <input type="number" min="0" class="form-control" id="editHargaNormal" name="harga_normal" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Harga Saat Ini (Rp)</label>
-                        <input type="number" min="0" class="form-control" id="editHargaSaatIni" name="harga_saat_ini">
+                        <input type="number" min="0" class="form-control" id="editHargaSaatIni" name="harga_saat_ini" required>
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100">Update Batch</button>
@@ -395,27 +404,32 @@
     </div>
 </div>
 
-<!-- MODAL HAPUS BATCH -->
-<div class="modal fade" id="deleteBatchModal">
+<<div class="modal fade" id="deleteBatchModal">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Konfirmasi Hapus Batch</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Apakah Anda yakin ingin menghapus batch ini? Tindakan ini tidak dapat dibatalkan.</p>
-                <input type="hidden" id="deleteBatchId">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-danger" onclick="deleteBatch()">Hapus</button>
-            </div>
+            <form id="deleteBatchForm" method="POST">
+                @csrf
+                @method('DELETE')
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi Hapus Batch</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p>Apakah Anda yakin ingin menghapus batch ini? Tindakan ini tidak dapat dibatalkan.</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-danger">Hapus</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
-<!-- Modal Diskon -->
+
 <div class="modal fade" id="discountModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -436,7 +450,6 @@
     </div>
 </div>
 
-<!-- Modal Naikkan Harga -->
 <div class="modal fade" id="hargaModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -457,7 +470,6 @@
     </div>
 </div>
 
-<!-- Modal Laporkan Rusak -->
 <div class="modal fade modal-rusak" id="rusakModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -508,67 +520,105 @@
     </div>
 </div>
 
-
 <script>
-function editBatch(id, tanggalMasuk, tanggalKadaluarsa, jumlah, hargaNormal, hargaSaatIni) {
-    document.getElementById('editBatchId').value = id;
-    document.getElementById('editTanggalMasuk').value = tanggalMasuk;
-    document.getElementById('editTanggalKadaluarsa').value = tanggalKadaluarsa;
-    document.getElementById('editJumlah').value = jumlah;
-    document.getElementById('editHargaNormal').value = hargaNormal.replace('Rp ', '').replace('.', '');
-    document.getElementById('editHargaSaatIni').value = hargaSaatIni.replace('Rp ', '').replace('.', '');
+function colorizeSingle(badgeEl, text){
+    if(!badgeEl || !text) return;
+    const colorPairs=[
+        {bg:"#BAE6FD",text:"#0369A1"},
+        {bg:"#FEF9C3",text:"#A16207"},
+        {bg:"#FBCFE8",text:"#9D174D"},
+        {bg:"#A7F3D0",text:"#065F46"},
+        {bg:"#DDD6FE",text:"#5B21B6"},
+        {bg:"#FECACA",text:"#991B1B"},
+        {bg:"#FDE68A",text:"#B45309"},
+        {bg:"#F5D0FE",text:"#86198F"}
+    ];
+    let hash=0;
+    for(let i=0;i<text.length;i++){
+        hash=text.charCodeAt(i)+((hash<<5)-hash);
+    }
+    const color=colorPairs[Math.abs(hash)%colorPairs.length];
+    badgeEl.style.backgroundColor=color.bg;
+    badgeEl.style.color=color.text;
 }
 
-function confirmDelete(id) {
-    document.getElementById('deleteBatchId').value = id;
+function colorizeBadges(){
+    document.querySelectorAll('.badge-supplier, .badge-kategori').forEach(badge=>{
+        const text=badge.textContent.trim();
+        if(text && text!=='-') colorizeSingle(badge,text.toLowerCase());
+    });
+}
+
+function editBatch(id, tglMasuk, tglExp, stok, hargaNormal, hargaSaat){
+    document.getElementById('editBatchForm').action = `/staff_produk/batch/update/${id}`;
+    document.getElementById('editTanggalMasuk').value = tglMasuk;
+    document.getElementById('editTanggalKadaluarsa').value = tglExp;
+    document.getElementById('editStok').value = stok;
+    document.getElementById('editHargaNormal').value = hargaNormal.replace(/[^\d]/g,'');
+    document.getElementById('editHargaSaatIni').value = hargaSaat.replace(/[^\d]/g,'');
+}
+
+function confirmDelete(id){
+    const form = document.getElementById('deleteBatchForm');
+    form.action = `/staff_produk/batch/delete/${id}`;
+
     new bootstrap.Modal(document.getElementById('deleteBatchModal')).show();
 }
 
+
 function deleteBatch() {
     const id = document.getElementById('deleteBatchId').value;
-    alert(`Batch ${id} dihapus! (Simulasi)`);
-    bootstrap.Modal.getInstance(document.getElementById('deleteBatchModal')).hide();
-    location.reload(); // Reload to simulate deletion
+    window.location.href = `/staff_produk/batch/delete/${id}`;
 }
 
-// Existing scripts for forms (simulasi)
+document.addEventListener('DOMContentLoaded', colorizeBadges);
+</script>
+
+<script>
+let estimasiHari = {{ $produk->estimasi_kadaluwarsa_hari ?? 0 }};
+estimasiHari = Math.max(1, estimasiHari);
+let isAutoMode = true;
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Add Batch Form
-    document.getElementById('addBatchForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('Batch ditambahkan! (Simulasi)');
-        bootstrap.Modal.getInstance(document.getElementById('addBatchModal')).hide();
-        location.reload();
+    const tglMasukInput = document.getElementById('tgl_masuk_add');
+    const tglKadaluarsaInput = document.getElementById('tgl_kadaluarsa_add');
+
+    if (!tglMasukInput || !tglKadaluarsaInput) {
+        return;
+    }
+
+    function updateKadaluarsa() {
+        if (!isAutoMode) {
+            return;
+        }
+
+        const masukStr = tglMasukInput.value;
+        if (!masukStr) {
+            tglKadaluarsaInput.value = '';
+            return;
+        }
+
+        const masukDate = new Date(masukStr);
+        const kadaluarsaDate = new Date(masukDate);
+        kadaluarsaDate.setDate(masukDate.getDate() + estimasiHari);
+
+        const year = kadaluarsaDate.getFullYear();
+        const month = String(kadaluarsaDate.getMonth() + 1).padStart(2, '0');
+        const day = String(kadaluarsaDate.getDate()).padStart(2, '0');
+        tglKadaluarsaInput.value = `${year}-${month}-${day}`;
+    }
+
+    tglMasukInput.addEventListener('change', updateKadaluarsa);
+    tglKadaluarsaInput.addEventListener('change', function() {
+        if (this.value === '') {
+            isAutoMode = true;
+            updateKadaluarsa();
+        } else {
+            isAutoMode = false;
+        }
     });
 
-    // Edit Batch Form
-    document.getElementById('editBatchForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('Batch diupdate! (Simulasi)');
-        bootstrap.Modal.getInstance(document.getElementById('editBatchModal')).hide();
-        location.reload();
-    });
-
-    // Discount Form
-    document.getElementById('discountForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('Diskon diterapkan! (Simulasi)');
-        bootstrap.Modal.getInstance(document.getElementById('discountModal')).hide();
-    });
-
-    // Harga Form
-    document.getElementById('hargaForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('Harga diupdate! (Simulasi)');
-        bootstrap.Modal.getInstance(document.getElementById('hargaModal')).hide();
-    });
-
-    // Rusak Form
-    document.getElementById('rusakForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('Laporan rusak dikirim! (Simulasi)');
-        bootstrap.Modal.getInstance(document.getElementById('rusakModal')).hide();
-    });
+    updateKadaluarsa();
 });
 </script>
 

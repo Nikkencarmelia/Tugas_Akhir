@@ -18,9 +18,13 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'id_google',
+        'nama_lengkap',
+        'role',
         'email',
+        'no_telepon',
         'password',
+        'status_online',
     ];
 
     /**
@@ -44,5 +48,15 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function kurir()
+    {
+        return $this->hasOne(Kurir::class, 'id_user');
+    }
+
+    public function alamats()
+    {
+        return $this->hasMany(Alamat::class, 'id_user');
     }
 }

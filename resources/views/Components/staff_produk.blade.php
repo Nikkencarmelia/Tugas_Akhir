@@ -270,6 +270,10 @@
                     <i class="bi bi-box-seam"></i> Data Produk
                 </a>
 
+                <a href="{{ route('produk.komponen.index') }}" class="nav-link {{ request()->is('staff_produk/komponen*') ? 'active' : '' }}">
+                    <i class="bi bi-sliders"></i> Komponen Produk
+                </a>
+
                 <a href="{{ route('produk.diskon') }}" class="nav-link {{ request()->is('staff_produk/diskon') ? 'active' : '' }}">
                     <i class="bi bi-percent"></i> Diskon
                 </a>
@@ -302,6 +306,11 @@
             <a href="{{ route('produk.data') }}" class="nav-link {{ request()->is('staff_produk/data') ? 'active' : '' }}">
                 <i class="bi bi-box-seam"></i> Data Produk
             </a>
+
+            <a href="{{ route('produk.komponen.index') }}" class="nav-link {{ request()->is('staff_produk/komponen*') ? 'active' : '' }}">
+                <i class="bi bi-sliders"></i> Komponen Produk
+            </a>
+
 
             <a href="{{ route('produk.diskon') }}" class="nav-link {{ request()->is('staff_produk/diskon') ? 'active' : '' }}">
                 <i class="bi bi-percent"></i> Diskon
