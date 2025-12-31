@@ -9,6 +9,8 @@ class Produk_Rusak extends Model
 {
     use HasFactory;
 
+    protected $table = 'produk_rusaks';
+
     protected $fillable = [
         'id_produk',
         'id_batch',
@@ -19,12 +21,14 @@ class Produk_Rusak extends Model
         'gambar',
     ];
 
-    public function produk(){
-
+    public function produk()
+    {
+        return $this->belongsTo(Produk::class, 'id_produk');
     }
 
-    public function batch(){
-
+    public function batch()
+    {
+        return $this->belongsTo(Batch::class, 'id_batch');
     }
 
 }

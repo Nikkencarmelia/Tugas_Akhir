@@ -20,11 +20,12 @@ class BatchController extends Controller
 
                 // FORMAT TANGGAL
                 $batch->tgl_masuk_format = Carbon::parse($batch->tgl_masuk)->format('d/m/Y');
-                $batch->tgl_kadaluarsa_format = Carbon::parse($batch->tgl_kadaluarsa)->format('d/m/Y');
+                $batch->tgl_kadaluarsa_format = Carbon::parse($batch->tgl_kadaluwarsa)->format('d/m/Y');
+                $batch->tgl_perubahan_format = $batch->tgl_perubahan_harga ? Carbon::parse($batch->tgl_perubahan_harga)->format('d/m/Y') : '-';
 
                 // SISA HARI
                 $today = Carbon::today();
-                $exp = Carbon::parse($batch->tgl_kadaluarsa)->startOfDay();
+                $exp = Carbon::parse($batch->tgl_kadaluwarsa)->startOfDay();
                 $diff = $today->diffInDays($exp, false);
 
                 if ($diff < 0) {
@@ -94,23 +95,28 @@ class BatchController extends Controller
         'id_produk' => 'required|exists:produks,id',
         'stok' => 'required|integer|min:1',
         'tgl_masuk' => 'nullable|date',
+        'tgl_kadaluwarsa' => 'nullable|date|after_or_equal:tgl_masuk',
         'harga_normal' => 'required|integer|min:0',
         'harga_saat_ini' => 'required|integer|min:0',
     ]);
 
     $produk = Produk::findOrFail($request->id_produk);
 
-    if (!$produk->estimasi_kadaluwarsa_hari || $produk->estimasi_kadaluwarsa_hari < 1) {
-        return back()->with('error', 'Produk belum punya estimasi kadaluarsa.');
-    }
-
     // ✅ tanggal masuk
     $tglMasuk = $request->tgl_masuk
         ? Carbon::parse($request->tgl_masuk)
         : Carbon::today();
 
-    // ✅ HITUNG ULANG DI BACKEND (TANPA PERCAYA FORM)
-    $tglKadaluwarsa = $tglMasuk->copy()->addDays($produk->estimasi_kadaluwarsa_hari);
+    // ✅ Gunakan input dari form jika ada, jika tidak hitung otomatis
+    if ($request->filled('tgl_kadaluwarsa')) {
+        $tglKadaluwarsa = Carbon::parse($request->tgl_kadaluwarsa);
+    } else {
+        // Hitung otomatis jika tidak ada input
+        if (!$produk->estimasi_kadaluwarsa_hari || $produk->estimasi_kadaluwarsa_hari < 1) {
+            return back()->with('error', 'Produk belum punya estimasi kadaluarsa. Silakan isi tanggal kadaluarsa secara manual.');
+        }
+        $tglKadaluwarsa = $tglMasuk->copy()->addDays($produk->estimasi_kadaluwarsa_hari);
+    }
 
     Batch::create([
         'id_produk' => $produk->id,
@@ -157,6 +163,55 @@ class BatchController extends Controller
     {
         Batch::findOrFail($id)->delete();
         return back()->with('success', 'Batch berhasil dihapus');
+    }
+
+    public function applyDiscount(Request $request, $id)
+    {
+        $request->validate([
+            'diskon_percent' => 'required|numeric|min:0|max:100',
+        ]);
+
+        $batch = Batch::findOrFail($id);
+        $diskonPercent = $request->diskon_percent;
+
+        // Hitung harga setelah diskon
+        $hargaSetelahDiskon = $batch->harga_normal - ($batch->harga_normal * $diskonPercent / 100);
+        $hargaSetelahDiskon = round($hargaSetelahDiskon);
+
+        // Update batch
+        $batch->update([
+            'harga_saat_ini' => $hargaSetelahDiskon,
+            'tgl_perubahan_harga' => now(),
+            'keterangan_harga' => 'diskon',
+        ]);
+
+        return back()->with('success', "Diskon {$diskonPercent}% berhasil diterapkan. Harga baru: Rp " . number_format($hargaSetelahDiskon, 0, ',', '.'));
+    }
+
+    public function increasePrice(Request $request, $id)
+    {
+        $request->validate([
+            'harga_saat_ini' => 'required|numeric|min:0',
+        ]);
+
+        $batch = Batch::findOrFail($id);
+        $hargaBaru = (int) $request->harga_saat_ini;  // Cast ke integer untuk konsistensi dengan schema int(11)
+
+        // Hitung persentase perubahan untuk display (dari harga normal, seperti logic di view)
+        $pct = $batch->harga_normal > 0 ? round((($hargaBaru - $batch->harga_normal) / $batch->harga_normal * 100)) : 0;
+        $keteranganDisplay = $pct > 0 ? "Naik {$pct}%" : "Harga Diperbarui";
+
+        // Simpan code pendek ke DB (konsisten dengan ENUM-like: 'normal', 'diskon', 'naik')
+        $keteranganHarga = $pct > 0 ? 'harga naik' : 'normal';
+
+        // Update batch
+        $batch->update([
+            'harga_saat_ini' => $hargaBaru,
+            'tgl_perubahan_harga' => now(),
+            'keterangan_harga' => $keteranganHarga,
+        ]);
+
+        return back()->with('success', "Harga baru Rp " . number_format($hargaBaru, 0, ',', '.') . " berhasil diterapkan. Keterangan: {$keteranganDisplay}.");
     }
 
     private function hitungStatusStok($stok)

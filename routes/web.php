@@ -8,6 +8,7 @@ use App\Http\Controllers\AlamatController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\KomponenProdukController;
 use App\Http\Controllers\BatchController;
+use App\Http\Controllers\ProdukRusakCacatController;
 use App\Http\Controllers\PengurusController;
 use App\Http\Controllers\OngkirDaerahController;
 use App\Http\Controllers\ManajemenUserController;
@@ -1380,7 +1381,6 @@ Route::prefix('staff_produk')->name('produk.')->group(function () {
     Route::get('/diskon', [ProdukController::class, 'diskonProduk'])->name('diskon');
     Route::get('/stok', [ProdukController::class, 'kelolaStok'])->name('stok');
     Route::get('/arsip', [ProdukController::class, 'arsipProduk'])->name('arsip');
-    Route::get('/rusak', [ProdukController::class, 'rusakCacat'])->name('rusak');
 
     //Produk
     Route::get('/tambah', [ProdukController::class, 'tambahProduk'])->name('tambah');
@@ -1394,6 +1394,8 @@ Route::prefix('staff_produk')->name('produk.')->group(function () {
     Route::post('/batch/store', [BatchController::class, 'store'])->name('batch.store');
     Route::put('/batch/update/{id}', [BatchController::class, 'update'])->name('batch.update');
     Route::delete('/batch/delete/{id}', [BatchController::class, 'destroy'])->name('batch.delete');
+    Route::put('/batch/diskon/{id}', [BatchController::class, 'applyDiscount'])->name('batch.diskon');
+    Route::put('/batch/naik/{id}', [BatchController::class, 'increasePrice'])->name('batch.naik');
 
     //Komponen Produk
     Route::prefix('komponen')->name('komponen.')->group(function () {
@@ -1419,6 +1421,12 @@ Route::prefix('staff_produk')->name('produk.')->group(function () {
         //Pindah Supplier
         Route::post('/supplier/move', [KomponenProdukController::class, 'moveSupplier'])->name('supplier.move');
     });
+
+
+    Route::get('/rusak_cacat', [ProdukRusakCacatController::class, 'index'])->name('rusak_cacat.index');
+    Route::get('/rusak_cacat/{id_produk}', [ProdukRusakCacatController::class, 'show'])->name('rusak_cacat.show');
+Route::post('/rusak_cacat/store', [ProdukRusakCacatController::class, 'store'])->name('produk.rusak_cacat.store');
+
 });
 
 Route::prefix('arsip-produk')->group(function () {

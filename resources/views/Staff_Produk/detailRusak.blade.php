@@ -76,129 +76,138 @@
     </style>
 </head>
 <body>
-@extends('Components.staff_produk')
-@section('content')
+    @extends('Components.staff_produk')
+    @section('content')
 
-<div class="dashboard-container">
+    <div class="dashboard-container">
 
-    <!-- DETAIL PRODUK -->
-    <div class="product-detail-card">
-        <div class="product-detail-header">
-            <h4 class="dashboard-title"><i class="bi bi-box-seam"></i> Detail Produk Rusak/Cacat</h4>
-        </div>
+        <!-- DETAIL PRODUK - FIXED: Akses sebagai model Eloquent -->
+        <div class="product-detail-card">
+            <div class="product-detail-header">
+                <h4 class="dashboard-title"><i class="bi bi-box-seam"></i> Detail Produk Rusak/Cacat</h4>
+            </div>
 
-        <div class="product-detail-body">
-            <div class="row align-items-start">
-                <div class="col-md-4">
-                    <img src="{{ $produk['gambar'] }}" alt="Produk">
-                </div>
-                <div class="col-md-8">
-                    <h4 class="fw-bold">{{ $produk['nama_produk'] }}</h4>
-                    <p class="text-muted">{{ $produk['deskripsi'] }}</p>
-
-                    <div class="row mt-3">
-                        <div class="col-6">
-                            <p><strong>Supplier:</strong> <span class="badge-supplier">{{ $produk['supplier'] }}</span></p>
-                            <p><strong>Kategori:</strong> <span class="badge-kategori">{{ $produk['kategori'] }}</span></p>
-                            <p><strong>Satuan:</strong> {{ $produk['satuan_berat'] }}</p>
-                        </div>
+            <div class="product-detail-body">
+                <div class="row align-items-start">
+                    <div class="col-md-4">
+                        <img src="{{ asset('storage/' . ($produk->gambar ?? 'default/no_image.jpg')) }}" alt="Produk">
                     </div>
+                    <div class="col-md-8">
+                        <h4 class="fw-bold">{{ $produk->nama_produk ?? '-' }}</h4>
+                        <p class="text-muted">{{ $produk->deskripsi ?? '-' }}</p>
 
+                        <div class="row mt-3">
+                            <div class="col-6">
+                                <p><strong>Supplier:</strong> <span class="badge-supplier">{{ $produk->supplier->nama_supplier ?? '-' }}</span></p>
+                                <p><strong>Kategori:</strong> <span class="badge-kategori">{{ $produk->kategori->nama_kategori ?? '-' }}</span></p>
+                                <p><strong>Satuan:</strong> {{ $produk->satuan_berat ?? ($produk->jumlah_satuan . ' ' . ($produk->satuan->nama_satuan ?? '-')) }}</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LIST BATCH RUSAK -->
+        <div class="batch-header">
+            <div>
+                <h3><i class="bi bi-exclamation-triangle"></i> Daftar Batch Rusak <span class="badge bg-danger ms-2">{{ $damaged_batches->total() }}</span></h3>
+                <small class="text-muted">Riwayat batch produk yang rusak/cacat</small>
+            </div>
+
+            <div class="input-group batch-search">
+                <input type="text" class="form-control" id="batchSearch" placeholder="Cari batch rusak...">
+                <button class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-responsive">
+                <table class="table align-middle" id="batchTable">
+                    <thead>
+                        <tr>
+                            <th>Batch</th>
+                            <th>Tanggal Masuk</th>
+                            <th>Harga Normal</th>
+                            <th>Jumlah Rusak</th>
+                            <th>Keterangan</th>
+                            <th>Tanggal Ditemukan Rusak</th>
+                            <th>Tingkat Kerusakan</th>
+                            <th>Bukti Gambar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($damaged_batches as $batch)
+                        <tr>
+                            <td>Batch {{ $batch['batch_id'] }}</td>
+                            <td>{{ $batch['tanggal_masuk'] }}</td>
+                            <td class="harga-normal">{{ $batch['harga_normal'] }}</td>
+                            <td>{{ $batch['jumlah_rusak'] ?? 0 }} unit</td>
+                            <td>{{ $batch['keterangan'] }}</td>
+                            <td>{{ $batch['tanggal_ditemukan'] }}</td> <!-- FIXED: Fallback dari controller -->
+                            <td><span class="badge badge-{{ strtolower($batch['tingkat_kerusakan']) }}">{{ $batch['tingkat_kerusakan'] ?? 'Sedang' }}</span></td>
+                            <td>
+                                <button class="btn-bukti" data-bs-toggle="modal" data-bs-target="#buktiModal{{ $batch['batch_id'] }}">
+                                    Lihat Detail
+                                </button>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">Belum ada batch rusak untuk produk ini.</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- FIXED: Dynamic Pagination -->
+        <nav aria-label="Batch pagination" class="mt-4">
+            {{ $damaged_batches->appends(request()->query())->links() }}
+        </nav>
+
+    </div>
+
+    @forelse($damaged_batches as $batch)
+    <!-- Modal Bukti Gambar per Batch - FIXED: Fallback gambar -->
+    <div class="modal fade" id="buktiModal{{ $batch['batch_id'] }}">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bukti Rusak - Batch {{ $batch['batch_id'] }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="{{ $batch['bukti_foto'] ?? asset('images/no_photo.jpg') }}" class="img-fluid rounded" alt="Bukti Rusak" style="max-height: 500px; object-fit: cover;">
+                    <p class="mt-3 text-muted">{{ $batch['keterangan'] }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
     </div>
+    @empty
+    @endforelse
 
-    <!-- LIST BATCH RUSAK -->
-    <div class="batch-header">
-        <div>
-            <h3><i class="bi bi-exclamation-triangle"></i> Daftar Batch Rusak <span class="badge bg-danger ms-2">{{ count($damaged_batches) }}</span></h3>
-            <small class="text-muted">Riwayat batch produk yang rusak/cacat</small>
-        </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // FIXED: JS Search Fungsional
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('batchSearch');
+            const tableRows = document.querySelectorAll('#batchTable tbody tr');
+            searchInput.addEventListener('keyup', function() {
+                const query = this.value.toLowerCase();
+                tableRows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(query) ? '' : 'none';
+                });
+            });
+        });
+    </script>
 
-        <div class="input-group batch-search">
-            <input type="text" class="form-control" id="batchSearch" placeholder="Cari batch rusak...">
-            <button class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
-        </div>
-    </div>
-
-    <div class="table-card">
-        <div class="table-responsive">
-            <table class="table align-middle" id="batchTable">
-                <thead>
-                    <tr>
-                        <th>Batch</th>
-                        <th>Tanggal Masuk</th>
-                        <th>Harga Normal</th>
-                        <th>Jumlah Rusak</th>
-                        <th>Keterangan</th>
-                        <th>Tanggal Ditemukan Rusak</th>
-                        <th>Tingkat Kerusakan</th>
-                        <th>Bukti Gambar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($damaged_batches as $batch)
-                    <tr>
-                        <td>Batch {{ $batch['batch_id'] }}</td>
-                        <td>{{ $batch['tanggal_masuk'] }}</td>
-                        <td class="harga-normal">{{ $batch['harga_normal'] }}</td>
-                        <td>{{ $batch['jumlah_rusak'] ?? 0 }} unit</td>
-                        <td>{{ $batch['keterangan'] }}</td>
-                        <td>{{ $batch['tanggal_ditemukan'] ?? date('Y-m-d', strtotime($batch['tanggal_masuk'] . ' + 7 days')) }}</td>
-                        <td><span class="badge badge-{{ strtolower($batch['tingkat_kerusakan']) }}">{{ $batch['tingkat_kerusakan'] ?? 'Sedang' }}</span></td>
-                        <td>
-                            <button class="btn-bukti" data-bs-toggle="modal" data-bs-target="#buktiModal{{ $batch['batch_id'] }}">
-                                Lihat Detail
-                            </button>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Pagination -->
-    <nav aria-label="Batch pagination" class="mt-4">
-        <ul class="pagination justify-content-center">
-            <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">«</a>
-            </li>
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item">
-                <a class="page-link" href="#">»</a>
-            </li>
-        </ul>
-    </nav>
-
-</div>
-
-@foreach($damaged_batches as $batch)
-<!-- Modal Bukti Gambar per Batch -->
-<div class="modal fade" id="buktiModal{{ $batch['batch_id'] }}">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Bukti Rusak - Batch {{ $batch['batch_id'] }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body text-center">
-                <img src="{{ $batch['bukti_foto'] ?? $batch['gambar'] ?? 'images/no_photo.jpg' }}" class="img-fluid rounded" alt="Bukti Rusak" style="max-height: 500px; object-fit: cover;">
-                <p class="mt-3 text-muted">{{ $batch['keterangan'] }}</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-            </div>
-        </div>
-    </div>
-</div>
-@endforeach
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-@endsection
+    @endsection
 </body>
 </html>

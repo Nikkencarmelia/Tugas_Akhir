@@ -286,7 +286,7 @@
                     <i class="bi bi-archive"></i> Produk Diarsipkan
                 </a>
 
-                <a href="{{ route('produk.rusak') }}" class="nav-link {{ request()->is('staff_produk/rusak') ? 'active' : '' }}">
+                <a href="{{ route('rusak_cacat.store') }}" class="nav-link {{ request()->is('rusak_cacat.store') ? 'active' : '' }}">
                     <i class="bi bi-exclamation-triangle"></i> Produk Rusak/Cacat
                 </a>
 
