@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -146,7 +147,7 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto align-items-center gap-2">
                         <li class="nav-item"><a class="nav-link" href="/">Beranda</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/produk">Produk</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ route('user.produk') }}">Produk</a></li>
 
                         @auth
                         <li class="nav-item"><a class="nav-link" href="/riwayat">Riwayat</a></li>
@@ -154,8 +155,15 @@
                             <a class="nav-link" href="{{ route('user.profil') }}">Profil</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/keranjang">
+                            <a class="nav-link position-relative" href="{{ route('keranjang.index') }}">
                                 <i class="fa-solid fa-cart-shopping"></i>
+                                @php
+                                    $cart = session('cart', []);
+                                    $cartCount = array_sum(array_column($cart, 'quantity'));
+                                @endphp
+                                <span id="cartBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem; padding: 0.25em 0.5em; {{ $cartCount > 0 ? '' : 'display: none;' }}">
+                                    {{ $cartCount > 99 ? '99+' : $cartCount }}
+                                </span>
                             </a>
                         </li>
                         <li class="nav-item">

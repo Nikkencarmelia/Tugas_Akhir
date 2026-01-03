@@ -1,211 +1,480 @@
 <!DOCTYPE html>
 <html lang="id">
-    <head>
-        <meta charset="UTF-8">
-        <title>Produk</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <style>
-            .carousel {
-                height: 350px;
-                overflow: hidden;
-                border-radius: 1rem;
-                margin: 0 auto;
-            }
+<head>
+    <meta charset="UTF-8">
+    <title>Semua Produk - Food Center</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .carousel {
+            height: 350px;
+            overflow: hidden;
+            border-radius: 1rem;
+            margin: 0 auto;
+        }
 
-            .carousel-item img {
-                height: 100%;
-                width: 100%;
-                object-fit: cover;
-            }
+        .carousel-item img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+        }
 
-            .search-wrapper {
-                border: 1px solid #ced4da;
-                border-radius: 0.375rem;
-                transition: all 0.2s ease;
-            }
+        .search-wrapper {
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
 
-            .search-wrapper:focus-within {
-                border-color: #198754; /* hijau pas fokus */
-                box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, .25);
-            }
+        .search-wrapper:focus-within {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, .25);
+        }
 
-            .search-wrapper .form-control,
-            .search-wrapper .input-group-text {
-                border: none;
-                box-shadow: none !important;
-                background-color: var(--bs-body-bg);
-            }
+        .search-wrapper .form-control,
+        .search-wrapper .input-group-text {
+            border: none;
+            box-shadow: none !important;
+            background-color: var(--bs-body-bg);
+        }
 
-            .input-group-text {
-                cursor: pointer;
-                transition: all 0.2s ease;
-            }
+        .input-group-text {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
 
-            .input-group-text:hover i {
-                color: #198754 !important;
-            }
+        .input-group-text:hover i {
+            color: #198754 !important;
+        }
 
-            .search-wrapper:focus-within .input-group-text i {
-                color: #198754 !important;
-            }
+        .search-wrapper:focus-within .input-group-text i {
+            color: #198754 !important;
+        }
 
+        .produk-card {
+            background: #fff;
+            border-radius: 1rem;
+            padding: 1rem;
+            box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease;
+            height: 100%;
+            position: relative;
+        }
 
-            .produk-card {
-                background: #fff;
-                border-radius: 1rem;
-                padding: 1rem;
-                box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.08);
-                transition: transform 0.2s ease;
-                height: 100%;
-            }
+        .produk-card:hover {
+            transform: translateY(-5px);
+        }
 
-            .produk-card:hover {
-                transform: translateY(-5px);
-            }
+        .produk-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+        }
 
-            .produk-card img {
-                width: 100%;
-                height: 120px;
-                object-fit: cover;
-                border-radius: 0.5rem;
-            }
+        .produk-card .card-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 0.5rem 0 0.25rem;
+        }
 
-            .produk-card .card-title {
-                font-size: 0.9rem;
-                font-weight: 600;
-                margin: 0.5rem 0 0.25rem;
-            }
+        .produk-card .card-subtitle {
+            font-size: 0.75rem;
+            color: #888;
+            margin-bottom: 0.25rem;
+        }
 
-            .produk-card .card-subtitle {
-                font-size: 0.75rem;
-                color: #888;
-                margin-bottom: 0.25rem;
-            }
+        .produk-card .card-text {
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
 
-            .produk-card .card-text {
-                font-size: 0.85rem;
-                margin-bottom: 0.5rem;
-            }
+        .produk-card .btn {
+            font-size: 0.75rem;
+        }
 
-            .produk-card .btn {
-                font-size: 0.75rem;
-            }
+        .category-title {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #198754;
+            font-family: 'Montserrat', sans-serif;
+            margin-top: 4rem;
+            margin-bottom: 2rem;
+        }
 
-        </style>
-    </head>
+        .no-produk {
+            text-align: center;
+            padding: 100px 20px;
+            color: #888;
+        }
 
-    <body>
-        @extends('components.user')
-        @section('content')
+        .search-result-info {
+            margin: 2rem 0;
+            font-size: 1.1rem;
+            color: #555;
+        }
 
-            <div class="container py-4 mt-5">
+        .highlight {
+            background-color: #fff3cd;
+            padding: 0.1em 0.2em;
+            border-radius: 0.2em;
+            font-weight: 600;
+        }
 
-            {{-- Carousel --}}
-                <div id="carouselExampleCaptions" class="carousel slide mb-4">
-                    <div class="carousel-indicators">
-                        <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                        <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                        <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
-                    </div>
+        .badge-diskon {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: linear-gradient(135deg, #FFC107, #FFB300);
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 0.85rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 0.5rem;
+            z-index: 10;
+            box-shadow: 0 2px 6px rgba(255, 193, 7, 0.5);
+        }
 
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <img src="{{ asset('images/slide1.png') }}" class="d-block w-100" alt="Slide 1">
-                            <div class="carousel-caption d-none d-md-block">
-                            <h5>First Slide</h5>
-                            <p>Promo produk segar hari ini!</p>
-                            </div>
-                        </div>
+        .add-to-cart {
+            cursor: pointer;
+        }
 
-                        <div class="carousel-item">
-                            <img src="{{ asset('images/slide2.png') }}" class="d-block w-100" alt="Slide 2">
-                            <div class="carousel-caption d-none d-md-block">
-                            <h5>Second Slide</h5>
-                            <p>Diskon besar untuk produk lokal</p>
-                            </div>
-                        </div>
+        .add-to-cart:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
 
-                        <div class="carousel-item">
-                            <img src="{{ asset('images/slide3.png') }}" class="d-block w-100" alt="Slide 3">
-                            <div class="carousel-caption d-none d-md-block">
-                            <h5>Third Slide</h5>
-                            <p>Langsung dari kebun milik dinas</p>
-                            </div>
-                        </div>
-                    </div>
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1055;
+        }
+    </style>
+</head>
+<body>
 
-                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                    </button>
+@extends('components.user')
 
-                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
+@section('content')
+<div class="container py-4 mt-5">
+
+    {{-- Carousel Banner --}}
+    <div id="carouselExampleCaptions" class="carousel slide mb-5">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{{ asset('images/slide1.png') }}" class="d-block w-100" alt="Promo">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Promo Produk Segar</h5>
+                    <p>Diskon spesial hari ini!</p>
                 </div>
-
-                {{-- Kategori --}}
-                <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
-                    <!-- Tombol Kategori (Kiri) -->
-                    <div class="d-flex flex-wrap gap-2 align-items-center">
-                        <button class="btn btn-success rounded-2 px-3 py-1">Kategori</button>
-                        <button class="btn btn-outline-success rounded-2 px-3 py-1">Bahan Pokok</button>
-                        <button class="btn btn-outline-success rounded-2 px-3 py-1">Sayuran</button>
-                        <button class="btn btn-outline-success rounded-2 px-3 py-1">Buah-Buahan</button>
-                        <button class="btn btn-outline-success rounded-2 px-3 py-1">Kacang-Kacangan</button>
-                    </div>
-
-                    <!-- Form Search (Kanan) -->
-                    <form class="d-flex mt-3 mt-md-0" role="search" style="width: 350px;">
-                        <div class="input-group search-wrapper w-100">
-                        <input type="text" class="form-control" placeholder="Cari produk..." aria-label="Search">
-                        <button class="input-group-text border-start-0" type="submit">
-                            <i class="fa fa-search text-muted"></i>
-                        </button>
-                        </div>
-                    </form>
+            </div>
+            <div class="carousel-item">
+                <img src="{{ asset('images/slide2.png') }}" class="d-block w-100" alt="Produk Lokal">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Produk Lokal Terbaik</h5>
+                    <p>Langsung dari petani Kutai Barat</p>
                 </div>
+            </div>
+            <div class="carousel-item">
+                <img src="{{ asset('images/slide3.png') }}" class="d-block w-100" alt="Kualitas Terjamin">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Kualitas Terjamin</h5>
+                    <p>Segar dan berkualitas tinggi</p>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
 
+    {{-- Search Bar Real-Time --}}
+    <div class="d-flex justify-content-end mb-5">
+        <div class="input-group search-wrapper" style="width: 350px;">
+            <input type="text" id="searchInput" class="form-control" placeholder="Cari produk (nama, kategori, deskripsi)...">
+            <button class="input-group-text border-start-0" type="button" id="searchClear" style="display:none;">
+                <i class="fa fa-times text-muted"></i>
+            </button>
+            <button class="input-group-text border-start-0" type="button" id="searchBtn">
+                <i class="fa fa-search text-muted"></i>
+            </button>
+        </div>
+    </div>
 
-                {{-- Terlaris --}}
-                {{-- Etalase Terlaris --}}
-                <div class="container ps-md-2" style="margin-top: 4rem;">
-                    <h2 class="fw-bold" style="font-family: 'Montserrat', sans-serif;">Produk Terlaris</h2>
-                    <h6>Produk Pangan Paling Banyak Diminati</h6>
+    {{-- Info Hasil Pencarian --}}
+    <div class="search-result-info text-center mb-4" id="searchInfo" style="display: none;">
+        Menampilkan hasil pencarian untuk: <strong id="searchTerm"></strong>
+    </div>
 
-                    <div class="container mt-4">
-                        <div class="row g-4">
-                            @foreach ($produkTerlaris as $produk)
-                            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+    {{-- Container Produk --}}
+    <div id="produkContainer">
+        @if($produks->isEmpty())
+            <div class="no-produk">
+                <h3>Belum Ada Produk Tersedia</h3>
+                <p>Silakan cek kembali nanti ya!</p>
+            </div>
+        @else
+            @foreach($produksGrouped as $kategori => $items)
+                <div class="category-section" data-kategori="{{ Str::slug($kategori) }}">
+                    <div class="text-start mb-4">
+                        <h2 class="category-title">{{ $kategori }}</h2>
+                    </div>
+                    <div class="row g-4 mb-5 justify-content-center produk-row">
+                        @foreach($items as $produk)
+                            <div class="col-6 col-sm-4 col-md-3 col-lg-2 produk-item"
+                                 data-id="{{ $produk['id'] }}"
+                                 data-nama="{{ strtolower($produk['nama_produk']) }}"
+                                 data-kategori="{{ strtolower($produk['kategori']) }}"
+                                 data-deskripsi="{{ strtolower($produk['deskripsi']) }}">
                                 <div class="produk-card text-center d-flex flex-column justify-content-between">
-                                    <img src="{{ asset($produk['gambar']) }}" alt="{{ $produk['nama_produk'] }}">
+                                    @if($produk['is_diskon'])
+                                        <span class="badge-diskon">-{{ $produk['persen_diskon'] }}%</span>
+                                    @endif
+                                    <img src="{{ $produk['gambar_url'] }}"
+                                         alt="{{ $produk['nama_produk'] }}"
+                                         onerror="this.src='{{ asset('images/default-product.jpg') }}'">
                                     <div class="mt-2">
-                                        <h5 class="card-title">{{ $produk['nama_produk'] }}</h5>
-                                        <p class="card-subtitle">{{ $produk['satuan_berat'] }}</p>
-                                        <p class="card-text fw-bold text-success">{{ $produk['harga'] }}</p>
+                                        <h5 class="card-title produk-nama">{{ $produk['nama_produk'] }}</h5>
+                                        <p class="card-subtitle">
+                                            {{ $produk['jumlah_satuan'] }} {{ $produk['satuan'] }}
+                                        </p>
+                                        @if($produk['is_diskon'])
+                                            <p class="card-text fw-bold text-success mb-0">
+                                                {{ $produk['harga_formatted'] }}
+                                            </p>
+                                            <p class="text-muted text-decoration-line-through small">
+                                                {{ $produk['harga_awal_formatted'] }}
+                                            </p>
+                                        @else
+                                            <p class="card-text fw-bold text-success">
+                                                {{ $produk['harga_formatted'] }}
+                                            </p>
+                                        @endif
                                     </div>
-
                                     <div class="mt-auto">
-                                        <a href="#" class="btn btn-outline-success btn-sm mb-2 w-100">Lihat Detail</a>
-                                        <form action="#" method="POST">
-                                            @csrf
-                                            <button type="submit" class="btn btn-success btn-sm w-100">Masukkan Keranjang</button>
-                                        </form>
+                                        <a href="{{ route('user.produk.detail', $produk['id']) }}"
+                                           class="btn btn-outline-success btn-sm mb-2 w-100">
+                                            Lihat Detail
+                                        </a>
+                                        <button class="btn btn-success btn-sm w-100 add-to-cart"
+                                                data-id="{{ $produk['id'] }}"
+                                                data-batch-id="{{ $produk['batch_id'] ?? '' }}"
+                                                data-quantity="{{ $produk['quantity'] ?? 1 }}">
+                                            Masukkan Keranjang
+                                        </button>
                                     </div>
-
                                 </div>
                             </div>
-                            @endforeach
-
-                        </div>
+                        @endforeach
                     </div>
                 </div>
+            @endforeach
+        @endif
+    </div>
 
+    {{-- Pesan Tidak Ditemukan --}}
+    <div id="noResult" class="no-produk" style="display: none;">
+        <h3>Tidak ditemukan produk dengan kata kunci "<span id="noResultTerm"></span>"</h3>
+        <p>Silakan coba kata kunci lain ya!</p>
+    </div>
+
+    {{-- Toast Container --}}
+    <div class="toast-container">
+        <div id="addToCartToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="fas fa-shopping-cart text-success me-2"></i>
+                <strong class="me-auto">Keranjang</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
+            <div class="toast-body">
+                <span id="toastMessage"></span>
+            </div>
+        </div>
+    </div>
+</div>
 
-        @endsection
+{{-- JavaScript Real-Time Search + Highlight --}}
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
+    const searchBtn = document.getElementById('searchBtn');
+    const searchInfo = document.getElementById('searchInfo');
+    const searchTermEl = document.getElementById('searchTerm');
+    const noResult = document.getElementById('noResult');
+    const noResultTerm = document.getElementById('noResultTerm');
+    const produkItems = document.querySelectorAll('.produk-item');
+    const categorySections = document.querySelectorAll('.category-section');
 
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
 
-    </body>
+    function highlightText(text, term) {
+        if (!term) return text;
+        const regex = new RegExp(`(${escapeRegExp(term)})`, 'gi');
+        return text.replace(regex, '<span class="highlight">$1</span>');
+    }
+
+    function filterProduk() {
+        const term = searchInput.value.trim();
+        const termLower = term.toLowerCase();
+        let visibleCount = 0;
+        let visibleCategories = new Set();
+
+        document.querySelectorAll('.produk-nama').forEach(el => {
+            const original = el.dataset.original || el.textContent.trim();
+            el.dataset.original = original;
+            el.innerHTML = original;
+        });
+
+        if (term === '') {
+            searchInfo.style.display = 'none';
+            noResult.style.display = 'none';
+            searchClear.style.display = 'none';
+            categorySections.forEach(sec => sec.style.display = 'block');
+            produkItems.forEach(item => item.style.display = 'block');
+            return;
+        }
+
+        searchClear.style.display = 'block';
+        categorySections.forEach(sec => sec.style.display = 'none');
+
+        produkItems.forEach(item => {
+            const nama = item.dataset.nama || '';
+            const kategori = item.dataset.kategori || '';
+            const deskripsi = item.dataset.deskripsi || '';
+
+            const matches = nama.includes(termLower) || kategori.includes(termLower) || deskripsi.includes(termLower);
+
+            if (matches) {
+                item.style.display = 'block';
+                visibleCount++;
+                visibleCategories.add(item.dataset.kategori);
+
+                const namaEl = item.querySelector('.produk-nama');
+                if (namaEl && nama.includes(termLower)) {
+                    namaEl.innerHTML = highlightText(namaEl.dataset.original, term);
+                }
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        visibleCategories.forEach(kat => {
+            const section = document.querySelector(`.category-section[data-kategori="${kat}"]`);
+            if (section) section.style.display = 'block';
+        });
+
+        searchTermEl.textContent = term;
+        searchInfo.style.display = visibleCount > 0 ? 'block' : 'none';
+        noResult.style.display = visibleCount === 0 ? 'block' : 'none';
+        if (visibleCount === 0) noResultTerm.textContent = term;
+    }
+
+    searchInput.addEventListener('input', filterProduk);
+    searchClear.addEventListener('click', () => {
+        searchInput.value = '';
+        filterProduk();
+        searchInput.focus();
+    });
+    searchBtn.addEventListener('click', () => searchInput.focus());
+
+    document.querySelectorAll('.produk-nama').forEach(el => {
+        el.dataset.original = el.textContent.trim();
+    });
+
+    document.addEventListener('DOMContentLoaded', filterProduk);
+
+    // Add to Cart Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const toastEl = document.getElementById('addToCartToast');
+        const toast = new bootstrap.Toast(toastEl, {
+            autohide: true,
+            delay: 3000
+        });
+
+        // Function to update cart badge
+        function updateCartBadge(count) {
+            const badge = document.getElementById('cartBadge');
+            if (badge) {
+                if (count > 0) {
+                    badge.textContent = count > 99 ? '99+' : count;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.dataset.id;
+                const batchId = this.dataset.batchId || null;
+                const quantity = parseInt(this.dataset.quantity) || 1;
+
+                const button = this;
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menambahkan...';
+
+                fetch('{{ route("keranjang.add") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        product_id: parseInt(productId),
+                        batch_id: batchId ? parseInt(batchId) : null,
+                        quantity: quantity
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('toastMessage').textContent = `Berhasil ditambahkan ${quantity} item ke keranjang!`;
+                        toast.show();
+
+                        // Update cart badge
+                        updateCartBadge(data.cart_count || 0);
+
+                        // Redirect ke halaman keranjang setelah 1.5 detik
+                        setTimeout(() => {
+                            window.location.href = '{{ route("keranjang.index") }}';
+                        }, 1500);
+                    } else {
+                        document.getElementById('toastMessage').textContent = 'Gagal: ' + (data.message || 'Unknown error');
+                        toast.show();
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    document.getElementById('toastMessage').textContent = 'Terjadi kesalahan: ' + error.message;
+                    toast.show();
+                })
+                .finally(() => {
+                    button.disabled = false;
+                    button.innerHTML = 'Masukkan Keranjang';
+                });
+            });
+        });
+    });
+</script>
+
+@endsection
+</body>
 </html>

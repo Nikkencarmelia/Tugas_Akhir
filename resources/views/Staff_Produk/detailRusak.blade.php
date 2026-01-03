@@ -24,10 +24,12 @@
 
         /* Detail Produk */
         .product-detail-card { background: var(--white); border-radius: .8rem; border: 1px solid var(--border-color); box-shadow: 0 2px 8px var(--shadow); overflow: hidden; margin-bottom: 2rem; }
-        .product-detail-header { background: var(--green-soft); padding: 1.5rem; border-bottom: 1px solid var(--border-color); }
+        .product-detail-header { background: var(--green-soft); padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+        .btn-back { background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; padding: 0; cursor: pointer; }
+        .btn-back:hover { color: var(--text-dark); }
 
         .product-detail-body { padding: 1.5rem; }
-        .product-detail-body img { width: 100%; border-radius: .5rem; border: 1px solid var(--border-color); }
+        .product-detail-body img { width: 100%; max-width: 300px; border-radius: .5rem; border: 1px solid var(--border-color); }
 
         .badge-kategori, .badge-supplier {
             font-size: .8rem; padding: .4rem .7rem; border-radius: .5rem; font-weight: 600;
@@ -63,14 +65,32 @@
             transform: scale(1.05);
         }
 
-        /* Status Badges for Tingkat Kerusakan */
-        .badge-ringan { background: #FEF3C7; color: #92400E; }
-        .badge-sedang { background: #FCD34D; color: #92400E; }
-        .badge-berat { background: #FEE2E2; color: #991B1B; }
+        /* Status Badges for Tingkat Kerusakan - FIXED: Solid colors without opacity */
+        .badge-ringan {
+            background-color: #6c757d !important;
+            color: #ffffff !important;
+            font-weight: 600;
+            padding: .3rem .6rem;
+            border-radius: .5rem;
+        }
+        .badge-sedang {
+            background-color: #ffc107 !important;
+            color: #000000 !important;
+            font-weight: 600;
+            padding: .3rem .6rem;
+            border-radius: .5rem;
+        }
+        .badge-berat {
+            background-color: #dc3545 !important;
+            color: #ffffff !important;
+            font-weight: 600;
+            padding: .3rem .6rem;
+            border-radius: .5rem;
+        }
 
         @media (max-width: 768px) {
             .batch-header { flex-direction: column; gap: 1rem; text-align: center; }
-            .batch-search { width: 50% !important; }
+            .batch-search { width: 100% !important; }
             .product-detail-body .row { flex-direction: column; }
         }
     </style>
@@ -79,12 +99,32 @@
     @extends('Components.staff_produk')
     @section('content')
 
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
     <div class="dashboard-container">
 
         <!-- DETAIL PRODUK - FIXED: Akses sebagai model Eloquent -->
         <div class="product-detail-card">
             <div class="product-detail-header">
-                <h4 class="dashboard-title"><i class="bi bi-box-seam"></i> Detail Produk Rusak/Cacat</h4>
+                <!-- FIXED: Add back button -->
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn-back" onclick="window.history.back()">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <h4 class="dashboard-title mb-0"><i class="bi bi-box-seam"></i> Detail Produk Rusak/Cacat</h4>
+                </div>
             </div>
 
             <div class="product-detail-body">
@@ -112,7 +152,7 @@
         <!-- LIST BATCH RUSAK -->
         <div class="batch-header">
             <div>
-                <h3><i class="bi bi-exclamation-triangle"></i> Daftar Batch Rusak <span class="badge bg-danger ms-2">{{ $damaged_batches->total() }}</span></h3>
+                <h3><i class="bi bi-exclamation-triangle"></i> Daftar Batch Rusak <span class="badge bg-danger ms-2">{{ $totalDamaged }}</span></h3>
                 <small class="text-muted">Riwayat batch produk yang rusak/cacat</small>
             </div>
 
@@ -129,7 +169,7 @@
                         <tr>
                             <th>Batch</th>
                             <th>Tanggal Masuk</th>
-                            <th>Harga Normal</th>
+                            <th>Harga saat ini</th>
                             <th>Jumlah Rusak</th>
                             <th>Keterangan</th>
                             <th>Tanggal Ditemukan Rusak</th>
@@ -171,7 +211,7 @@
     </div>
 
     @forelse($damaged_batches as $batch)
-    <!-- Modal Bukti Gambar per Batch - FIXED: Fallback gambar -->
+    <!-- Modal Bukti Gambar per Batch - FIXED: Image size not too big -->
     <div class="modal fade" id="buktiModal{{ $batch['batch_id'] }}">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -180,7 +220,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body text-center">
-                    <img src="{{ $batch['bukti_foto'] ?? asset('images/no_photo.jpg') }}" class="img-fluid rounded" alt="Bukti Rusak" style="max-height: 500px; object-fit: cover;">
+                    <img src="{{ $batch['bukti_foto'] ?? asset('images/no_photo.jpg') }}" class="img-fluid rounded" alt="Bukti Rusak" style="max-width: 100%; max-height: 400px; object-fit: contain;">
                     <p class="mt-3 text-muted">{{ $batch['keterangan'] }}</p>
                 </div>
                 <div class="modal-footer">
@@ -205,6 +245,21 @@
                     row.style.display = text.includes(query) ? '' : 'none';
                 });
             });
+
+            // FIXED: Colorize badges for supplier & kategori (same as previous badges)
+            function colorizeSingle(badgeEl, text){
+                if(!badgeEl || !text) return;
+                const colorPairs=[{bg:"#BAE6FD",text:"#0369A1"},{bg:"#FEF9C3",text:"#A16207"},{bg:"#FBCFE8",text:"#9D174D"},{bg:"#A7F3D0",text:"#065F46"},{bg:"#DDD6FE",text:"#5B21B6"},{bg:"#FECACA",text:"#991B1B"},{bg:"#FDE68A",text:"#B45309"},{bg:"#F5D0FE",text:"#86198F"}];
+                let hash=0;
+                for(let i=0;i<text.length;i++){ hash=text.charCodeAt(i)+((hash<<5)-hash); }
+                const color=colorPairs[Math.abs(hash)%colorPairs.length];
+                badgeEl.style.backgroundColor=color.bg;
+                badgeEl.style.color=color.text;
+            }
+            function colorizeBadges(){
+                document.querySelectorAll('.badge-supplier, .badge-kategori').forEach(badge=>{ const text=badge.textContent.trim(); if(text && text!=='-') colorizeSingle(badge,text.toLowerCase()); });
+            }
+            colorizeBadges();
         });
     </script>
 

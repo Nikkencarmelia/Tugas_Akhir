@@ -359,21 +359,21 @@
                     <div class="stat-value">{{ $totalArsip ?? 0 }}</div>
                 </div>
 
-                {{-- Menipis dan Habis (Diberi nilai 0 di Controller) --}}
+                {{-- Menipis dan Habis (Sekarang dinamis dari Controller, berdasarkan total stok batch per produk) --}}
                 <div class="stat-card warning warning-icon">
                     <div class="stat-header">
-                        <div class="stat-label">Produk Menipis (0)</div>
+                        <div class="stat-label">Produk Menipis</div>
                         <div class="stat-icon"><i class="bi bi-exclamation-triangle"></i></div>
                     </div>
-                    <div class="stat-value">0</div>
+                    <div class="stat-value">{{ $totalMenipis ?? 0 }}</div>
                 </div>
 
                 <div class="stat-card danger danger-icon">
                     <div class="stat-header">
-                        <div class="stat-label">Produk Habis (0)</div>
+                        <div class="stat-label">Produk Habis</div>
                         <div class="stat-icon"><i class="bi bi-x-circle "></i></div>
                     </div>
-                    <div class="stat-value">0</div>
+                    <div class="stat-value">{{ $totalHabis ?? 0 }}</div>
                 </div>
             </div>
 
@@ -411,8 +411,20 @@
                                 @else
                                     @foreach($produkBaru as $p)
                                         @php
+                                            // Compute status_stok dari batch
+                                            $totalStok = $p->batch->sum('stok') ?? 0;
+                                            if ($totalStok > 10) {
+                                                $statusStok = 'Tersedia';
+                                                $statusStokClass = 'tersedia';
+                                            } elseif ($totalStok > 0) {
+                                                $statusStok = 'Menipis';
+                                                $statusStokClass = 'menipis';
+                                            } else {
+                                                $statusStok = 'Habis';
+                                                $statusStokClass = 'habis';
+                                            }
+
                                             $statusTampilClass = strtolower(str_replace([' ', '_'], '_', $p->status_tampil ?? 'draft'));
-                                            $statusStokClass = $p->status_stok ? strtolower(str_replace([' ', '_'], '-', $p->status_stok)) : null;
                                         @endphp
                                         <tr>
                                             <td>{{ $p->id }}</td>
@@ -431,12 +443,8 @@
                                             <td><span class="badge-kategori">{{ $p->kategori->nama_kategori ?? '-' }}</span></td>
                                             <td>{{ $p->jumlah_satuan ?? 0 }} {{ $p->satuan->nama_satuan ?? '-' }}</td>
                                             <td>
-                                                <span class="badge-status badge-{{ $statusTampilClass }}">{{ $p->status_tampil }}</span>
-                                                @if($statusStokClass)
-                                                    <span class="badge-status badge-{{ $statusStokClass }}">{{ ucfirst($p->status_stok) }}</span>
-                                                @else
-                                                    <span class="text-muted">-</span>
-                                                @endif
+                                                <span class="badge-status badge-{{ $statusTampilClass }}">{{ $p->status_tampil ?? 'Draft' }}</span>
+                                                <span class="badge-status badge-{{ $statusStokClass }}">{{ $statusStok }}</span>
                                             </td>
                                             <td>
                                                 <button class="btn-action btn-detail" data-bs-toggle="modal" data-bs-target="#detailModal"
@@ -568,12 +576,21 @@
                     (produkData.status_tampil ?? '')
                     .toLowerCase().replace(/ /g, '_');
 
+                // Compute status_stok di JS juga, buat konsisten
+                const totalStok = produkData.batch ? produkData.batch.reduce((sum, b) => sum + (b.stok || 0), 0) : 0;
+                let statusStok = 'Habis';
+                let statusStokClass = 'habis';
+                if (totalStok > 10) {
+                    statusStok = 'Tersedia';
+                    statusStokClass = 'tersedia';
+                } else if (totalStok > 0) {
+                    statusStok = 'Menipis';
+                    statusStokClass = 'menipis';
+                }
+
                 const statusStokEl = document.getElementById('detailStatusStok');
-                statusStokEl.textContent = produkData.status_stok ?? '-';
-                statusStokEl.className =
-                    'badge-status badge-' +
-                    (produkData.status_stok ?? '')
-                    .toLowerCase().replace(/_| /g, '-');
+                statusStokEl.textContent = statusStok;
+                statusStokEl.className = 'badge-status badge-' + statusStokClass;
             });
 
             function colorizeSingle(badgeEl, text){

@@ -7,85 +7,97 @@ use App\Models\Produk_Rusak;
 use App\Models\Batch;
 use App\Models\Produk;
 use App\Models\Supplier;
+use App\Models\Kategori;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProdukRusakCacatController extends Controller
 {
     public function index(Request $request)
     {
-        try {
-            $query = Produk::with([
+        // Ambil SEMUA produk yang punya laporan rusak (jumlah_rusak > 0) + relasi lengkap
+        $produkAll = Produk::with([
                 'kategori',
                 'supplier',
                 'satuan',
                 'rusak' => function ($q) {
-                    $q->select('id_produk')->selectRaw('SUM(jumlah_rusak) as total_rusak')->groupBy('id_produk');
+                    $q->select('id_produk')
+                      ->selectRaw('SUM(jumlah_rusak) as total_rusak')
+                      ->groupBy('id_produk');
                 }
-            ])->whereHas('rusak', function ($q) {
+            ])
+            ->whereHas('rusak', function ($q) {
                 $q->havingRaw('SUM(jumlah_rusak) > 0');
-            });
+            })
+            ->latest()
+            ->get();
 
-            // Filters
-            if ($request->filled('status_tampil') && $request->status_tampil != 'all') {
-                $query->where('status_tampil', $request->status_tampil);
-            }
-            if ($request->filled('status_stok') && $request->status_stok != 'all') {
-                $query->where('status_stok', $request->status_stok);
-            }
-            if ($request->filled('supplier') && $request->supplier != 'all') {
-                $query->where('id_supplier', $request->supplier);
-            }
-            if ($request->filled('search')) {
-                $search = $request->search;
-                $query->where(function ($q) use ($search) {
-                    $q->where('id', 'like', "%{$search}%")
-                      ->orWhere('nama_produk', 'like', "%{$search}%")
-                      ->orWhere('deskripsi', 'like', "%{$search}%");
-                });
-            }
+        // Dropdown kategori & supplier unik dari data rusak (aman dari null)
+        $kategoris = $produkAll
+            ->pluck('kategori.nama_kategori')
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
 
-            $produk = $query->paginate(10);
+        $suppliers = $produkAll
+            ->pluck('supplier.nama_supplier')
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
 
-            $supplier = collect();
-            try {
-                $supplier = Supplier::select('id', 'nama_supplier')->get();
-                Log::info('Suppliers loaded successfully', ['count' => $supplier->count()]);
-            } catch (\Exception $e) {
-                Log::error('Failed to load suppliers', ['error' => $e->getMessage()]);
-            }
-
-            return view('Staff_Produk.rusakCacat', compact('produk', 'supplier'));
-        } catch (\Exception $e) {
-            Log::error('Error in index rusak_cacat', ['error' => $e->getMessage(), 'line' => $e->getLine()]);
-            return view('Staff_Produk.rusakCacat', ['produk' => collect(), 'supplier' => collect()]);
-        }
+        return view('Staff_Produk.rusakCacat', [
+            'produkAll' => $produkAll,
+            'kategori'  => $kategoris,
+            'supplier'  => $suppliers,
+        ]);
     }
 
     public function show($id_produk)
     {
         $produk = Produk::with(['kategori', 'supplier', 'satuan'])->findOrFail($id_produk);
 
-        $damaged_batches = Produk_Rusak::with(['batch', 'produk'])
+        // FIXED: Get paginator first
+        $paginator = Produk_Rusak::with(['batch', 'produk'])
             ->where('id_produk', $id_produk)
-            ->paginate(10) // FIXED: Paginate untuk dynamic pagination
-            ->map(function ($rusak) use ($produk) {
-                $tanggalDitemukan = $rusak->tgl_rusak ? Carbon::parse($rusak->tgl_rusak)->format('Y-m-d') : now()->format('Y-m-d');
-                $tanggalMasukFallback = $rusak->batch->tgl_masuk ?? now()->format('Y-m-d');
-                return [
-                    'batch_id' => $rusak->batch->id ?? 0,
-                    'tanggal_masuk' => $rusak->batch->tgl_masuk_format ?? Carbon::parse($tanggalMasukFallback)->format('d/m/Y'),
-                    'harga_normal' => 'Rp ' . number_format($rusak->batch->harga_normal ?? 0, 0, ',', '.'),
-                    'jumlah_rusak' => $rusak->jumlah_rusak ?? 0,
-                    'keterangan' => $rusak->keterangan ?? '-',
-                    'tanggal_ditemukan' => $tanggalDitemukan,
-                    'tingkat_kerusakan' => ucfirst($rusak->tingkat_rusak ?? 'Sedang'),
-                    'bukti_foto' => $rusak->gambar ? asset('storage/' . $rusak->gambar) : asset('storage/' . $produk->gambar),
-                ];
-            });
+            ->paginate(10);
 
-        return view('Staff_Produk.detail_rusak_batch', compact('produk', 'damaged_batches'));
+        // FIXED: Extract total before mapping
+        $totalDamaged = $paginator->total();
+
+        // FIXED: Map items while preserving pagination structure
+        $mappedItems = $paginator->getCollection()->map(function ($rusak) use ($produk) {
+            $tanggalDitemukan = $rusak->tgl_rusak ? Carbon::parse($rusak->tgl_rusak)->format('Y-m-d') : now()->format('Y-m-d');
+            $tanggalMasukFallback = $rusak->batch->tgl_masuk ?? now()->format('Y-m-d');
+            return [
+                'batch_id' => $rusak->batch->id ?? 0,
+                'tanggal_masuk' => $rusak->batch->tgl_masuk_format ?? Carbon::parse($tanggalMasukFallback)->format('d/m/Y'),
+                'harga_normal' => 'Rp ' . number_format($rusak->batch->harga_normal ?? 0, 0, ',', '.'),
+                'jumlah_rusak' => $rusak->jumlah_rusak ?? 0,
+                'keterangan' => $rusak->keterangan ?? '-',
+                'tanggal_ditemukan' => $tanggalDitemukan,
+                'tingkat_kerusakan' => ucfirst($rusak->tingkat_rusak ?? 'Sedang'),
+                'bukti_foto' => $rusak->gambar ? asset('storage/' . $rusak->gambar) : asset('storage/' . $produk->gambar),
+            ];
+        });
+
+        // FIXED: Recreate paginator with mapped items - Use path() for base URL
+        $damaged_batches = new LengthAwarePaginator(
+            $mappedItems,
+            $paginator->total(),
+            $paginator->perPage(),
+            $paginator->currentPage(),
+            [
+                'path' => $paginator->path(),  // FIXED: path() instead of url()
+                'pageName' => $paginator->getPageName(),
+            ]
+        );
+
+        // FIXED: Pass totalDamaged to view for badge
+        return view('Staff_Produk.detailRusak', compact('produk', 'damaged_batches', 'totalDamaged'));
     }
 
     public function store(Request $request)

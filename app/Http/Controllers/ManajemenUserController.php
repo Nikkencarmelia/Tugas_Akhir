@@ -10,8 +10,7 @@ class ManajemenUserController extends Controller
 {
     public function __construct()
     {
-        // Pastikan cuma super admin
-        $this->middleware('auth:web_admin');
+        $this->middleware('auth');
     }
 
     // ================= LIST USER =================
@@ -34,7 +33,7 @@ class ManajemenUserController extends Controller
     {
         $request->validate([
             'role' => 'required|in:user,kurir,staff_produk,staff_purchasing,super_admin',
-            'status_online' => 'nullable|in:aktif,tidak_aktif', // FIX: Buat nullable (opsional), karena status disabled di modal
+            'status_online' => 'nullable|in:aktif,tidak_aktif', // Nullable karena opsional dari modal
         ]);
 
         $user = User::findOrFail($id);
@@ -43,7 +42,7 @@ class ManajemenUserController extends Controller
             'role' => $request->role,
         ];
 
-        // Hanya update status kalau dikirim (kalau gak, tetep yang lama)
+        // Update status_online kalau ada input (tetep nullable)
         if ($request->filled('status_online')) {
             $updateData['status_online'] = $request->status_online;
         }

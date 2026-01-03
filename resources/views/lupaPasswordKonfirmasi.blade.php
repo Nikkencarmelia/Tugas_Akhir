@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Lupa Kata Sandi</title>
+        <title>Reset Kata Sandi</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -65,8 +65,8 @@
 
                 <!-- KANAN -->
                 <div class="col-md-6 p-5 right-box">
-                    <h2 class="fw-bold mb-4">Lupa Kata Sandi</h2>
-                    <p class="text-muted mb-4">Masukkan email Anda dan kami akan mengirimkan link untuk mereset kata sandi.</p>
+                    <h2 class="fw-bold mb-4">Reset Kata Sandi</h2>
+                    <p class="text-muted mb-4">Masukkan Kata Sandi baru untuk akun Anda. Pastikan Kata Sandi kuat dan mudah diingat.</p>
 
                     {{-- ERROR --}}
                     @if ($errors->any())
@@ -84,15 +84,39 @@
                         <div class="alert alert-success">{{ session('success') }}</div>
                     @endif
 
-                    {{-- FORM LUPA PASSWORD --}}
-                    <form method="POST" action="{{ route('password.email') }}">
+                    {{-- ERROR SESSION --}}
+                    @if (session('error'))
+                        <div class="alert alert-danger">{{ session('error') }}</div>
+                    @endif
+
+                    {{-- FORM RESET PASSWORD --}}
+                    <form method="POST" action="{{ route('password.update') }}">
                         @csrf
+
+                        {{-- HIDDEN FIELDS --}}
+                        <input type="hidden" name="email" value="{{ $email ?? old('email') }}">
+                        <input type="hidden" name="token" value="{{ $token ?? old('token') }}">
 
                         <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input type="email" name="email" value="{{ old('email') }}"
-                                class="form-control @error('email') is-invalid @enderror" placeholder="Masukkan email Anda" required>
-                            @error('email')
+                            <input type="email" name="email_display" value="{{ $email ?? old('email') }}" class="form-control" readonly>
+                            <small class="form-text text-muted">Email akun Anda (tidak dapat diubah)</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Kata Sandi Baru</label>
+                            <input type="password" name="password" value="{{ old('password') }}"
+                                class="form-control @error('password') is-invalid @enderror" placeholder="Masukkan Kata Sandi baru" required minlength="6">
+                            @error('password')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Konfirmasi Kata Sandi Baru</label>
+                            <input type="password" name="password_confirmation" value="{{ old('password_confirmation') }}"
+                                class="form-control @error('password_confirmation') is-invalid @enderror" placeholder="Konfirmasi Kata Sandi baru" required minlength="6">
+                            @error('password_confirmation')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -104,16 +128,9 @@
                         </div>
 
                         <button type="submit" class="btn w-100 text-white mb-3" style="background:#2A522A">
-                            Kirim Link Reset Password
+                            Update Kata Sandi
                         </button>
                     </form>
-
-                    <p class="text-center small">
-                        Belum punya akun?
-                        <a href="{{ route('register') }}" class="fw-bold text-decoration-none" style="color:#2A522A">
-                            Daftar
-                        </a>
-                    </p>
                 </div>
 
             </div>
@@ -123,7 +140,7 @@
 
         <script>
             // Gak ada JS interaksi, cuma placeholder
-            console.log('Forgot password UI loaded');
+            console.log('Reset password UI loaded');
         </script>
     </body>
 </html>

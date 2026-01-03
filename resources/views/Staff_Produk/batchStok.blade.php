@@ -150,28 +150,22 @@
         @extends('Components.staff_produk')
         @section('content')
 
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-
-        @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-
         <div class="dashboard-container">
 
             <div class="product-detail-card">
                 <div class="product-detail-header">
                     <div class="header-left">
-                        <button class="btn-back" onclick="window.history.back()">
+                        {{-- DYNAMIC BACK URL DARI SESSION --}}
+                        @php
+                            $refData = \Illuminate\Support\Facades\Session::get('batch_referrer', ['route' => 'produk.data', 'query' => []]);
+                            $backUrl = route($refData['route']);
+                            if (!empty($refData['query'])) {
+                                $backUrl .= '?' . http_build_query($refData['query']);
+                            }
+                        @endphp
+                        <a href="{{ $backUrl }}" class="btn-back">
                             <i class="bi bi-chevron-left"></i>
-                        </button>
+                        </a>
                         <h4 class="dashboard-title mb-0"><i class="bi bi-box-seam"></i> Detail Produk</h4>
                     </div>
                     <button class="btn btn-add-top" data-bs-toggle="modal" data-bs-target="#addBatchModal">
@@ -278,7 +272,7 @@
                                     <td class="col-tgl-exp">{{ $batch->tgl_kadaluarsa_format }}</td>
                                     <td class="col-sisa-hari fw-bold {{ $batch->sisa_color }}">{{ $batch->sisa_text }}</td>
                                     <td class="col-harga-normal {{ $batch->harga_saat_ini < $batch->harga_normal ? 'text-decoration-line-through text-muted' : '' }}">{{ $batch->harga_normal_rp }}</td>
-                                    <td class="col-harga-saat fw-bold {{ $batch->harga_saat_ini < $batch->harga_normal ? 'text-success' : ($batch->harga_saat_ini > $batch->harga_normal ? 'text-danger' : '') }}">{{ $batch->harga_saat_ini_rp }}</td>
+                                    <td class="col-harga-saat fw-bold {{ $batch->harga_saat_ini < $batch->harga_normal ? 'text-success' : ($batch->harga_saat_ini > $batch->harga_normal ? 'text-success' : '') }}">{{ $batch->harga_saat_ini_rp }}</td>
                                     <td class="col-tgl-perubahan">{{ $batch->tgl_perubahan_format }}</td>
                                     <td class="col-ket-harga" title="{{ $batch->keterangan }}">
                                         @if($batch->harga_saat_ini < $batch->harga_normal)
@@ -331,6 +325,31 @@
                 </ul>
             </nav>
 
+        </div>
+
+        <!-- Toast Container -->
+        <div class="toast-container position-fixed top-0 end-0 p-3">
+            @if (session('success'))
+                <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            {{ session('success') }}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            {{ session('error') }}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            @endif
         </div>
 
         <div class="modal fade" id="addBatchModal">
@@ -526,7 +545,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="rusakForm" action="{{ route('produk.rusak_cacat.store') }}" method="POST" enctype="multipart/form-data"> <!-- FIXED: Prefix produk. -->
+                <form id="rusakForm" action="{{ route('produk.rusak_cacat.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="id_produk" value="{{ $produk->id }}">
                     <input type="hidden" name="id_batch" id="rusakBatchId">
@@ -643,12 +662,30 @@
                     }
                 });
             }
+
+            // Initialize toasts if they exist
+            @if (session('success'))
+                var successToastEl = document.getElementById('successToast');
+                var successToast = new bootstrap.Toast(successToastEl);
+                successToast.show();
+            @endif
+
+            @if (session('error'))
+                var errorToastEl = document.getElementById('errorToast');
+                var errorToast = new bootstrap.Toast(errorToastEl);
+                errorToast.show();
+            @endif
         });
 
 
         function deleteBatch() {
             const id = document.getElementById('deleteBatchId').value;
             window.location.href = `/staff_produk/batch/delete/${id}`;
+        }
+
+        // FIX: Tambahkan fungsi ini agar id_batch bisa diset saat modal dibuka
+        function setRusakBatch(id) {
+            document.getElementById('rusakBatchId').value = id;
         }
 
         document.addEventListener('DOMContentLoaded', colorizeBadges);

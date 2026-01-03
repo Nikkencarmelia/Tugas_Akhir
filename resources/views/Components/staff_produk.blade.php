@@ -278,7 +278,7 @@
                     <i class="bi bi-percent"></i> Diskon
                 </a>
 
-                <a href="{{ route('produk.stok') }}" class="nav-link {{ request()->is('staff_produk/stok') ? 'active' : '' }}">
+                <a href="{{ route('produk.kelola_stok') }}" class="nav-link {{ request()->is('staff_produk/kelola_stok') ? 'active' : '' }}">
                     <i class="bi bi-boxes"></i> Kelola Stok Menipis/Habis
                 </a>
 
@@ -286,13 +286,14 @@
                     <i class="bi bi-archive"></i> Produk Diarsipkan
                 </a>
 
-                <a href="{{ route('rusak_cacat.store') }}" class="nav-link {{ request()->is('rusak_cacat.store') ? 'active' : '' }}">
+                <a href="{{ route('produk.rusak_cacat.index') }}" class="nav-link {{ request()->is('staff_produk/rusak_cacat*') ? 'active' : '' }}">
                     <i class="bi bi-exclamation-triangle"></i> Produk Rusak/Cacat
                 </a>
 
-                <a href="/logout" class="nav-link">
+                <!-- TRIGGER MODAL LOGOUT -->
+                <button type="button" class="nav-link logout-trigger" data-bs-toggle="modal" data-bs-target="#logoutModal">
                     <i class="bi bi-box-arrow-right"></i> Logout
-                </a>
+                </button>
             </div>
         </div>
 
@@ -316,21 +317,21 @@
                 <i class="bi bi-percent"></i> Diskon
             </a>
 
-            <a href="{{ route('produk.stok') }}" class="nav-link {{ request()->is('staff_produk/stok') ? 'active' : '' }}">
+            <a href="{{ route('produk.kelola_stok') }}" class="nav-link {{ request()->is('staff_produk/kelola_stok') ? 'active' : '' }}">
                 <i class="bi bi-boxes"></i> Kelola Stok Menipis/Habis
             </a>
-
             <a href="{{ route('produk.arsip') }}" class="nav-link {{ request()->is('staff_produk/arsip') ? 'active' : '' }}">
                 <i class="bi bi-archive"></i> Produk Diarsipkan
             </a>
 
-            <a href="{{ route('produk.rusak') }}" class="nav-link {{ request()->is('staff_produk/rusak') ? 'active' : '' }}">
+            <a href="{{ route('produk.rusak_cacat.index') }}" class="nav-link {{ request()->is('staff_produk/rusak') ? 'active' : '' }}">
                 <i class="bi bi-exclamation-triangle"></i> Produk Rusak/Cacat
             </a>
 
-            <a href="/logout" class="nav-link">
+            <!-- TRIGGER MODAL LOGOUT -->
+            <button type="button" class="nav-link logout-trigger" data-bs-toggle="modal" data-bs-target="#logoutModal">
                 <i class="bi bi-box-arrow-right"></i> Logout
-            </a>
+            </button>
         </div>
 
         <!-- Main Content -->
@@ -341,7 +342,45 @@
             @yield('content')
         </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- MODAL KONFIRMASI LOGOUT -->
+        <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="logoutModalLabel">
+                            <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                            Konfirmasi Logout
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-0">Apakah Anda yakin ingin keluar dari akun? Anda akan diarahkan ke halaman login.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-danger">Ya, Logout</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // Optional: JS untuk handle logout trigger (kalau butuh custom, misalnya close offcanvas dulu)
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('.logout-trigger').forEach(trigger => {
+                    trigger.addEventListener('click', function() {
+                        // Kalau di mobile offcanvas, tutup offcanvas dulu sebelum modal
+                        const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('sidebarOffcanvas'));
+                        if (offcanvas) {
+                            offcanvas.hide();
+                        }
+                    });
+                });
+            });
+        </script>
     </body>
 </html>

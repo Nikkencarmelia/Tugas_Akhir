@@ -103,7 +103,7 @@
                 </div>
 
                 <div class="mb-3 text-end">
-                    <a href="#" class="fw-bold text-decoration-none" style="color:#2A522A;font-size:.9rem">
+                    <a href="{{ route('password.request') }}" class="fw-bold text-decoration-none" style="color:#2A522A;font-size:.9rem">
                         Lupa kata sandi?
                     </a>
                 </div>

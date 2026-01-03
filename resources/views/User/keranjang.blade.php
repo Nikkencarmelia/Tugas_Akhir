@@ -4,6 +4,7 @@
         <meta charset="UTF-8" />
         <title>Keranjang</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
         <style>
 
@@ -30,40 +31,6 @@
                 display: flex;
                 align-items: center;
                 gap: 1rem;
-            }
-
-            .cart-actions {
-                display: flex;
-                gap: 0.25rem;
-            }
-
-            .cart-actions .btn {
-                border-radius: 12px;
-                font-size: 12px;
-                padding: 6px 12px;
-                font-weight: 500;
-                line-height: 1.2;
-                min-width: auto;
-            }
-
-            .cart-actions .btn-outline-success {
-                border-color: #198754;
-                color: #198754;
-            }
-
-            .cart-actions .btn-outline-success:hover {
-                background: #198754;
-                color: white;
-            }
-
-            .cart-actions .btn-outline-danger {
-                border-color: #dc3545;
-                color: #dc3545;
-            }
-
-            .cart-actions .btn-outline-danger:hover {
-                background: #dc3545;
-                color: white;
             }
 
             .search-wrapper {
@@ -99,6 +66,35 @@
                 color: #198754 !important;
             }
 
+            .selected-actions {
+                display: none;
+                background: #f8f9fa;
+                padding: 0.75rem 1.5rem;
+                border-radius: 8px;
+                margin-bottom: 1rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border: 1px solid #e9ecef;
+                font-size: 14px;
+            }
+
+            .selected-actions.show {
+                display: flex;
+            }
+
+            .selected-count {
+                color: #666;
+            }
+
+            .delete-selected {
+                border-radius: 6px;
+                font-size: 12px;
+                padding: 4px 10px;
+                font-weight: 500;
+                line-height: 1.2;
+            }
+
             .cart-table-header {
                 display: flex;
                 justify-content: space-between;
@@ -114,6 +110,20 @@
             .cart-table-header > div {
                 text-align: center;
                 font-size: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+
+            .cart-table-header > div:first-child {
+                justify-content: flex-start;
+                padding-left: 0.25rem;
+            }
+
+            .cart-table-header input[type="checkbox"] {
+                accent-color: #198754;
+                transform: scale(1.1);
             }
 
             .cart-item {
@@ -170,30 +180,35 @@
                 align-items: center;
                 justify-content: center;
                 gap: 6px;
-            }
-
-            .qty-input {
-                width: 60px;
-                text-align: center;
-                border: 1px solid #ced4da;
+                border: 1px solid #198754;
                 border-radius: 6px;
+                overflow: hidden;
             }
 
             .btn-minus, .btn-plus {
-                width: 36px;
-                height: 36px;
-                border-radius: 6px;
-                border: 1px solid #198754;
+                width: 35px;
+                height: 35px;
                 background: transparent;
+                border: none;
                 color: #198754;
-                font-size: 18px;
+                font-size: 16px;
                 font-weight: bold;
-                transition: all 0.2s ease;
+                cursor: pointer;
+                transition: all 0.2s;
             }
 
             .btn-minus:hover, .btn-plus:hover {
                 background: #198754;
                 color: white;
+            }
+
+            .qty-input {
+                width: 60px;
+                height: 35px;
+                text-align: center;
+                border: none;
+                font-size: 16px;
+                background: #f8fff9;
             }
 
             .harga, .total {
@@ -264,6 +279,16 @@
                 color: white;
             }
 
+            .btn-outline-danger {
+                border-color: #dc3545;
+                color: #dc3545;
+            }
+
+            .btn-outline-danger:hover {
+                background: #dc3545;
+                color: white;
+            }
+
             @media (max-width: 768px) {
                 .cart-table-header {
                     display: none;
@@ -281,9 +306,15 @@
                     justify-content: flex-start;
                 }
 
-                .harga, .qty-box, .total {
+                .harga, .total {
                     width: 100%;
                     text-align: left;
+                    margin-top: 0.5rem;
+                }
+
+                .qty-box {
+                    width: 100%;
+                    justify-content: flex-start;
                     margin-top: 0.5rem;
                 }
 
@@ -303,20 +334,55 @@
                     justify-content: space-between;
                 }
 
-                .cart-actions {
-                    order: 3;
-                    width: 100%;
-                    justify-content: flex-start;
-                }
-
                 .search-wrapper {
                     max-width: none;
                     order: 2;
                 }
 
+                .selected-actions {
+                    flex-direction: column;
+                    gap: 0.5rem;
+                    align-items: flex-start;
+                    text-align: left;
+                }
+
                 .checkout-box {
                     margin-top: 2rem;
                     position: static;
+                }
+
+                .qty-box {
+                    gap: 4px;
+                }
+
+                .btn-minus, .btn-plus {
+                    width: 30px;
+                    height: 30px;
+                    font-size: 14px;
+                }
+
+                .qty-input {
+                    width: 50px;
+                    height: 30px;
+                    font-size: 14px;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .qty-box {
+                    gap: 4px;
+                }
+
+                .btn-minus, .btn-plus {
+                    width: 30px;
+                    height: 30px;
+                    font-size: 14px;
+                }
+
+                .qty-input {
+                    width: 50px;
+                    height: 30px;
+                    font-size: 14px;
                 }
             }
         </style>
@@ -333,10 +399,6 @@
                     <div class="cart-header">
                         <div class="header-left">
                             <h3>Keranjang Saya</h3>
-                            <div class="cart-actions">
-                                <button id="selectAll" class="btn btn-outline-success">Pilih Semua</button>
-                                <button id="deleteAll" class="btn btn-outline-danger">Hapus Semua</button>
-                            </div>
                         </div>
                         <form class="d-flex search-form" role="search">
                             <div class="input-group search-wrapper">
@@ -348,8 +410,16 @@
                         </form>
                     </div>
 
+                    <div class="selected-actions">
+                        <span class="selected-count"></span>
+                        <button id="deleteSelected" class="btn btn-outline-danger delete-selected">Hapus Terpilih</button>
+                    </div>
+
                     <div class="cart-table-header">
-                        <div style="flex: 3">Produk</div>
+                        <div style="flex: 3">
+                            <input type="checkbox" id="selectAllHeader" checked />
+                            <span>Produk</span>
+                        </div>
                         <div style="flex: 1">Harga</div>
                         <div style="flex: 1">Jumlah</div>
                         <div style="flex: 1">Total</div>
@@ -360,14 +430,18 @@
                             <i class="fa fa-shopping-cart fa-3x text-muted mb-3"></i>
                             <h5 class="text-muted">Keranjang Anda kosong</h5>
                             <p class="text-muted">Tambahkan produk untuk melihat di sini.</p>
-                            <a href="/produk" class="btn btn-success">Belanja Sekarang</a>
+                            <a href="{{ route('user.produk') }}" class="btn btn-success">Belanja Sekarang</a>
                         </div>
                     @else
-                        @foreach ($keranjang as $item)
-                        <div class="cart-item" data-harga="{{ $item['harga'] }}">
+                        @foreach ($keranjang as $cartKey => $item)
+                        <div class="cart-item"
+                             data-id="{{ $cartKey }}"
+                             data-product-id="{{ $item['product_id'] }}"
+                             data-batch-id="{{ $item['batch_id'] ?? '' }}"
+                             data-harga="{{ $item['harga'] }}">
                             <div class="product-info">
                                 <input type="checkbox" style="accent-color: #198754;" checked />
-                                <img src="{{ asset($item['gambar']) }}" alt="{{ $item['nama_produk'] }}" />
+                                <img src="{{ $item['gambar'] }}" alt="{{ $item['nama_produk'] }}" />
                                 <div class="product-details">
                                     <strong>{{ $item['nama_produk'] }}</strong><br />
                                     <small>{{ $item['satuan_berat'] }}</small>
@@ -376,12 +450,12 @@
 
                             <div class="harga">Rp {{ number_format($item['harga'], 0, ',', '.') }}</div>
                             <div class="qty-box">
-                                <button class="btn-minus">−</button>
-                                <input type="number" class="qty-input" value="1" min="1">
-                                <button class="btn-plus">+</button>
+                                <button class="btn-minus" type="button">−</button>
+                                <input type="number" class="qty-input" value="{{ $item['quantity'] }}" min="1">
+                                <button class="btn-plus" type="button">+</button>
                             </div>
 
-                            <div class="total">Rp {{ number_format($item['harga'], 0, ',', '.') }}</div>
+                            <div class="total">Rp {{ number_format($item['harga'] * $item['quantity'], 0, ',', '.') }}</div>
                         </div>
                         @endforeach
                     @endif
@@ -396,12 +470,12 @@
                         </div>
 
                         <div class="d-flex justify-content-between mb-4">
-                            <span>Subtotal Harga</span><span id="subtotal">Rp 0</span>
+                            <span>Subtotal Harga</span><span id="subtotal">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                         </div>
 
                         <div class="d-flex gap-2">
                             <a href="/" class="btn btn-outline-success w-100">Batal</a>
-                            <a href="/checkout" class="btn btn-success w-100">Checkout</a>
+                            <a href="{{ route('keranjang.checkout') }}" class="btn btn-success w-100">Checkout</a>
                         </div>
                     </div>
                 </div>
@@ -409,12 +483,15 @@
         </div>
 
         <script>
+            // CSRF Token
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
             // Format angka jadi Rupiah
             function formatRupiah(angka) {
                 return 'Rp ' + angka.toLocaleString('id-ID');
             }
 
-            // Update total harga dan jumlah produk
+            // Update total harga dan jumlah produk (client-side)
             function updateTotal() {
                 let subtotal = 0;
                 let totalProduk = 0;
@@ -437,11 +514,66 @@
                 document.getElementById('total-produk').textContent = totalProduk + ' Produk';
             }
 
+            // Update selected actions bar
+            function updateSelectedActions() {
+                const checkboxes = document.querySelectorAll('.cart-item input[type="checkbox"]:checked');
+                const count = checkboxes.length;
+                const selectedActions = document.querySelector('.selected-actions');
+                const selectedCount = document.querySelector('.selected-count');
+
+                if (count > 0) {
+                    selectedCount.textContent = `${count} produk dipilih`;
+                    selectedActions.classList.add('show');
+                } else {
+                    selectedActions.classList.remove('show');
+                }
+            }
+
+            // AJAX Update Quantity
+            function updateQuantity(productId, batchId, quantity) {
+                const payload = {
+                    product_id: parseInt(productId),
+                    quantity: parseInt(quantity)
+                };
+
+                // Only add batch_id if it exists and is not empty
+                if (batchId && batchId !== '') {
+                    payload.batch_id = parseInt(batchId);
+                }
+
+                fetch(`{{ route('keranjang.update') }}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        alert(data.message || 'Gagal update quantity');
+                        // Revert to previous value if needed
+                        location.reload(); // Reload untuk sync dengan server
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat update quantity');
+                    location.reload(); // Reload untuk sync dengan server
+                });
+            }
+
             // Tombol tambah qty
             document.querySelectorAll('.btn-plus').forEach(btn => {
                 btn.addEventListener('click', function () {
                     const input = this.parentElement.querySelector('.qty-input');
-                    input.value = parseInt(input.value) + 1;
+                    const cartItem = this.closest('.cart-item');
+                    const productId = cartItem.dataset.productId;
+                    const batchId = cartItem.dataset.batchId || null;
+                    let newQty = parseInt(input.value) + 1;
+                    input.value = newQty;
+                    updateQuantity(productId, batchId, newQty);
                     updateTotal();
                 });
             });
@@ -450,41 +582,98 @@
             document.querySelectorAll('.btn-minus').forEach(btn => {
                 btn.addEventListener('click', function () {
                     const input = this.parentElement.querySelector('.qty-input');
+                    const cartItem = this.closest('.cart-item');
+                    const productId = cartItem.dataset.productId;
+                    const batchId = cartItem.dataset.batchId || null;
                     if (parseInt(input.value) > 1) {
-                        input.value = parseInt(input.value) - 1;
+                        let newQty = parseInt(input.value) - 1;
+                        input.value = newQty;
+                        updateQuantity(productId, batchId, newQty);
                         updateTotal();
                     }
                 });
             });
 
+            // Update qty manual
+            document.querySelectorAll('.qty-input').forEach(input => {
+                input.addEventListener('change', function() {
+                    const cartItem = this.closest('.cart-item');
+                    const productId = cartItem.dataset.productId;
+                    const batchId = cartItem.dataset.batchId || null;
+                    updateQuantity(productId, batchId, parseInt(this.value));
+                    updateTotal();
+                });
+            });
+
+            // Select all header checkbox
+            const selectAllHeader = document.getElementById('selectAllHeader');
+            selectAllHeader.addEventListener('change', function() {
+                const isChecked = this.checked;
+                document.querySelectorAll('.cart-item input[type="checkbox"]').forEach(chk => {
+                    chk.checked = isChecked;
+                });
+                updateTotal();
+                updateSelectedActions();
+            });
+
             // Update total saat checkbox dicentang / dihapus
             document.querySelectorAll('input[type="checkbox"]').forEach(chk => {
-                chk.addEventListener('change', updateTotal);
-            });
+                chk.addEventListener('change', function() {
+                    updateTotal();
 
-            // Update total kalau user ubah angka qty manual
-            document.querySelectorAll('.qty-input').forEach(input => {
-                input.addEventListener('input', updateTotal);
-            });
+                    // Update select all header state
+                    const allCheckboxes = document.querySelectorAll('.cart-item input[type="checkbox"]');
+                    const checkedCount = document.querySelectorAll('.cart-item input[type="checkbox"]:checked').length;
+                    selectAllHeader.checked = checkedCount === allCheckboxes.length;
+                    selectAllHeader.indeterminate = checkedCount > 0 && checkedCount < allCheckboxes.length;
 
-            // Button Pilih Semua
-            document.getElementById('selectAll').addEventListener('click', function() {
-                document.querySelectorAll('input[type="checkbox"]').forEach(chk => {
-                    chk.checked = true;
+                    updateSelectedActions();
                 });
-                updateTotal();
             });
 
-            // Button Hapus Semua (uncheck semua, sehingga tidak terhitung di checkout)
-            document.getElementById('deleteAll').addEventListener('click', function() {
-                document.querySelectorAll('input[type="checkbox"]').forEach(chk => {
-                    chk.checked = false;
+            // Button Hapus Terpilih
+            document.getElementById('deleteSelected').addEventListener('click', function() {
+                const selectedItems = document.querySelectorAll('.cart-item input[type="checkbox"]:checked');
+                if (selectedItems.length === 0) {
+                    alert('Pilih item untuk dihapus');
+                    return;
+                }
+
+                const ids = Array.from(selectedItems).map(chk => chk.closest('.cart-item').dataset.id);
+
+                fetch(`{{ route('keranjang.delete-multiple') }}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({ ids: ids })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        ids.forEach(id => {
+                            const item = document.querySelector(`.cart-item[data-id="${id}"]`);
+                            if (item) item.remove();
+                        });
+                        // Reset select all header
+                        selectAllHeader.checked = false;
+                        selectAllHeader.indeterminate = false;
+                        updateSelectedActions();
+                        updateTotal();
+                    } else {
+                        alert(data.message || 'Gagal hapus item');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat hapus item');
                 });
-                updateTotal();
             });
 
-            // Inisialisasi subtotal awal
+            // Inisialisasi subtotal awal dan actions
             updateTotal();
+            updateSelectedActions();
         </script>
 
         @endsection
