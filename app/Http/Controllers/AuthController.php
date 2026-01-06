@@ -34,10 +34,13 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         $user = Auth::user();
+        $user->update(['status_online' => 'aktif']);
 
-        $user->update([
-            'status_online' => 'aktif'
-        ]);
+        // IF KURIR: Sync status_antar
+        if ($user->role === 'kurir') {
+            $kurir = \App\Models\Kurir::firstOrCreate(['id_user' => $user->id]);
+            $kurir->syncStatus();
+        }
 
         switch ($user->role) {
             case 'super_admin':
@@ -47,7 +50,7 @@ class AuthController extends Controller
             case 'staff_purchasing':
                 return redirect()->route('staff_purchasing.dashboard');
             case 'kurir':
-                return redirect()->route('kurir.pengiriman');
+            return redirect()->route('kurir.pengiriman');
             default:
                 return redirect()->route('beranda');
         }
@@ -84,9 +87,18 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         if (Auth::check()) {
-            Auth::user()->update([
+            $user = Auth::user();
+            $user->update([
                 'status_online' => 'tidak_aktif'
             ]);
+
+            // IF KURIR: Sync status_antar
+            if ($user->role === 'kurir') {
+                $kurir = \App\Models\Kurir::where('id_user', $user->id)->first();
+                if ($kurir) {
+                    $kurir->syncStatus();
+                }
+            }
         }
 
         Auth::logout();

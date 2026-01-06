@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
-class ManajemenUserController extends Controller
+class ManajemenPenggunaController extends Controller
 {
     public function __construct()
     {
@@ -25,7 +25,7 @@ class ManajemenUserController extends Controller
             'status_online'
         )->orderBy('nama_lengkap')->get()->toArray();
 
-        return view('super_admin.manajemenUser', compact('users'));
+        return view('super_admin.manajemenPengguna', compact('users'));
     }
 
     // ================= UPDATE ROLE & STATUS =================
@@ -48,6 +48,15 @@ class ManajemenUserController extends Controller
         }
 
         $user->update($updateData);
+
+        // SYNC STATUS ANTAR FOR COURIER
+        if ($user->role === 'kurir') {
+            $kurir = \App\Models\Kurir::firstOrCreate(
+                ['id_user' => $user->id],
+                ['jenis_kendaraan' => 'motor']
+            );
+            $kurir->syncStatus();
+        }
 
         return response()->json([
             'success' => true,

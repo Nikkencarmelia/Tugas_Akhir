@@ -5,6 +5,7 @@
         <title>Keranjang</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
         <style>
 
@@ -385,6 +386,22 @@
                     font-size: 14px;
                 }
             }
+            .back-btn {
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                width:40px;
+                height:40px;
+                margin-right:.5rem;
+                color:#6c757d;
+                background:transparent;
+                font-size:1.5rem;
+                text-decoration:none;
+                border:none;
+                border-radius:.5rem;
+                transition:color .2s ease, transform .2s ease;
+            }
+
         </style>
     </head>
 
@@ -396,19 +413,24 @@
             <div class="row">
                 <div class="col-lg-8">
 
-                    <div class="cart-header">
-                        <div class="header-left">
-                            <h3>Keranjang Saya</h3>
+                    <div class="cart-header d-flex align-items-center justify-content-between">
+                        <div class="header-left d-flex align-items-center">
+                            <a href="/" class="back-btn" title="Kembali">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                            <h3 class="mb-0">Keranjang Saya</h3>
                         </div>
+
                         <form class="d-flex search-form" role="search">
                             <div class="input-group search-wrapper">
                                 <input type="text" class="form-control" placeholder="Cari produk..." aria-label="Search">
                                 <button class="input-group-text border-start-0" type="submit">
-                                <i class="fa fa-search text-muted"></i>
+                                    <i class="fa fa-search text-muted"></i>
                                 </button>
                             </div>
                         </form>
                     </div>
+
 
                     <div class="selected-actions">
                         <span class="selected-count"></span>
@@ -549,17 +571,28 @@
                     },
                     body: JSON.stringify(payload)
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (!data.success) {
-                        alert(data.message || 'Gagal update quantity');
-                        // Revert to previous value if needed
-                        location.reload(); // Reload untuk sync dengan server
+                .then(async response => {
+                    const isJson = response.headers.get('content-type')?.includes('application/json');
+                    const text = await response.text();
+                    
+                    try {
+                        const data = JSON.parse(text);
+                        if (!response.ok || !data.success) {
+                            throw new Error(data.message || 'Gagal update quantity');
+                        }
+                        return data;
+                    } catch (e) {
+                         // If not JSON, it's likely a server error page (HTML)
+                        console.error('Server Error:', text);
+                        throw new Error('Terjadi kesalahan di server (Cek Console).');
                     }
+                })
+                .then(data => {
+                     // Success (update UI done by updateTotal listener mostly, or reload not needed)
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Terjadi kesalahan saat update quantity');
+                    alert(error.message);
                     location.reload(); // Reload untuk sync dengan server
                 });
             }

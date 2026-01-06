@@ -108,11 +108,11 @@ class AlamatController extends Controller
 
     public function kelurahanByKecamatan($id)
     {
-        return Kelurahan::where('id_kecamatan', $id)->get();
+        return response()->json(Kelurahan::where('id_kecamatan', $id)->get());
     }
 
     public function kodePosByKelurahan($id)
     {
-        return KodePos::where('id_kelurahan', $id)->get();
+        return response()->json(KodePos::where('id_kelurahan', $id)->get());
     }
 }

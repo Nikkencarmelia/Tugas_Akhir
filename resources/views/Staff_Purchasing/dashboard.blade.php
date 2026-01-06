@@ -224,7 +224,7 @@
                 <div class="stat-label">Pesanan Masuk</div>
                 <div class="stat-icon"><i class="bi bi-cart-plus"></i></div>
             </div>
-            <div class="stat-value">{{ count(array_filter($pesanan, fn($p) => $p['status'] === 'Masuk')) }}</div>
+            <div class="stat-value">{{ $pesanan_masuk_count }}</div>
         </div>
 
         <div class="stat-card konfirmasi-pembayaran konfirmasi-pembayaran-icon">
@@ -232,7 +232,7 @@
                 <div class="stat-label">Konfirmasi Pembayaran</div>
                 <div class="stat-icon"><i class="bi bi-credit-card"></i></div>
             </div>
-            <div class="stat-value">{{ count(array_filter($pesanan, fn($p) => $p['status'] === 'Konfirmasi Pembayaran')) }}</div>
+            <div class="stat-value">{{ $konfirmasi_pembayaran_count }}</div>
         </div>
 
         <div class="stat-card belum-kurir belum-kurir-icon">
@@ -240,7 +240,23 @@
                 <div class="stat-label">Pesanan Belum Dapat Kurir</div>
                 <div class="stat-icon"><i class="bi bi-truck"></i></div>
             </div>
-            <div class="stat-value">{{ count(array_filter($pesanan, fn($p) => $p['status'] === 'Belum Dapat Kurir')) }}</div>
+            <div class="stat-value">{{ $belum_kurir_count }}</div>
+        </div>
+
+        <div class="stat-card" style="border-left: 4px solid #ef4444;">
+            <div class="stat-header">
+                <div class="stat-label">Pesanan Ditolak Kurir</div>
+                <div class="stat-icon" style="background-color: #fee2e2; color: #b91c1c;"><i class="bi bi-x-circle"></i></div>
+            </div>
+            <div class="stat-value">{{ $ditolak_kurir_count }}</div>
+        </div>
+
+        <div class="stat-card" style="border-left: 4px solid #f59e0b;">
+            <div class="stat-header">
+                <div class="stat-label">Menunggu Pembayaran</div>
+                <div class="stat-icon" style="background-color: #ffedd5; color: #9a3412;"><i class="bi bi-hourglass-split"></i></div>
+            </div>
+            <div class="stat-value">{{ $menunggu_pembayaran_count }}</div>
         </div>
 
         <div class="stat-card kecamatan kecamatan-icon">
@@ -248,7 +264,7 @@
                 <div class="stat-label">Jumlah Kecamatan</div>
                 <div class="stat-icon"><i class="bi bi-geo-alt"></i></div>
             </div>
-            <div class="stat-value">{{ count($kecamatans) }}</div>
+            <div class="stat-value">{{ $kecamatans_count }}</div>
         </div>
     </div>
 </div>

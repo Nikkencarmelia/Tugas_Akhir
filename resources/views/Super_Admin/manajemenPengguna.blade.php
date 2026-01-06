@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Manajemen User - Super Admin</title>
+    <title>Manajemen Pengguna - Super Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -127,7 +127,7 @@
 @section('content')
 <div class="container py-5">
     <div class="orders-header">
-        <h3><i class="bi bi-people"></i>Manajemen User</h3>
+        <h3><i class="bi bi-people"></i>Manajemen Pengguna</h3>
         <div class="search-input-group">
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-search"></i></span>
@@ -136,7 +136,7 @@
         </div>
     </div>
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="fw-semibold">Data User</h5>
+        <h5 class="fw-semibold">Data Pengguna</h5>
     </div>
     <div class="table-responsive">
         <table class="table table-bordered align-middle" id="tableUser">
@@ -174,7 +174,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="text-center text-muted">Belum ada data user.</td>
+                    <td colspan="7" class="text-center text-muted">Belum ada data pengguna.</td>
                 </tr>
                 @endforelse
             </tbody>
@@ -187,7 +187,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="titleUser">Edit User</h5>
+                <h5 class="modal-title" id="titleUser">Edit Pengguna</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form id="formUser">
@@ -309,10 +309,10 @@ document.addEventListener('DOMContentLoaded', function() {
             role: document.getElementById('role').value
         };
 
-        console.log('Mengirim ke URL: /super_admin/manajemen_user/' + id);
+        console.log('Mengirim ke URL: /super_admin/manajemen_pengguna/' + id);
         console.log('Data:', formData);
 
-        fetch(`/super_admin/manajemen_user/${id}`, {
+        fetch(`/super_admin/manajemen_pengguna/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

@@ -430,6 +430,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
                     body: JSON.stringify({
@@ -438,11 +439,12 @@
                         quantity: quantity
                     })
                 })
-                .then(response => {
+                .then(async response => {
+                    const data = await response.json();
                     if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                        throw new Error(data.message || `HTTP error! status: ${response.status}`);
                     }
-                    return response.json();
+                    return data;
                 })
                 .then(data => {
                     if (data.success) {
@@ -452,10 +454,7 @@
                         // Update cart badge
                         updateCartBadge(data.cart_count || 0);
 
-                        // Redirect ke halaman keranjang setelah 1.5 detik
-                        setTimeout(() => {
-                            window.location.href = '{{ route("keranjang.index") }}';
-                        }, 1500);
+                        // Redirection removed as per user request
                     } else {
                         document.getElementById('toastMessage').textContent = 'Gagal: ' + (data.message || 'Unknown error');
                         toast.show();

@@ -405,6 +405,7 @@
 
         <div class="product-weight">{{ $satuanLengkap }}</div>
         <div class="product-stock">Stok: {{ $totalStok }}</div>
+        <div class="text-muted small mb-2">kategori : {{ $produk->kategori->nama_kategori ?? 'Umum' }}</div>
 
         <div class="product-description">
             {{ $produk->deskripsi ?? 'Deskripsi produk belum tersedia.' }}
@@ -426,7 +427,9 @@
                     data-batch-id="{{ $batchId ?? '' }}">
                 Tambahkan ke Keranjang
             </button>
-            <button class="btn btn-success" type="button">
+            <button class="btn btn-success btn-beli-sekarang" 
+                    type="button"
+                    data-product-id="{{ $produk->id }}">
                 Beli Sekarang
             </button>
         </div>
@@ -498,23 +501,27 @@
                 quantity: quantity
             };
 
-            if (batchId && batchId !== '') {
-                payload.batch_id = parseInt(batchId);
-            }
+            // Jika kita ingin user bisa beli melebihi stok SATU BATCH saja (total stok), 
+            // sebaiknya JANGAN kirim batch_id spesifik. Controller akan ambil batch tertua otomatis (FEFO).
+            // if (batchId && batchId !== '') {
+            //     payload.batch_id = parseInt(batchId);
+            // }
 
             fetch('{{ route("keranjang.add") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 },
                 body: JSON.stringify(payload)
             })
-            .then(response => {
+            .then(async response => {
+                const data = await response.json();
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(data.message || `HTTP error! status: ${response.status}`);
                 }
-                return response.json();
+                return data;
             })
             .then(data => {
                 if (data.success) {
@@ -524,10 +531,56 @@
                     // Update cart badge
                     updateCartBadge(data.cart_count || 0);
 
-                    // Redirect ke halaman keranjang setelah 1.5 detik
-                    setTimeout(() => {
-                        window.location.href = '{{ route("keranjang.index") }}';
-                    }, 1500);
+                    // Redirection removed as per user request
+                } else {
+                    document.getElementById('toastMessage').textContent = 'Gagal: ' + (data.message || 'Unknown error');
+                    toast.show();
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                document.getElementById('toastMessage').textContent = 'Terjadi kesalahan: ' + error.message;
+                toast.show();
+                button.disabled = false;
+                button.innerHTML = originalText;
+            });
+        });
+
+        // Beli Sekarang (Buy Now)
+        document.querySelector('.btn-beli-sekarang').addEventListener('click', function() {
+            const button = this;
+            const productId = button.dataset.productId;
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+
+            button.disabled = true;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="bi bi-hourglass-split"></i> Memproses...';
+
+            fetch('{{ route("keranjang.buy-now") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    product_id: parseInt(productId),
+                    quantity: quantity
+                })
+            })
+            .then(async response => {
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.message || `HTTP error! status: ${response.status}`);
+                }
+                return data;
+            })
+            .then(data => {
+                if (data.success) {
+                    // Langsung redirect ke checkout sesuai permintaan user
+                    window.location.href = '{{ route("keranjang.checkout") }}';
                 } else {
                     document.getElementById('toastMessage').textContent = 'Gagal: ' + (data.message || 'Unknown error');
                     toast.show();

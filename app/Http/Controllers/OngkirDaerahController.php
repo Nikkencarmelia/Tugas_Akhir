@@ -93,7 +93,8 @@ class OngkirDaerahController extends Controller
         try {
             $validated = $r->validate([
                 'nama_kecamatan' => 'required|string|max:255',
-                'ongkir_minimal' => 'required|integer|min:0'
+                'ongkir_minimal_mobil' => 'required|integer|min:0',
+                'ongkir_minimal_motor' => 'required|integer|min:0'
             ]);
             Kecamatan::create($validated);
             return redirect()->route('staff_purchasing.ongkir.index', ['tab' => 'kecamatan'])->with('success', 'Kecamatan berhasil ditambahkan');
@@ -109,7 +110,8 @@ class OngkirDaerahController extends Controller
             $kec = Kecamatan::findOrFail($id);
             $validated = $r->validate([
                 'nama_kecamatan' => 'required|string|max:255',
-                'ongkir_minimal' => 'required|integer|min:0'
+                'ongkir_minimal_mobil' => 'required|integer|min:0',
+                'ongkir_minimal_motor' => 'required|integer|min:0'
             ]);
             $kec->update($validated);
             return redirect()->route('staff_purchasing.ongkir.index', ['tab' => 'kecamatan'])->with('success', 'Kecamatan berhasil diperbarui');
@@ -197,7 +199,7 @@ class OngkirDaerahController extends Controller
         try {
             $validated = $r->validate([
                 'id_kelurahan' => 'required|exists:kelurahans,id',
-                'kode_pos' => 'required|integer|digits:5'
+                'kode_pos' => 'required|string|size:5|regex:/^\d{5}$/'
             ]);
             KodePos::create($validated);
             return redirect()->route('staff_purchasing.ongkir.index', ['tab' => 'kodepos'])->with('success', 'Kode pos berhasil ditambahkan');
@@ -213,7 +215,7 @@ class OngkirDaerahController extends Controller
             $kp = KodePos::findOrFail($id);
             $validated = $r->validate([
                 'id_kelurahan' => 'required|exists:kelurahans,id',
-                'kode_pos' => 'required|integer|digits:5'
+                'kode_pos' => 'required|string|size:5|regex:/^\d{5}$/'
             ]);
             $kp->update($validated);
             return redirect()->route('staff_purchasing.ongkir.index', ['tab' => 'kodepos'])->with('success', 'Kode pos berhasil diperbarui');
@@ -244,6 +246,22 @@ class OngkirDaerahController extends Controller
         } catch (\Exception $e) {
             Log::error('Get Kelurahan Error: ' . $e->getMessage());
             return response()->json(['error' => 'Gagal memuat kelurahan'], 500);
+        }
+    }
+
+    public function getMinimalOngkir(Request $request, $id_kecamatan)
+    {
+        try {
+            $kec = Kecamatan::findOrFail($id_kecamatan);
+            $kendaraan = $request->query('kendaraan');
+            if (!$kendaraan || !in_array($kendaraan, ['Mobil', 'Motor'])) {
+                return response()->json(['minimal' => 0], 400);
+            }
+            $minimal = $kendaraan === 'Mobil' ? $kec->ongkir_minimal_mobil : $kec->ongkir_minimal_motor;
+            return response()->json(['minimal' => $minimal]);
+        } catch (\Exception $e) {
+            Log::error('Get Minimal Ongkir Error: ' . $e->getMessage());
+            return response()->json(['minimal' => 0], 500);
         }
     }
 }

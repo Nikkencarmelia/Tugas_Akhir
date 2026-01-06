@@ -53,6 +53,18 @@
                 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             }
 
+            /* Force white navbar on mobile/responsive */
+            @media (max-width: 991px) {
+                .navbar {
+                    background-color: #ffffff !important;
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+                }
+                .navbar.transparent {
+                    background-color: #ffffff !important;
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+                }
+            }
+
             .nav-link {
                 color: #495057 !important;
                 transition: color 0.2s ease;
@@ -146,16 +158,26 @@
 
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto align-items-center gap-2">
-                        <li class="nav-item"><a class="nav-link" href="/">Beranda</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ route('user.produk') }}">Produk</a></li>
-
-                        @auth
-                        <li class="nav-item"><a class="nav-link" href="/riwayat">Riwayat</a></li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('user.profil') }}">Profil</a>
+                            <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="/">Beranda</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link position-relative" href="{{ route('keranjang.index') }}">
+                            <a class="nav-link {{ request()->routeIs('user.produk*') ? 'active' : '' }}" href="{{ route('user.produk') }}">Produk</a>
+                        </li>
+
+                        @auth
+                        @php
+                            $isRiwayat = request()->routeIs('pemesanan.riwayat.pesanan') || request()->routeIs('pemesanan.index');
+                            $isProfil = request()->routeIs('user.profil');
+                        @endphp
+                        <li class="nav-item">
+                            <a class="nav-link {{ $isRiwayat ? 'active' : '' }}" href="{{ route('pemesanan.riwayat.pesanan') }}">Riwayat</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ $isProfil ? 'active' : '' }}" href="{{ route('user.profil') }}">Profil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link position-relative {{ request()->routeIs('keranjang.index') ? 'active' : '' }}" href="{{ route('keranjang.index') }}">
                                 <i class="fa-solid fa-cart-shopping"></i>
                                 @php
                                     $cart = session('cart', []);
@@ -166,10 +188,51 @@
                                 </span>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        
+                        <!-- Notification Bell -->
+                        <li class="nav-item dropdown">
+                            @php
+                                $waitingPayment = \App\Models\Pemesanan::where('id_user', Auth::id())
+                                    ->where('status_pesanan', 'menunggu_pembayaran')
+                                    ->latest()
+                                    ->get();
+                                $notifCount = $waitingPayment->count();
+                            @endphp
+                            <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-solid fa-bell"></i>
+                                @if($notifCount > 0)
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem; padding: 0.25em 0.5em;">
+                                    {{ $notifCount }}
+                                </span>
+                                @endif
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 py-0" style="width: 320px; max-height: 400px; overflow-y: auto; border-radius: 12px;">
+                                <li><h6 class="dropdown-header fw-bold border-bottom py-3">Notifikasi</h6></li>
+                                @forelse($waitingPayment as $notif)
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-start gap-2 py-3 border-bottom" href="{{ route('pemesanan.riwayat.pesanan') }}">
+                                        <div class="bg-warning bg-opacity-10 text-warning p-2 rounded-circle">
+                                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                                        </div>
+                                        <div class="text-wrap">
+                                            <p class="mb-0 small fw-bold">Menunggu Pembayaran</p>
+                                            <p class="mb-1 small text-muted">Pesanan #{{ $notif->kode_pesanan }} perlu dibayar.</p>
+                                            <small class="text-secondary" style="font-size: 0.7rem;">{{ $notif->created_at->diffForHumans() }}</small>
+                                        </div>
+                                    </a>
+                                </li>
+                                @empty
+                                <li><div class="dropdown-item text-center text-muted small py-4">Tidak ada notifikasi baru</div></li>
+                                @endforelse
+                                <li>
+                                    <a href="{{ route('pemesanan.riwayat.pesanan') }}" class="dropdown-item text-center small fw-bold text-success py-2">Lihat Semua Pesanan</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item ms-2">
                             <form method="POST" action="{{ route('logout') }}" class="d-inline">
                                 @csrf
-                                <button type="submit" class="btn btn-secondary" style="border-radius: 20px; padding: 8px 16px; font-weight: 500;">Logout</button>
+                                <button type="submit" class="btn btn-secondary shadow-sm" style="border-radius: 20px; padding: 8px 16px; font-weight: 500; font-size: 14px;">Logout</button>
                             </form>
                         </li>
                         @endauth
@@ -227,28 +290,34 @@
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-            window.addEventListener('scroll', function () {
-                const navbar = document.querySelector('.navbar');
-                if (window.scrollY > 50) {
-                    navbar.classList.remove('transparent');
-                    navbar.classList.add('white');
-                } else {
-                    navbar.classList.add('transparent');
-                    navbar.classList.remove('white');
-                }
-            });
-
-            // Saat halaman pertama dibuka, kasih class transparent
-            document.addEventListener('DOMContentLoaded', function () {
-                const navbar = document.querySelector('.navbar');
-                navbar.classList.add('transparent');
-            });
+            // Check if current page is landing page
+            const isLandingPage = document.querySelector('.navbar').classList.contains('transparent');
+            
+            // Only apply scroll behavior on landing page and desktop
+            if (isLandingPage) {
+                window.addEventListener('scroll', function () {
+                    // Skip on mobile
+                    if (window.innerWidth <= 991) return;
+                    
+                    const navbar = document.querySelector('.navbar');
+                    if (window.scrollY > 50) {
+                        navbar.classList.remove('transparent');
+                        navbar.classList.add('white');
+                    } else {
+                        navbar.classList.add('transparent');
+                        navbar.classList.remove('white');
+                    }
+                });
+            }
 
             //button aktif di halaman itu pada navbar
             document.addEventListener('DOMContentLoaded', function () {
                 const currentPath = window.location.pathname;
+                const origin = window.location.origin;
+                
                 document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
-                    if (link.getAttribute('href') === currentPath) {
+                    const href = link.getAttribute('href');
+                    if (href === currentPath || href === origin + currentPath) {
                         link.classList.add('active');
                     }
                 });

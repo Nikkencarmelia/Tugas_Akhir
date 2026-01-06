@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('status_stok', ['tersedia', 'menipis', 'habis']);
             $table->integer('harga_normal');
             $table->integer('harga_saat_ini');
-            $table->date('tgl_perubahan_harga');
+            $table->datetime('tgl_perubahan_harga');
             $table->date('tgl_kadaluwarsa');
             $table->enum('keterangan_harga', ['normal', 'harga naik', 'diskon']);
             $table->timestamps();

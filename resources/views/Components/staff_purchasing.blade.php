@@ -84,9 +84,8 @@
                 box-shadow: inset 3px 0 0 white;
             }
 
-            /* Main Content */
-            .main-content-desktop {
-                margin-left: 250px;
+            /* Main Content Container */
+            .main-content {
                 padding: 1.5rem;
                 min-height: 100vh;
                 transition: var(--transition);
@@ -118,15 +117,25 @@
                 padding: 0.75rem 1rem;
                 z-index: 1040;
                 border-bottom: 1px solid var(--border-light);
+                position: sticky;
+                top: 0;
+            }
+
+            /* Responsive Logic */
+            @media (min-width: 992px) {
+                .main-content {
+                    margin-left: 250px; /* Push content to right on desktop */
+                }
+                .mobile-header {
+                    display: none !important;
+                }
+                .sidebar-mobile {
+                    display: none !important;
+                }
             }
 
             @media (max-width: 991.98px) {
-                .sidebar-desktop, .main-content-desktop {
-                    display: none !important;
-                }
-                }
-                @media (min-width: 992px) {
-                .sidebar-mobile, .main-content-mobile, .mobile-header {
+                .sidebar-desktop {
                     display: none !important;
                 }
             }
@@ -134,7 +143,7 @@
     </head>
 
     <body>
-        <!-- Mobile Header -->
+        <!-- Mobile Header (Visible only on mobile) -->
         <div class="mobile-header d-lg-none">
             <nav class="navbar navbar-expand-lg">
                 <div class="container-fluid">
@@ -146,94 +155,81 @@
             </nav>
         </div>
 
-        <!-- Mobile Sidebar -->
-        <div class="sidebar-mobile d-lg-none offcanvas offcanvas-start" tabindex="-1" id="sidebarOffcanvas">
+        <!-- Mobile Sidebar (Offcanvas) -->
+        <div class="sidebar-mobile offcanvas offcanvas-start" tabindex="-1" id="sidebarOffcanvas">
             <div class="offcanvas-header">
                 <h5 class="offcanvas-title">Staff Purchasing</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
             </div>
 
             <div class="offcanvas-body">
-                <a href="/purchasing/dashboard" class="nav-link {{ request()->is('purchasing/dashboard') ? 'active' : '' }}">
-                    <i class="bi bi-speedometer2"></i> Dashboard
-                </a>
-
-                <a href="/purchasing/pesanan_masuk" class="nav-link {{ request()->is('purchasing/pesanan_masuk') ? 'active' : '' }}">
-                    <i class="bi bi-bag-check"></i> Pesanan Masuk
-                </a>
-
-                <a href="/purchasing/cari_kurir" class="nav-link {{ request()->is('purchasing/cari_kurir') ? 'active' : '' }}">
-                    <i class="bi bi-truck"></i> Cari Kurir
-                </a>
-
-                <a href="/purchasing/konfirmasi_pembayaran" class="nav-link {{ request()->is('purchasing/konfirmasi_pembayaran') ? 'active' : '' }}">
-                    <i class="bi bi-cash-coin"></i> Konfirmasi Pembayaran
-                </a>
-
-                <a href="/purchasing/pesanan_berjalan" class="nav-link {{ request()->is('purchasing/pesanan_berjalan') ? 'active' : '' }}">
-                    <i class="bi bi-hourglass-split"></i> Pesanan Berjalan
-                </a>
-
-                <a href="/purchasing/kelola_ongkir" class="nav-link {{ request()->is('purchasing/kelola_ongkir') ? 'active' : '' }}">
-                    <i class="bi bi-geo-alt"></i> Kelola Ongkir & Daerah
-                </a>
-
-                <a href="/purchasing/riwayat_pesanan" class="nav-link {{ request()->is('purchasing/riwayat_pesanan') ? 'active' : '' }}">
-                    <i class="bi bi-clock-history"></i> Riwayat Pesanan
-                </a>
-
-                <a href="/logout" class="nav-link">
-                    <i class="bi bi-box-arrow-right"></i> Logout
-                </a>
+                @include('components.staff_purchasing_nav')
             </div>
         </div>
 
-        <!-- Desktop Sidebar -->
+        <!-- Desktop Sidebar (Fixed) -->
         <div class="sidebar-desktop d-none d-lg-block">
             <h4>Staff Purchasing</h4>
-
-            <a href="/purchasing/dashboard" class="nav-link {{ request()->is('purchasing/dashboard') ? 'active' : '' }}">
-                <i class="bi bi-speedometer2"></i> Dashboard
-            </a>
-
-            <a href="/purchasing/pesanan_masuk" class="nav-link {{ request()->is('purchasing/pesanan_masuk') ? 'active' : '' }}">
-                <i class="bi bi-bag-check"></i> Pesanan Masuk
-            </a>
-
-            <a href="/purchasing/cari_kurir" class="nav-link {{ request()->is('purchasing/cari_kurir') ? 'active' : '' }}">
-                <i class="bi bi-truck"></i> Cari Kurir
-            </a>
-
-            <a href="/purchasing/konfirmasi_pembayaran" class="nav-link {{ request()->is('purchasing/konfirmasi_pembayaran') ? 'active' : '' }}">
-                <i class="bi bi-cash-coin"></i> Konfirmasi Pembayaran
-            </a>
-
-            <a href="/purchasing/pesanan_berjalan" class="nav-link {{ request()->is('purchasing/pesanan_berjalan') ? 'active' : '' }}">
-                <i class="bi bi-hourglass-split"></i> Pesanan Berjalan
-            </a>
-
-            <a href="/purchasing/kelola_ongkir" class="nav-link {{ request()->is('purchasing/kelola_ongkir') ? 'active' : '' }}">
-                <i class="bi bi-geo-alt"></i> Kelola Ongkir & Daerah
-            </a>
-
-            <a href="/purchasing/riwayat_pesanan" class="nav-link {{ request()->is('purchasing/riwayat_pesanan') ? 'active' : '' }}">
-                <i class="bi bi-clock-history"></i> Riwayat Pesanan
-            </a>
-
-            <a href="/logout" class="nav-link">
-                <i class="bi bi-box-arrow-right"></i> Logout
-            </a>
+            @include('components.staff_purchasing_nav')
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content-desktop">
+        <!-- Main Content (Single Source of Truth) -->
+        <div class="main-content">
             @yield('content')
         </div>
 
-        <div class="main-content-mobile d-lg-none">
-            @yield('content')
+        <!-- Universal Confirmation Modal -->
+        <div class="modal fade" id="universalConfirmModal" tabindex="-1" aria-labelledby="universalConfirmModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header bg-success text-white border-0">
+                        <h5 class="modal-title fw-bold" id="universalConfirmModalLabel">
+                            <i class="bi bi-question-circle-fill me-2"></i>Konfirmasi Tindakan
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4 text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 id="confirmMessage" class="fw-bold mb-0">Apakah Anda yakin ingin melanjutkan?</h5>
+                    </div>
+                    <div class="modal-footer border-0 pb-4 justify-content-center gap-2">
+                        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal" style="border-radius: 10px;">Batal</button>
+                        <button type="button" id="confirmActionBtn" class="btn btn-success px-4" style="border-radius: 10px;">Ya, Lanjutkan</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            /**
+             * Universal Confirmation Modal Handler
+             * @param {string} message - Message to display
+             * @param {function} onConfirm - Callback on confirmation
+             */
+            window.confirmAction = function(message, onConfirm) {
+                const modalEl = document.getElementById('universalConfirmModal');
+                const modal = new bootstrap.Modal(modalEl);
+                const confirmBtn = document.getElementById('confirmActionBtn');
+                const messageEl = document.getElementById('confirmMessage');
+
+                messageEl.textContent = message;
+                
+                // Clear previous listeners to avoid multiple triggers
+                const newConfirmBtn = confirmBtn.cloneNode(true);
+                confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+                newConfirmBtn.addEventListener('click', () => {
+                    modal.hide();
+                    if (typeof onConfirm === 'function') {
+                        onConfirm();
+                    }
+                });
+
+                modal.show();
+            };
+        </script>
     </body>
 </html>

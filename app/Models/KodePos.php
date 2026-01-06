@@ -10,6 +10,8 @@ class KodePos extends Model
 {
     use HasFactory;
 
+    protected $table = 'kode_pos';
+
     protected $fillable = [
         'id_kelurahan',
         'kode_pos',

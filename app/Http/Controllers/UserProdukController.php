@@ -16,60 +16,80 @@ class UserProdukController extends Controller
         // Data kepengurusan
         $kepengurusan = Pengurus::orderBy('nama', 'asc')->get();
 
-        // Ambil 24 produk terbaru untuk section Produk Terbaru & Terlaris
-        $produkUnggul = Produk::with(['satuan', 'batch'])
+        // 1. Produk Terbaru (12 buah)
+        $produkTerbaruRaw = Produk::with(['satuan', 'batch'])
             ->where('status_tampil', 'Ditampilkan')
             ->whereHas('batch', function ($q) {
                 $q->where('stok', '>', 0);
             })
             ->latest('created_at')
-            ->take(24)
-            ->get()
-            ->map(function ($produk) {
-                $batchTertua = $produk->batch
-                    ->where('stok', '>', 0)
-                    ->sortBy('tgl_masuk')
-                    ->first();
+            ->take(12)
+            ->get();
 
-                if (!$batchTertua) {
-                    return null;
-                }
+        $produkTerbaru = $this->mapProdukDetails($produkTerbaruRaw);
 
-                $hargaSaatIni = $batchTertua->harga_saat_ini ?? 0;
-                $hargaNormal = $batchTertua->harga_normal ?? $hargaSaatIni;
-                $keteranganHarga = $batchTertua->keterangan_harga ?? 'normal';
-
-                // Deteksi diskon: dari keterangan ATAU harga lebih rendah
-                $isDiskon = ($keteranganHarga === 'diskon') || ($hargaSaatIni < $hargaNormal && $hargaNormal > 0);
-
-                $persenDiskon = 0;
-                if ($isDiskon && $hargaNormal > 0) {
-                    $persenDiskon = round((($hargaNormal - $hargaSaatIni) / $hargaNormal) * 100);
-                }
-
-                return [
-                    'id'                   => $produk->id,
-                    'batch_id'             => $batchTertua->id,  // ID batch untuk tracking stok spesifik
-                    'quantity'             => 1,  // Default quantity 1 (bisa diganti dengan $batchTertua->stok untuk full stok)
-                    'gambar'               => $produk->gambar
-                        ? asset('storage/' . $produk->gambar)
-                        : asset('images/default-product.jpg'),
-                    'nama_produk'          => $produk->nama_produk,
-                    'satuan_berat'         => ($produk->jumlah_satuan ?? 1) . ' ' . ($produk->satuan?->nama_satuan ?? 'pcs'),
-                    'harga_formatted'      => $hargaSaatIni > 0
-                        ? 'Rp ' . number_format($hargaSaatIni, 0, ',', '.')
-                        : 'Hubungi Penjual',
-                    'harga_awal_formatted' => $isDiskon
-                        ? 'Rp ' . number_format($hargaNormal, 0, ',', '.')
-                        : null,
-                    'is_diskon'            => $isDiskon,
-                    'persen_diskon'        => $persenDiskon,
-                ];
+        // 2. Produk Terlaris (12 buah) - Berdasarkan quantity terjual terbanyak
+        $produkTerlarisRaw = Produk::with(['satuan', 'batch'])
+            ->withSum(['detailPesanans as total_terjual'], 'quantity')
+            ->where('status_tampil', 'Ditampilkan')
+            ->whereHas('batch', function ($q) {
+                $q->where('stok', '>', 0);
             })
-            ->filter() // hilangkan yang null
-            ->values();
+            ->orderByDesc('total_terjual')
+            ->take(12)
+            ->get();
 
-        return view('User.landingPage', compact('kepengurusan', 'produkUnggul'));
+        $produkTerlaris = $this->mapProdukDetails($produkTerlarisRaw);
+
+        return view('User.landingPage', compact('kepengurusan', 'produkTerbaru', 'produkTerlaris'));
+    }
+
+    /**
+     * Helper untuk memetakan data Produk ke format yang digunakan di view
+     */
+    private function mapProdukDetails($produks)
+    {
+        return $produks->map(function ($produk) {
+            $batchTertua = $produk->batch
+                ->where('stok', '>', 0)
+                ->sortBy('tgl_masuk')
+                ->first();
+
+            if (!$batchTertua) {
+                return null;
+            }
+
+            $hargaSaatIni = $batchTertua->harga_saat_ini ?? 0;
+            $hargaNormal = $batchTertua->harga_normal ?? $hargaSaatIni;
+            $keteranganHarga = $batchTertua->keterangan_harga ?? 'normal';
+
+            // Deteksi diskon
+            $isDiskon = ($keteranganHarga === 'diskon') || ($hargaSaatIni < $hargaNormal && $hargaNormal > 0);
+
+            $persenDiskon = 0;
+            if ($isDiskon && $hargaNormal > 0) {
+                $persenDiskon = round((($hargaNormal - $hargaSaatIni) / $hargaNormal) * 100);
+            }
+
+            return [
+                'id'                   => $produk->id,
+                'batch_id'             => $batchTertua->id,
+                'quantity'             => 1,
+                'gambar'               => $produk->gambar
+                    ? asset('storage/' . $produk->gambar)
+                    : asset('images/default-product.jpg'),
+                'nama_produk'          => $produk->nama_produk,
+                'satuan_berat'         => ($produk->jumlah_satuan ?? 1) . ' ' . ($produk->satuan?->nama_satuan ?? 'pcs'),
+                'harga_formatted'      => $hargaSaatIni > 0
+                    ? 'Rp ' . number_format($hargaSaatIni, 0, ',', '.')
+                    : 'Hubungi Penjual',
+                'harga_awal_formatted' => $isDiskon
+                    ? 'Rp ' . number_format($hargaNormal, 0, ',', '.')
+                    : null,
+                'is_diskon'            => $isDiskon,
+                'persen_diskon'        => $persenDiskon,
+            ];
+        })->filter()->values();
     }
 
     /**

@@ -214,7 +214,8 @@
                             <tr>
                                 <th style="width: 60px">No</th>
                                 <th>Nama Kecamatan</th>
-                                <th>Ongkir Minimal (Rp)</th>
+                                <th>Ongkir Minimal Mobil (Rp)</th>
+                                <th>Ongkir Minimal Motor (Rp)</th>
                                 <th>Jumlah Kelurahan</th>
                                 <th style="width: 140px">Aksi</th>
                             </tr>
@@ -224,10 +225,11 @@
                                 <tr data-id="{{ $item->id }}">
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $item->nama_kecamatan }}</td>
-                                    <td>{{ number_format($item->ongkir_minimal, 0, ',', '.') }}</td>
+                                    <td>{{ number_format($item->ongkir_minimal_mobil, 0, ',', '.') }}</td>
+                                    <td>{{ number_format($item->ongkir_minimal_motor, 0, ',', '.') }}</td>
                                     <td><span class="badge bg-success">{{ $item->kelurahan_count }}</span></td>
                                     <td>
-                                        <button class="btn btn-warning btn-sm btn-edit-kec" data-bs-toggle="modal" data-bs-target="#modalKecamatan" data-id="{{ $item->id }}" data-nama="{{ $item->nama_kecamatan }}" data-ongkir="{{ $item->ongkir_minimal }}">
+                                        <button class="btn btn-warning btn-sm btn-edit-kec" data-bs-toggle="modal" data-bs-target="#modalKecamatan" data-id="{{ $item->id }}" data-nama="{{ $item->nama_kecamatan }}" data-ongkir-mobil="{{ $item->ongkir_minimal_mobil }}" data-ongkir-motor="{{ $item->ongkir_minimal_motor }}">
                                             <i class="bi bi-pencil"></i>
                                         </button>
                                         <form action="{{ route('staff_purchasing.kecamatan.destroy', $item->id) }}" method="POST" style="display: inline-block;">
@@ -241,7 +243,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center">Tidak ada data kecamatan.</td>
+                                    <td colspan="6" class="text-center">Tidak ada data kecamatan.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -425,8 +427,12 @@
                             <input type="text" class="form-control" id="namaKecamatan" name="nama_kecamatan" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Ongkir Minimal (Rp)</label>
-                            <input type="number" class="form-control" id="ongkirKecamatan" name="ongkir_minimal" min="0" step="1000" required>
+                            <label class="form-label">Ongkir Minimal Mobil (Rp)</label>
+                            <input type="number" class="form-control" id="ongkirMobilKecamatan" name="ongkir_minimal_mobil" min="0" step="1000" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ongkir Minimal Motor (Rp)</label>
+                            <input type="number" class="form-control" id="ongkirMotorKecamatan" name="ongkir_minimal_motor" min="0" step="1000" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -498,7 +504,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Kode Pos</label>
-                            <input type="number" class="form-control" id="kodePos" name="kode_pos" min="10000" max="99999" required>
+                            <input type="text" class="form-control" id="kodePos" name="kode_pos" maxlength="5" pattern="[0-9]{5}" placeholder="01234" title="Kode pos harus 5 digit angka (leading zero diperbolehkan)" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -599,12 +605,14 @@
                 const btn = e.target.closest('.btn-edit-kec');
                 const id = btn.dataset.id;
                 const nama = btn.dataset.nama;
-                const ongkir = btn.dataset.ongkir;
+                const ongkirMobil = btn.dataset.ongkirMobil;
+                const ongkirMotor = btn.dataset.ongkirMotor;
                 const form = document.getElementById('formKecamatan');
                 form.action = `/purchasing/kecamatan/${id}`;
                 form.querySelector('input[name="_method"]').value = 'PUT';
                 document.getElementById('namaKecamatan').value = nama;
-                document.getElementById('ongkirKecamatan').value = ongkir;
+                document.getElementById('ongkirMobilKecamatan').value = ongkirMobil;
+                document.getElementById('ongkirMotorKecamatan').value = ongkirMotor;
                 document.getElementById('titleKecamatan').textContent = 'Edit Kecamatan';
                 document.getElementById('idKecamatan').value = id;
             }

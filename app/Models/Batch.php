@@ -24,7 +24,7 @@ class Batch extends Model
     protected $casts = [
         'tgl_masuk' => 'date',
         'tgl_kadaluwarsa' => 'date',
-        'tgl_perubahan_harga' => 'date',
+        'tgl_perubahan_harga' => 'datetime',
     ];
 
 

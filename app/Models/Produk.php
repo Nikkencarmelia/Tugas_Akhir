@@ -45,4 +45,9 @@ class Produk extends Model
     {
         return $this->hasMany(Produk_Rusak::class, 'id_produk');
     }
+
+    public function detailPesanans()
+    {
+        return $this->hasMany(DetailPesanan::class, 'id_produk');
+    }
 }

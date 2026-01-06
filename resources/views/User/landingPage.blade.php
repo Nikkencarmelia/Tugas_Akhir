@@ -315,7 +315,7 @@
         </div>
     </div>
     <div class="row g-4 mt-2 justify-content-center">
-        @foreach ($produkUnggul->take(12) as $item)
+        @foreach ($produkTerbaru as $item)
             <div class="col-6 col-sm-4 col-md-3 col-lg-2">
                 <div class="produk-card text-center d-flex flex-column justify-content-between">
                     @if($item['is_diskon'])
@@ -343,7 +343,7 @@
 </div>
 
 {{-- Produk Terlaris --}}
-@if($produkUnggul->count() > 12)
+@if($produkTerlaris->isNotEmpty())
     <div class="container mt-5 mb-5">
         <div class="row align-items-center mb-4">
             <div class="col">
@@ -354,7 +354,7 @@
             </div>
         </div>
         <div class="row g-4 mt-2 justify-content-center">
-            @foreach ($produkUnggul->skip(12)->take(12) as $item)
+            @foreach ($produkTerlaris as $item)
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2">
                     <div class="produk-card text-center d-flex flex-column justify-content-between">
                         @if($item['is_diskon'])
@@ -392,6 +392,51 @@
             <span id="toastMessage"></span>
         </div>
     </div>
+
+    @auth
+        @php
+            $pendingCount = \App\Models\Pemesanan::where('id_user', Auth::id())
+                            ->where('status_pesanan', 'menunggu_pembayaran')
+                            ->count();
+        @endphp
+        @if($pendingCount > 0)
+        <!-- Toast Pembayaran -->
+        <div id="toastPayment" class="toast align-items-center text-bg-warning border-0 shadow-lg position-fixed top-0 start-50 translate-middle-x mt-4" role="alert" aria-live="assertive" aria-atomic="true" style="min-width: 420px; font-size: 1.1rem; border-radius: 0.75rem; z-index: 1060;">
+            <div class="d-flex">
+                <div class="toast-body fw-semibold text-dark">
+                    <i class="fa-solid fa-bell me-2"></i>
+                    Halo {{ Auth::user()->name }}, Anda memiliki {{ $pendingCount }} pesanan yang menunggu pembayaran.
+                    <a href="{{ route('pemesanan.index') }}" class="fw-bold text-dark text-decoration-underline ms-1">Lihat</a>
+                </div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        @endif
+
+        @php
+            // Check for recently cancelled orders (e.g., last 24 hours, or just latest one)
+            // Ideally we should track 'read' status, but for now we show latest cancelled.
+            $cancelledOrder = \App\Models\Pemesanan::where('id_user', Auth::id())
+                            ->where('status_pesanan', 'dibatalkan')
+                            ->where('updated_at', '>=', now()->subHours(24)) // Show if cancelled in last 24h
+                            ->latest()
+                            ->first();
+        @endphp
+
+        @if($cancelledOrder)
+        <!-- Toast Pembayaran Dibatalkan -->
+        <div id="toastCancelled" class="toast align-items-center text-bg-danger border-0 shadow-lg position-fixed top-0 start-50 translate-middle-x mt-4" role="alert" aria-live="assertive" aria-atomic="true" style="min-width: 420px; font-size: 1.1rem; border-radius: 0.75rem; z-index: 1060;">
+            <div class="d-flex">
+                <div class="toast-body fw-semibold text-white">
+                    <i class="fa-solid fa-circle-exclamation me-2"></i>
+                    Pesanan #{{ $cancelledOrder->kode_pesanan }} telah dibatalkan oleh Staff.
+                    <a href="{{ route('pemesanan.index') }}" class="fw-bold text-white text-decoration-underline ms-1">Cek Riwayat</a>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        @endif
+    @endauth
 </div>
 
 @endsection
@@ -412,6 +457,22 @@
             autohide: true,  // Auto hide setelah delay
             delay: 3000      // 3 detik
         });
+
+        // Toast Payment & Cancelled (Show once per visit)
+        const toastPaymentEl = document.getElementById('toastPayment');
+        const toastCancelledEl = document.getElementById('toastCancelled');
+
+        if (toastPaymentEl && !localStorage.getItem('toastPaymentShown')) {
+            const toastPayment = new bootstrap.Toast(toastPaymentEl, { delay: 10000 });
+            toastPayment.show();
+            localStorage.setItem('toastPaymentShown', 'true');
+        }
+
+        if (toastCancelledEl && !localStorage.getItem('toastCancelledShown')) {
+            const toastCancelled = new bootstrap.Toast(toastCancelledEl, { delay: 10000 });
+            toastCancelled.show();
+            localStorage.setItem('toastCancelledShown', 'true');
+        }
 
         // Function to update cart badge
         function updateCartBadge(count) {

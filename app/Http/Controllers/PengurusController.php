@@ -11,6 +11,7 @@ class PengurusController extends Controller
     /**
      * Tampilkan daftar pengurus di halaman manajemen super admin
      */
+
     public function index()
     {
         $kepengurusan = Pengurus::latest()->get();
@@ -72,6 +73,10 @@ class PengurusController extends Controller
 
         return redirect()->back()->with('success', 'Pengurus berhasil diperbarui');
     }
+
+    /**
+     * Halaman Laporan Super Admin
+     */
 
     /**
      * Hapus pengurus

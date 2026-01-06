@@ -11,7 +11,8 @@ class Kecamatan extends Model
 
     protected $fillable = [
         'nama_kecamatan',
-        'ongkir_minimal',
+        'ongkir_minimal_mobil',
+        'ongkir_minimal_motor',
     ];
 
     public function kelurahan(){

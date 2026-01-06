@@ -118,8 +118,10 @@
         .badge-online-aktif { background-color: var(--bs-success-bg-subtle) !important; color: var(--bs-success-text-emphasis) !important; padding: 0.5em 0.75em; border-radius: 0.375rem; font-size: 0.75em; font-weight: 500; }
         .badge-online-tidak-aktif { background-color: var(--bs-danger-bg-subtle) !important; color: var(--bs-danger-text-emphasis) !important; padding: 0.5em 0.75em; border-radius: 0.375rem; font-size: 0.75em; font-weight: 500; }
         /* Antar Status Badges */
-        .badge-antar-siap { background-color: var(--bs-success-bg-subtle) !important; color: var(--bs-success-text-emphasis) !important; padding: 0.5em 0.75em; border-radius: 0.375rem; font-size: 0.75em; font-weight: 500; }
-        .badge-antar-sedang-antar { background-color: var(--bs-warning-bg-subtle) !important; color: var(--bs-warning-text-emphasis) !important; padding: 0.5em 0.75em; border-radius: 0.375rem; font-size: 0.75em; font-weight: 500; }
+        /* Antar Status Badges - Prominent Solid Colors */
+        .badge-antar-siap { background-color: #198754 !important; color: white !important; padding: 0.5em 0.85em; border-radius: 50px; font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-antar-sedang-antar { background-color: #f59e0b !important; color: white !important; padding: 0.5em 0.85em; border-radius: 50px; font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-antar-- { background-color: #6c757d !important; color: white !important; padding: 0.5em 0.85em; border-radius: 50px; font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
@@ -150,36 +152,40 @@
                     <th>Kendaraan</th>
                     <th>Status Online</th>
                     <th>Status Antar</th>
-                    <th style="width: 140px">Aksi</th>
+                    <th style="width: 100px">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($kurir ?? [] as $index => $kurir_item)
-                <tr data-id="{{ $kurir_item['id'] ?? $index }}" data-nama="{{ $kurir_item['nama_lengkap'] ?? '' }}" data-email="{{ $kurir_item['email'] ?? '' }}" data-telpon="{{ $kurir_item['no_telpon'] ?? '' }}" data-role="{{ $kurir_item['role'] ?? 'Kurir' }}" data-kendaraan="{{ $kurir_item['kendaraan'] ?? '' }}" data-statusonline="{{ $kurir_item['status_online'] ?? 'Aktif' }}" data-statusantar="{{ $kurir_item['status_antar'] ?? 'Siap' }}">
+                <tr data-id="{{ $kurir_item->id }}" 
+                    data-nama="{{ $kurir_item->nama_lengkap ?? '' }}" 
+                    data-email="{{ $kurir_item->email ?? '' }}" 
+                    data-telpon="{{ $kurir_item->no_telepon ?? '' }}" 
+                    data-role="{{ $kurir_item->role ?? 'Kurir' }}" 
+                    data-kendaraan="{{ $kurir_item->kendaraan ?? '' }}" 
+                    data-statusonline="{{ $kurir_item->status_online ?? 'Aktif' }}" 
+                    data-statusantar="{{ $kurir_item->status_antar ?? 'Siap' }}">
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $kurir_item['nama_lengkap'] ?? '' }}</td>
-                    <td>{{ $kurir_item['email'] ?? '' }}</td>
-                    <td>{{ $kurir_item['no_telpon'] ?? '' }}</td>
+                    <td>{{ $kurir_item->nama_lengkap ?? '' }}</td>
+                    <td>{{ $kurir_item->email ?? '' }}</td>
+                    <td>{{ $kurir_item->no_telepon ?? '-' }}</td>
                     <td>
-                        <span class="badge badge-role-{{ strtolower(str_replace(' ', '-', str_replace('/', '', $kurir_item['role'] ?? 'kurir'))) }}">{{ $kurir_item['role'] ?? 'Kurir' }}</span>
+                        <span class="badge badge-role-{{ strtolower(str_replace(' ', '-', str_replace('/', '', $kurir_item->role ?? 'kurir'))) }}">{{ $kurir_item->role ?? 'Kurir' }}</span>
                     </td>
-                    <td>{{ $kurir_item['kendaraan'] ?? '' }}</td>
+                    <td>{{ $kurir_item->kendaraan ?? '-' }}</td>
                     <td>
-                        <span class="badge badge-online-{{ strtolower(str_replace(' ', '-', $kurir_item['status_online'] ?? 'aktif')) }}">
-                            {{ $kurir_item['status_online'] ?? 'Aktif' }}
+                        <span class="badge badge-online-{{ strtolower(str_replace([' ', '_'], '-', $kurir_item->status_online ?? 'aktif')) }}">
+                            {{ $kurir_item->status_online ?? 'Aktif' }}
                         </span>
                     </td>
                     <td>
-                        <span class="badge badge-antar-{{ strtolower(str_replace(' ', '-', $kurir_item['status_antar'] ?? 'siap')) }}">
-                            {{ $kurir_item['status_antar'] ?? 'Siap' }}
+                        <span class="badge badge-antar-{{ strtolower(str_replace([' ', '_'], '-', $kurir_item->status_antar ?? 'siap')) }}">
+                            {{ $kurir_item->status_antar == 'sedang_antar' ? 'Sedang Antar' : ($kurir_item->status_antar == 'siap' ? 'Siap' : ($kurir_item->status_antar ?? 'Siap')) }}
                         </span>
                     </td>
                     <td>
                         <button class="btn btn-warning btn-sm btn-edit-kurir" data-bs-toggle="modal" data-bs-target="#modalKurir" title="Edit">
                             <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-danger btn-sm btn-delete-kurir" title="Hapus">
-                            <i class="bi bi-trash"></i>
                         </button>
                     </td>
                 </tr>
@@ -205,45 +211,45 @@
                     <input type="hidden" id="idKurir" value="">
                     <div class="mb-3">
                         <label class="form-label">Nama Lengkap</label>
-                        <input type="text" class="form-control" id="namaLengkap" required>
+                        <input type="text" class="form-control" id="namaLengkap" disabled>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" required>
+                        <input type="email" class="form-control" id="email" disabled>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">No Telpon</label>
-                        <input type="text" class="form-control" id="noTelpon" required>
+                        <input type="text" class="form-control" id="noTelpon" disabled>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Role</label>
                         <select class="form-select" id="role" required>
                             <option value="">Pilih Role</option>
-                            <option value="Super Admin">Super Admin</option>
-                            <option value="Staff Purchasing">Staff Purchasing</option>
-                            <option value="Staff Produk">Staff Produk</option>
-                            <option value="Kurir">Kurir</option>
-                            <option value="User">User</option>
+                            <option value="user">User</option>
+                            <option value="kurir">Kurir</option>
+                            <option value="staff_produk">Staff Produk</option>
+                            <option value="staff_purchasing">Staff Purchasing</option>
+                            <option value="super_admin">Super Admin</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Kendaraan</label>
-                        <input type="text" class="form-control" id="kendaraan" required>
+                        <input type="text" class="form-control" id="kendaraan" disabled>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" placeholder="Kosongkan jika tidak diubah">
+                        <input type="password" class="form-control" id="password" placeholder="Kosongkan jika tidak diubah" disabled>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Status Online</label>
-                        <select class="form-select" id="statusOnline" required>
+                        <select class="form-select" id="statusOnline" disabled>
                             <option value="Aktif">Aktif</option>
                             <option value="Tidak Aktif">Tidak Aktif</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Status Antar</label>
-                        <select class="form-select" id="statusAntar" required>
+                        <select class="form-select" id="statusAntar" disabled>
                             <option value="Siap">Siap</option>
                             <option value="Sedang Antar">Sedang Antar</option>
                         </select>
@@ -260,15 +266,20 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Search functionality
+    // === SEARCH FUNCTIONALITY ===
     document.getElementById('searchKurir').addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase();
         const rows = document.querySelectorAll('#tableKurir tbody tr');
         let index = 1;
+
         rows.forEach(row => {
+            // Check if it's a data row (has data-nama)
+            if (!row.dataset.nama) return;
+
             const nama = row.dataset.nama.toLowerCase();
             const email = row.dataset.email.toLowerCase();
             const telpon = row.dataset.telpon.toLowerCase();
+
             if (nama.includes(searchTerm) || email.includes(searchTerm) || telpon.includes(searchTerm)) {
                 row.style.display = '';
                 row.querySelector('td:first-child').textContent = index++;
@@ -276,8 +287,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 row.style.display = 'none';
             }
         });
+
+        // Toggle "No results" row if all data rows are hidden
+        let noResultsRow = document.getElementById('noResultsRow');
+        let visibleRows = Array.from(rows).filter(r => r.style.display !== 'none' && r.dataset.nama);
+        
+        if (visibleRows.length === 0 && searchTerm !== '') {
+            if (!noResultsRow) {
+                noResultsRow = document.createElement('tr');
+                noResultsRow.id = 'noResultsRow';
+                noResultsRow.innerHTML = `<td colspan="9" class="text-center text-muted">Tidak ada data kurir yang cocok dengan pencarian "${searchTerm}".</td>`;
+                document.querySelector('#tableKurir tbody').appendChild(noResultsRow);
+            } else {
+                noResultsRow.style.display = '';
+                noResultsRow.innerHTML = `<td colspan="9" class="text-center text-muted">Tidak ada data kurir yang cocok dengan pencarian "${searchTerm}".</td>`;
+            }
+        } else if (noResultsRow) {
+            noResultsRow.style.display = 'none';
+        }
     });
-    // Edit kurir
+
+    // === EDIT KURIR ===
     document.querySelectorAll('.btn-edit-kurir').forEach(btn => {
         btn.addEventListener('click', function() {
             const row = this.closest('tr');
@@ -287,30 +317,64 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('noTelpon').value = row.dataset.telpon;
             document.getElementById('role').value = row.dataset.role;
             document.getElementById('kendaraan').value = row.dataset.kendaraan;
-            document.getElementById('statusOnline').value = row.dataset.statusonline;
-            document.getElementById('statusAntar').value = row.dataset.statusantar;
+            // Map badge status back to value
+            document.getElementById('statusOnline').value = row.dataset.statusonline === 'Aktif' ? 'Aktif' : 'Tidak Aktif';
+            document.getElementById('statusAntar').value = row.dataset.statusantar === 'Siap' ? 'Siap' : 'Sedang Antar';
         });
     });
-    // Submit form (edit only)
+
+    // === SUBMIT KURIR (EDIT ROLE) ===
     document.getElementById('formKurir').addEventListener('submit', function(e) {
         e.preventDefault();
         const id = document.getElementById('idKurir').value;
-        // Simulate submit
-        alert('Kurir diupdate!');
-        bootstrap.Modal.getInstance(document.getElementById('modalKurir')).hide();
-        this.reset();
-        document.getElementById('idKurir').value = '';
-    });
-    // Delete kurir
-    document.querySelectorAll('.btn-delete-kurir').forEach(btn => {
-        btn.addEventListener('click', function() {
-            if (confirm('Yakin hapus kurir ini?')) {
-                const row = this.closest('tr');
-                row.remove();
-                alert('Kurir dihapus!');
+        const formData = {
+            role: document.getElementById('role').value,
+            // Note: Kendaraan & Status Antar are disabled/readonly in UI for editing logic based on requirements "disable except role", 
+            // but if we want to allow editing them we need to handle it. 
+            // The Controller primarily updates Role. If we need to update other fields, we need to update Controller too.
+            // For now, based on requirements "all fields disabled except role" for edit:
+        };
+
+        // If user is editing Role, we send that.
+        
+        // Note: Using updated route prefix 'super_admin'
+        fetch(`/super_admin/manajemen_kurir/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                const row = document.querySelector(`tr[data-id="${id}"]`);
+                if (row) {
+                    // Update Role Badge
+                    row.dataset.role = formData.role;
+                    // Simplify role class logic
+                    const roleClass = formData.role.toLowerCase().replace(/ /g, '-').replace('_','-');
+                    row.querySelector('td:nth-child(5) span').className = `badge badge-role-${roleClass}`;
+                    row.querySelector('td:nth-child(5) span').textContent = formData.role;
+                }
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modalKurir'));
+                modal.hide();
+                window.location.reload(); // Reload to reflect deletions if role changed from Kurir
+            } else {
+                alert('Gagal update: ' + data.message);
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan.');
         });
     });
+
+    // === REMOVED DELETE KURIR ===
+
     // Reset modal on close
     document.getElementById('modalKurir').addEventListener('hidden.bs.modal', function() {
         document.getElementById('formKurir').reset();

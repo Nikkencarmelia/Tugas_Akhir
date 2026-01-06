@@ -8,14 +8,12 @@
   <style>
     body { background: #f5f7fa; }
     .orders-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;background:white;padding:1.5rem 2rem;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.08);}
-    .orders-header h3{color:#2a522a;font-weight:700;margin:0;display:flex;align-items:center;gap:.5rem;}
-    .orders-header h3::before{content:"\f0d1";font-family:"Font Awesome 6 Free";font-weight:900;color:#198754;}
+    .orders-header h3{color:#198754;font-weight:700;margin:0;display:flex;align-items:center;gap:.5rem;}
     .order-card{background:white;border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 4px 15px rgba(0,0,0,0.06);transition:all .3s ease;border:1px solid #f1f3f4;}
     .order-card:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,0.1);}
-    .order-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid #e9ecef;}
+    .order-header{display:flex;justify-content:space-between;align-items:start;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid #e9ecef;}
     .order-meta{display:flex;flex-direction:column;font-size:14px;color:#6c757d;}
-    .order-meta .alamat{background:#e8f5e9;color:#1b5e20;padding:3px 8px;border-radius:6px;display:inline-block;margin-top:4px;font-size:13px;}
-    .order-number{font-weight:600;color:#495057;}
+    .order-number{font-weight:700;color:#334155;font-size: 1.1rem;}
     .order-product{display:flex;align-items:center;gap:1rem;margin-bottom:1rem;padding:1rem;background:#f8f9fa;border-radius:12px;}
     .order-product img{width:80px;height:80px;object-fit:cover;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
     .order-product-details { flex-grow: 1; }
@@ -32,13 +30,8 @@
 
     .order-actions{display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap;}
     .btn-order{padding:6px 14px;border-radius:20px;font-size:13px;font-weight:500;transition:all .3s ease;}
-    .btn-primary-order{background:#198754;color:white;border:1px solid #198754;}
-    .btn-primary-order:hover{background:#146c43;border-color:#146c43;}
-    .btn-danger-order{background:#dc3545;color:white;border:1px solid #dc3545;}
-    .btn-danger-order:hover{background:#b02a37;border-color:#b02a37;}
-    .btn-secondary-order{background:#f8f9fa;color:#495057;border:1px solid #dee2e6;}
-    .btn-secondary-order:hover{background:#e9ecef;color:#212529;}
     .select-controls{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem;}
+    
     @media(max-width:768px){.orders-header{flex-direction:column;gap:1rem;text-align:center}.order-header{flex-direction:column;gap:.5rem;align-items:flex-start}.order-product{flex-direction:column;text-align:center}.order-actions{justify-content:center}}
   </style>
 </head>
@@ -50,16 +43,16 @@
 
   <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index:9999;">
     <div id="toastSuccess" class="toast align-items-center text-bg-success border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" style="min-width:380px;font-size:1rem;border-radius:0.75rem;">
-      <div class="d-flex"><div class="toast-body fw-semibold"><i class="fa-solid fa-circle-check me-2"></i>Pengiriman telah diterima!</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>
+      <div class="d-flex"><div class="toast-body fw-semibold"><i class="fa-solid fa-circle-check me-2"></i>{{ session('success') }}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>
     </div>
     <div id="toastReject" class="toast align-items-center text-bg-danger border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" style="min-width:380px;font-size:1rem;border-radius:0.75rem;">
-      <div class="d-flex"><div class="toast-body fw-semibold"><i class="fa-solid fa-triangle-exclamation me-2"></i>Pengiriman telah ditolak!</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>
+      <div class="d-flex"><div class="toast-body fw-semibold"><i class="fa-solid fa-triangle-exclamation me-2"></i>{{ session('error') }}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>
     </div>
   </div>
 
   <div class="orders-header">
     <h3>Pengiriman Masuk <span class="badge bg-success ms-2">{{ count($pengiriman_masuk) }}</span></h3>
-    <small class="text-muted">Daftar pengiriman pesanan yang menunggu konfirmasi dari kurir</small>
+    <small class="text-muted">Daftar pengiriman pesanan yang menunggu konfirmasi dari kurir (ID Akun: {{ Auth::id() }})</small>
   </div>
 
   <div class="select-controls">
@@ -68,49 +61,139 @@
       <label class="form-check-label fw-semibold" for="selectAll">Pilih Semua</label>
     </div>
     <div class="d-flex gap-2">
-      <button class="btn btn-success btn-sm" id="btnTerimaSemua"><i class="fa-solid fa-check me-1"></i>Terima Semua</button>
-      <button class="btn btn-danger btn-sm" id="btnTolakSemua"><i class="fa-solid fa-xmark me-1"></i>Tolak Semua</button>
+      <!-- Bulk Selected Actions -->
+      <button class="btn btn-success btn-sm btn-bulk-selected d-none" id="btnTerimaDipilih"><i class="fa-solid fa-check me-1"></i>Terima Dipilih</button>
+      <button class="btn btn-danger btn-sm btn-bulk-selected d-none" id="btnTolakDipilih"><i class="fa-solid fa-xmark me-1"></i>Tolak Dipilih</button>
+      <!-- Button Terima Semua Removed as per request -->
     </div>
   </div>
 
-  @foreach($pengiriman_masuk as $order)
+  <!-- Form for Bulk Selected Actions -->
+  <form id="bulkActionForm" method="POST" action="">
+      @csrf
+  </form>
+
+  @forelse($pengiriman_masuk as $order)
+    @php
+        $firstItem = $order->detailPesanan->first();
+        $supplier = $firstItem && $firstItem->produk && $firstItem->produk->supplier ? $firstItem->produk->supplier->nama_supplier : 'Non-Supplier';
+        
+        $imagePath = $firstItem->gambar ?? '';
+        if (!str_contains($imagePath, 'http') && !str_starts_with($imagePath, 'storage/')) {
+            $imagePath = 'storage/' . $imagePath;
+        }
+        $src = asset($imagePath);
+
+        $penerima = $order->nama_penerima ?? ($order->user->name ?? '-');
+        $telepon = $order->no_telepon ?? ($order->user->no_telepon ?? '-');
+        $kelurahan = $order->nama_kelurahan ?? '-';
+        $metode = $order->opsi_pengiriman;
+        $kendaraan = $order->kendaraan;
+
+        // Status Badge Logic (Mimicking cariKurir)
+        $status = $order->status_pesanan;
+        $statusClass = 'status-' . $status;
+        $statusLabel = ucwords(str_replace('_', ' ', $status));
+        
+        if(in_array($status, ['dibatalkan', 'ditolak_staff', 'ditolak_kurir'])) {
+            $statusClass = 'status-dibatalkan';
+            if($status == 'ditolak_staff') $statusLabel = 'Ditolak Staff';
+            elseif($status == 'ditolak_kurir') $statusLabel = 'Ditolak Kurir';
+        }
+        elseif(in_array($status, ['menunggu_konfirmasi_pembayaran', 'menunggu_verifikasi_pembayaran', 'menunggu_pembayaran_diverifikasi'])) {
+            $statusClass = 'status-verif';
+            $statusLabel = 'Menunggu Verifikasi';
+        }
+        elseif($status == 'menunggu_konfirmasi_kurir') {
+            $statusClass = 'status-menunggu_konfirmasi_kurir';
+            $statusLabel = 'Menunggu Konfirmasi Anda';
+        }
+
+        $icon = 'fa-box';
+        if($status == 'selesai') $icon = 'fa-check-circle';
+        elseif($statusClass == 'status-dibatalkan') $icon = 'fa-times-circle';
+        elseif(in_array($status, ['dikirim', 'sedang_diantar'])) $icon = 'fa-truck';
+        elseif($statusClass == 'status-menunggu_konfirmasi' || $statusClass == 'status-menunggu_konfirmasi_kurir') $icon = 'fa-hourglass-half';
+        elseif($statusClass == 'status-verif') $icon = 'fa-clock';
+        elseif($status == 'menunggu_pembayaran') $icon = 'fa-wallet';
+        elseif($status == 'siap_diambil') $icon = 'fa-box-open';
+        elseif($status == 'pesanan_telah_diambil') $icon = 'fa-check-double';
+    @endphp
 <div class="order-card">
   <div class="order-header">
-    <div class="d-flex align-items-start gap-2">
-      <div class="form-check">
-        <input class="form-check-input orderCheckbox" type="checkbox">
+    <div class="d-flex align-items-start gap-3">
+      <div class="form-check mt-1">
+        <input class="form-check-input orderCheckbox" type="checkbox" name="order_ids[]" value="{{ $order->id }}" form="bulkActionForm">
       </div>
       <div class="order-meta">
-        <div><i class="fa-regular fa-calendar me-1"></i>{{ date('d M Y', strtotime($order['tanggal'])) }}</div>
-        <div class="text-success fw-semibold"><i class="fa-solid fa-truck me-1"></i> Ongkir: {{ $order['ongkir'] }}</div>
-        <div class="alamat"><i class="fa-solid fa-location-dot me-1"></i>{{ $order['alamat'] }}</div>
+        <div class="order-number mb-2">#{{ $order->kode_pesanan }}</div>
+        <div class="mb-2"><i class="fa-regular fa-calendar me-1"></i>{{ $order->created_at->format('d M Y') }}</div>
+        <div class="d-flex flex-wrap gap-1">
+            @if($metode == 'delivery')
+            <span class="vehicle-badge text-uppercase">
+                <i class="fa-solid fa-{{ $kendaraan == 'motor' ? 'motorcycle' : 'truck-pickup' }}"></i>
+                {{ $kendaraan }}
+            </span>
+            @endif
+            <span class="alamat-badge">
+                <i class="fa-solid fa-location-dot"></i>
+                {{ $kelurahan }} - {{ $order->alamat_lengkap }}
+            </span>
+            <span class="penerima-badge">
+                <i class="fa-solid fa-user"></i>
+                {{ Str::limit($penerima, 15) }}
+            </span>
+            <span class="phone-badge">
+                <i class="fa-solid fa-phone"></i>
+                {{ $telepon }}
+            </span>
+        </div>
       </div>
     </div>
-    <div class="order-number">#{{ rand(1000000000,9999999999) }}</div>
+    <div class="text-end">
+        <div class="order-status {{ $statusClass }}">
+            <i class="fas {{ $icon }} me-1"></i> {{ $statusLabel }}
+        </div>
+        <div class="text-success fw-bold small mt-2">
+            Rp {{ number_format($order->ongkir, 0, ',', '.') }}
+        </div>
+    </div>
   </div>
 
   <div class="order-product">
     <div class="img-container">
-      <img src="{{ asset($order['gambar']) }}" alt="{{ $order['produk'] }}">
-      <span class="badge-supplier">{{ $order['supplier'] }}</span>
+      <img src="{{ $src }}" alt="{{ $firstItem->nama_produk ?? 'Produk' }}">
+      <span class="badge-supplier">{{ $supplier }}</span>
     </div>
     <div class="order-product-details">
-      <h6>{{ $order['produk'] }}</h6>
-      <small>Jumlah: {{ $order['jumlah'] }}</small>
-      @if(isset($order['total_produk']) && $order['total_produk'] > 1)
-        <div class="produk-lain">+ {{ $order['total_produk'] - 1 }} produk lain</div>
-      @endif
+      <h6>{{ $firstItem->nama_produk ?? '-' }}</h6>
+      <small>Jumlah: {{ $firstItem->quantity ?? 0 }} {{ $firstItem->satuan ?? 'pcs' }}</small>
+        @if($order->detailPesanan->count() > 1)
+        <div class="produk-lain">+ {{ $order->detailPesanan->count() - 1 }} produk lain</div>
+        @endif
     </div>
   </div>
 
   <div class="order-actions">
-  <button class="btn btn-success btnTerima btn-sm"><i class="fa-solid fa-check me-1"></i>Terima</button>
-  <button class="btn btn-outline-danger btnTolak btn-sm"><i class="fa-solid fa-xmark me-1"></i>Tolak</button>
-  <a href="/kurir/detail" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-eye me-1"></i>Lihat Detail</a>
-</div>
+    <form action="{{ route('kurir.terima', $order->id) }}" method="POST" class="d-inline">
+      @csrf
+      <button type="submit" class="btn btn-success btn-sm"><i class="fa-solid fa-check me-1"></i>Terima</button>
+    </form>
+    
+    <form action="{{ route('kurir.tolak', $order->id) }}" method="POST" class="d-inline">
+        @csrf
+        <button type="submit" class="btn btn-danger-order btn-sm"><i class="fa-solid fa-xmark me-1"></i>Tolak</button>
+    </form>
+
+    <a href="{{ route('kurir.detail_pesanan', $order->id) }}" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-eye me-1"></i>Lihat Detail</a>
+  </div>
 
 </div>
-@endforeach
+@empty
+<div class="text-center py-5">
+    <h5 class="text-muted">Tidak ada pengiriman yang harus diproses.</h5>
+</div>
+@endforelse
 
 
 </div>
@@ -120,16 +203,53 @@
 document.addEventListener('DOMContentLoaded',()=>{
   const toastSuccess=new bootstrap.Toast(document.getElementById('toastSuccess'),{delay:3000});
   const toastReject=new bootstrap.Toast(document.getElementById('toastReject'),{delay:3000});
+
   const selectAll=document.getElementById('selectAll');
   const checkboxes=document.querySelectorAll('.orderCheckbox');
-  const btnTerimaSemua=document.getElementById('btnTerimaSemua');
-  const btnTolakSemua=document.getElementById('btnTolakSemua');
+  
+  const btnTerimaDipilih=document.getElementById('btnTerimaDipilih');
+  const btnTolakDipilih=document.getElementById('btnTolakDipilih');
+  const btnsBulkSelected = document.querySelectorAll('.btn-bulk-selected');
+  const btnsBulkAll = document.querySelectorAll('.btn-bulk-all');
+  
+  const bulkActionForm = document.getElementById('bulkActionForm');
 
-  document.querySelectorAll('.btnTerima').forEach(btn=>btn.addEventListener('click',()=>toastSuccess.show()));
-  document.querySelectorAll('.btnTolak').forEach(btn=>btn.addEventListener('click',()=>toastReject.show()));
-  selectAll.addEventListener('change',()=>checkboxes.forEach(cb=>cb.checked=selectAll.checked));
-  btnTerimaSemua.addEventListener('click',()=>{if([...checkboxes].filter(cb=>cb.checked).length>0)toastSuccess.show()});
-  btnTolakSemua.addEventListener('click',()=>{if([...checkboxes].filter(cb=>cb.checked).length>0)toastReject.show()});
+  function updateButtons() {
+      const checkedCount = [...checkboxes].filter(cb => cb.checked).length;
+      if (checkedCount > 0) {
+          btnsBulkSelected.forEach(btn => btn.classList.remove('d-none'));
+      } else {
+          btnsBulkSelected.forEach(btn => btn.classList.add('d-none'));
+      }
+      selectAll.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+      selectAll.checked = checkedCount === checkboxes.length && checkboxes.length > 0;
+  }
+
+  selectAll.addEventListener('change', () => {
+      checkboxes.forEach(cb => cb.checked = selectAll.checked);
+      updateButtons();
+  });
+
+  checkboxes.forEach(cb => {
+      cb.addEventListener('change', updateButtons);
+  });
+  
+  // Handle Bulk Selected Submit
+  btnTerimaDipilih.addEventListener('click', (e) => {
+      e.preventDefault();
+      bulkActionForm.action = "{{ route('kurir.terima_dipilih') }}";
+      if(confirm('Terima pesanan yang dipilih?')) bulkActionForm.submit();
+  });
+  
+  btnTolakDipilih.addEventListener('click', (e) => {
+      e.preventDefault();
+      bulkActionForm.action = "{{ route('kurir.tolak_dipilih') }}";
+      if(confirm('Tolak pesanan yang dipilih?')) bulkActionForm.submit();
+  });
+
+  // Success init
+  if({{ session('success') ? 'true' : 'false' }}) toastSuccess.show();
+  if({{ session('error') ? 'true' : 'false' }}) toastReject.show();
 
   // Colorize supplier badges
   function colorizeBadges() {

@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('kurirs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_user')->constrained('users')->onDelete('cascade');
-            $table->enum('jenis_kendaraan', ['motor', 'mobil']);
-            $table->enum('status_antar', ['siap', 'sedang_antar'])->default('siap');
+            $table->enum('jenis_kendaraan', ['motor', 'mobil'])->nullable();
+            $table->enum('status_antar', ['siap', 'sedang_antar', '-'])->default('-');
             $table->timestamps();
         });
     }

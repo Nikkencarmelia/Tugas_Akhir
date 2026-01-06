@@ -1,24 +1,15 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Detail Pengiriman</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body { background: #f5f7fa; }
+@extends('components.kurir')
+
+@section('content')
+<style>
     .detail-header {
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 2rem; background: white; padding: 1.5rem 2rem;
       border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
     .detail-header h3 {
-      color: #2a522a; font-weight: 700; margin: 0;
+      color: #198754; font-weight: 700; margin: 0;
       display: flex; align-items: center; gap: .5rem;
-    }
-    .detail-header h3::before {
-      content: "\f48b"; font-family: "Font Awesome 6 Free";
-      font-weight: 900; color: #198754;
     }
     .detail-card {
       background: white; border-radius: 16px; padding: 1.5rem;
@@ -31,7 +22,7 @@
       margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #e9ecef;
     }
     .detail-meta { display: flex; gap: 2rem; font-size: 14px; color: #6c757d; }
-    .detail-number { font-weight: 600; color: #495057; }
+    .detail-number { font-weight: 700; color: #334155; font-size: 1.1rem; }
     .product-item {
       display: flex; align-items: center; gap: 1rem;
       margin-bottom: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 12px;
@@ -48,7 +39,7 @@
 
     /* Badge Supplier Styles */
     .img-container { position: relative; width: 80px; height: 80px; }
-    .img-container img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 1px solid #f1f3f4; }
+    .img-container img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 1px solid #dee2e6; }
     .badge-supplier {
       position: absolute; top: 5px; right: 5px;
       font-size: .7rem; font-weight: 600;
@@ -61,58 +52,81 @@
       .product-item { flex-direction: column; text-align: center; }
       .detail-meta { flex-direction: column; gap: .5rem; }
     }
-  </style>
-</head>
+</style>
 
-<body>
-   @extends('components.kurir')
-@section('content')
+@php
+    $tab = request('tab');
+    $backUrl = route('kurir.pengiriman'); // Default fallback
+
+    if (in_array($tab, ['menunggu', 'dikirim'])) {
+        $backUrl = route('kurir.status_pengiriman', ['tab' => $tab]);
+    } elseif (in_array($tab, ['selesai', 'ditolak'])) {
+        $backUrl = route('kurir.riwayat', ['tab' => $tab]);
+    }
+@endphp
 
 <div class="container py-5">
 
+  <div class="mb-3">
+    <a href="{{ $backUrl }}" class="btn btn-outline-secondary btn-sm border-0">
+        <i class="fa-solid fa-chevron-left me-1"></i> Kembali
+    </a>
+  </div>
+
   <!-- HEADER -->
   <div class="detail-header">
-    <h3>Detail Pengiriman</h3>
-    <small class="text-muted">Informasi alamat & barang dikirim</small>
+    <h3><i class="fa-solid fa-circle-info"></i> Detail Pengiriman</h3>
+    <div class="text-end">
+        <div class="detail-number">#{{ $pemesanan->kode_pesanan }}</div>
+        <div class="small text-muted">{{ $pemesanan->created_at->format('d M Y, H:i') }}</div>
+    </div>
   </div>
 
   <!-- BAGIAN ALAMAT -->
   <div class="detail-card">
-    <div class="detail-header-section">
-      <div class="detail-meta">
-        <div>Tanggal: {{ date('d M Y', strtotime($detail['tanggal'])) }}</div>
-      </div>
+    <h5 class="mb-3 fw-bold text-success"><i class="fa-solid fa-location-dot me-2"></i>Alamat Pengiriman</h5>
+    <div class="p-3 bg-light rounded-3 border-start border-success border-4">
+        <p class="mb-1 fw-bold text-dark" style="font-size: 1.1rem;">{{ $pemesanan->nama_penerima }}</p>
+        <p class="mb-2 text-success fw-semibold"><i class="fa-solid fa-phone me-1"></i> {{ $pemesanan->no_telepon }}</p>
+        <p class="mb-1 text-muted">{{ $pemesanan->alamat_lengkap }}</p>
+        <p class="mb-0 fw-bold text-dark">
+          {{ $pemesanan->nama_kelurahan }}, {{ $pemesanan->nama_kecamatan }} - {{ $pemesanan->kode_pos }}
+        </p>
     </div>
-
-    <h5 class="mb-3 fw-bold">Alamat Pengiriman</h5>
-    <p class="mb-1 fw-semibold">{{ $detail['nama_penerima'] }} ({{ $detail['no_telp'] }})</p>
-    <p class="mb-1">{{ $detail['alamat_jalan'] }}</p>
-    <p class="mb-1">
-      {{ $detail['kelurahan'] }}, {{ $detail['kecamatan'] }}, {{ $detail['kabupaten'] }} - {{ $detail['kode_pos'] }}
-    </p>
   </div>
 
   <!-- BAGIAN PRODUK -->
   <div class="detail-card">
-    <h5 class="fw-bold mb-3">Produk Dikirim</h5>
+    <h5 class="fw-bold mb-3 text-success"><i class="fa-solid fa-box me-2"></i>Produk Dikirim</h5>
 
-    @foreach($detail['produk_list'] as $item)
+    @foreach($pemesanan->detailPesanan as $item)
+    @php
+        $supplierName = $item->produk && $item->produk->supplier ? $item->produk->supplier->nama_supplier : 'Non-Supplier';
+        $imagePath = $item->gambar ?? '';
+        if (str_starts_with($imagePath, 'images/')) {
+            $src = asset($imagePath);
+        } elseif (!str_contains($imagePath, 'http') && !str_starts_with($imagePath, 'storage/') && $imagePath) {
+            $src = asset('storage/' . $imagePath);
+        } else {
+            $src = $imagePath ? asset($imagePath) : asset('images/default-product.png');
+        }
+    @endphp
     <div class="product-item">
       <div class="img-container">
-        <img src="{{ asset($item['gambar']) }}" alt="{{ $item['produk'] }}">
-        <span class="badge-supplier">{{ $item['supplier'] }}</span>
+        <img src="{{ $src }}" alt="{{ $item->nama_produk }}">
+        <span class="badge-supplier">{{ $supplierName }}</span>
       </div>
 
       <div class="product-details">
-        <h6 class="fw-semibold mb-1">{{ $item['produk'] }}</h6>
-        <p class="small text-muted mb-0"> jumlah: {{ $item['jumlah'] }}</p>
+        <h6 class="fw-bold mb-1">{{ $item->nama_produk }}</h6>
+        <p class="small text-muted mb-0">Jumlah: <span class="fw-bold text-dark">{{ $item->quantity }} item - {{ $item->jumlah_satuan }} {{ $item->satuan }}</span></p>
       </div>
     </div>
     @endforeach
 
     <div class="total-section">
-      <p class="mb-0 fw-semibold">Ongkos Kirim</p>
-      <p class="mb-0 fw-bold text-success">{{ $detail['ongkir'] }}</p>
+      <p class="mb-0 fw-bold text-dark">Ongkos Kirim</p>
+      <p class="mb-0 fw-bold text-success fs-5">Rp {{ number_format($pemesanan->ongkir, 0, ',', '.') }}</p>
     </div>
 
   </div>
@@ -143,6 +157,3 @@ document.addEventListener('DOMContentLoaded', colorizeBadges);
 </script>
 
 @endsection
-
-</body>
-</html>

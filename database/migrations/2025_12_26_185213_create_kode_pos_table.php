@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('kode_pos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_kelurahan')->constrained('kelurahans')->restrictOnDelete();
-            $table->integer('kode_pos');
+            $table->string('kode_pos');
             $table->timestamps();
         });
     }

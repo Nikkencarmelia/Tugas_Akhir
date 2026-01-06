@@ -268,8 +268,8 @@
                             @forelse($batches as $batch)
                                 <tr>
                                     <td class="col-batch">Batch {{ $batch->id }}</td>
-                                    <td class="col-tgl-masuk">{{ $batch->tgl_masuk_format }}</td>
-                                    <td class="col-tgl-exp">{{ $batch->tgl_kadaluarsa_format }}</td>
+                                    <td class="col-tgl-masuk">{{ $batch->tgl_masuk->format('d/m/Y') }}</td>
+                                    <td class="col-tgl-exp">{{ $batch->tgl_kadaluwarsa->format('d/m/Y') }}</td>
                                     <td class="col-sisa-hari fw-bold {{ $batch->sisa_color }}">{{ $batch->sisa_text }}</td>
                                     <td class="col-harga-normal {{ $batch->harga_saat_ini < $batch->harga_normal ? 'text-decoration-line-through text-muted' : '' }}">{{ $batch->harga_normal_rp }}</td>
                                     <td class="col-harga-saat fw-bold {{ $batch->harga_saat_ini < $batch->harga_normal ? 'text-success' : ($batch->harga_saat_ini > $batch->harga_normal ? 'text-success' : '') }}">{{ $batch->harga_saat_ini_rp }}</td>
@@ -294,7 +294,7 @@
                                                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#discountModal" onclick="openDiscountModal({{ $batch->id }}, {{ $batch->harga_normal }})"><i class="bi bi-percent"></i> Kasih Diskon</a></li>
                                                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#hargaModal" onclick="openHargaModal({{ $batch->id }}, {{ $batch->harga_normal }}, {{ $batch->harga_saat_ini }})"><i class="bi bi-arrow-up"></i> Naikkan Harga</a></li>
                                                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#rusakModal" onclick="setRusakBatch({{ $batch->id }})"><i class="bi bi-exclamation-triangle"></i> Produk Rusak</a></li>
-                                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editBatchModal" onclick="editBatch({{ $batch->id }}, '{{ $batch->tgl_masuk }}', '{{ $batch->tgl_kadaluarsa }}', {{ $batch->stok }}, '{{ $batch->harga_normal_rp }}', '{{ $batch->harga_saat_ini_rp }}')"><i class="bi bi-pencil"></i> Edit</a></li>
+                                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editBatchModal" onclick="editBatch({{ $batch->id }}, '{{ $batch->tgl_masuk->format('Y-m-d') }}', '{{ $batch->tgl_kadaluwarsa->format('Y-m-d') }}', {{ $batch->stok }}, '{{ $batch->harga_normal_rp }}', '{{ $batch->harga_saat_ini_rp }}')"><i class="bi bi-pencil"></i> Edit</a></li>
                                                 <li><hr class="dropdown-divider"></li>
                                                 <li><a class="dropdown-item text-danger" href="#" onclick="confirmDelete({{ $batch->id }})"><i class="bi bi-trash"></i> Hapus</a>
                                             </ul>
@@ -420,11 +420,11 @@
                             <input type="hidden" id="editBatchId" name="id">
                             <div class="mb-3">
                                 <label class="form-label">Tanggal Masuk</label>
-                                <input type="date" class="form-control" id="editTanggalMasuk" name="tgl_masuk" required>
+                                <input type="date" class="form-control" id="editTanggalMasuk" name="tgl_masuk" readonly disabled>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Tanggal Kadaluarsa</label>
-                                <input type="date" class="form-control" id="editTanggalKadaluarsa" name="tgl_kadaluarsa" required>
+                                <input type="date" class="form-control" id="editTanggalKadaluarsa" name="tgl_kadaluwarsa" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Jumlah Stok</label>

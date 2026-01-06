@@ -230,12 +230,73 @@
             }
 
             /* Smooth Transitions for All */
-            .offcanvas {
-                transition: var(--transition);
-            }
-
             .offcanvas.show {
                 transform: none;
+            }
+
+            /* Unified Status & Badge Styles */
+            .order-status { 
+                display: flex; 
+                align-items: center; 
+                gap: .5rem; 
+                padding: 6px 14px; 
+                border-radius: 50px; 
+                font-size: 13px; 
+                font-weight: 600; 
+                width: fit-content; 
+            }
+
+            /* Status Colors - Sync with User/Staff */
+            .status-menunggu_konfirmasi { background: #f1f3f5; color: #495057; }
+            .status-menunggu_pembayaran { background: #fff4e6; color: #d9480f; }
+            .status-diproses { background: #fef9c3; color: #854d0e; }
+            .status-dikirim, .status-sedang_diantar { background: #e0f2fe; color: #0369a1; }
+            .status-selesai { background: #dcfce7; color: #166534; }
+            .status-dibatalkan, .status-ditolak_staff, .status-ditolak_kurir { background: #fee2e2; color: #991b1b; }
+            .status-verif { background: #fff7ed; color: #9a3412; }
+            .status-siap_diambil { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+            .status-pesanan_telah_diambil { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+
+            /* Courier Specific Overrides / Alignment */
+            .status-handover { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; } /* For Siap Diantar */
+            .status-preparing { background: #fef9c3; color: #854d0e; } /* For Disiapkan oleh Staff */
+
+            /* Badge Styles */
+            .vehicle-badge {
+                background: #fff3ce;
+                color: #856404;
+                padding: 4px 12px;
+                border-radius: 50px;
+                font-size: 11px;
+                font-weight: 600;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                border: 1px solid #ffeaa7;
+            }
+            .alamat-badge {
+                background: #f1f5f9;
+                color: #475569;
+                padding: 4px 12px;
+                border-radius: 50px;
+                font-size: 12px;
+                font-weight: 600;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                border: 1px solid #e2e8f0;
+            }
+            .penerima-badge, .phone-badge {
+                background: #f1f5f9;
+                color: #475569;
+                padding: 4px 12px;
+                border-radius: 50px;
+                font-size: 12px;
+                font-weight: 600;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                border: 1px solid #e2e8f0;
             }
         </style>
     </head>
@@ -244,7 +305,7 @@
     <div class="mobile-header d-lg-none">
         <nav class="navbar navbar-expand-lg">
             <div class="container-fluid">
-                <a class="navbar-brand" href="/dashboard_produk">Kurir</a>
+                <a class="navbar-brand" href="{{ route('kurir.pengiriman') }}">Kurir</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
                     <i class="bi bi-list"></i>
                 </button>
@@ -263,10 +324,10 @@
             <a href="{{ route('kurir.pengiriman') }}" class="nav-link {{ request()->routeIs('kurir.pengiriman') ? 'active' : '' }}">
                 <i class="bi bi-inbox"></i> Pengiriman Masuk
             </a>
-            <a href="/status_pengiriman" class="nav-link {{ request()->is('status_pengiriman') ? 'active' : '' }}">
+            <a href="{{ route('kurir.status_pengiriman') }}" class="nav-link {{ request()->routeIs('kurir.status_pengiriman') ? 'active' : '' }}">
                 <i class="bi bi-truck"></i> Status Pengiriman
             </a>
-            <a href="/riwayat_kurir" class="nav-link {{ request()->is('riwayat_kurir') ? 'active' : '' }}">
+            <a href="{{ route('kurir.riwayat') }}" class="nav-link {{ request()->routeIs('kurir.riwayat') ? 'active' : '' }}">
                 <i class="bi bi-archive"></i> Riwayat Pengiriman
             </a>
             <a href="{{ route('kurir.profil') }}" class="nav-link {{ request()->routeIs('kurir.profil') ? 'active' : '' }}">
@@ -286,10 +347,10 @@
         <a href="{{ route('kurir.pengiriman') }}" class="nav-link {{ request()->routeIs('kurir.pengiriman') ? 'active' : '' }}">
             <i class="bi bi-inbox"></i> Pengiriman Masuk
         </a>
-        <a href="/status_pengiriman" class="nav-link {{ request()->is('status_pengiriman') ? 'active' : '' }}">
+        <a href="{{ route('kurir.status_pengiriman') }}" class="nav-link {{ request()->routeIs('kurir.status_pengiriman') ? 'active' : '' }}">
             <i class="bi bi-truck"></i> Status Pengiriman
         </a>
-        <a href="/riwayat_kurir" class="nav-link {{ request()->is('riwayat_kurir') ? 'active' : '' }}">
+        <a href="{{ route('kurir.riwayat') }}" class="nav-link {{ request()->routeIs('kurir.riwayat') ? 'active' : '' }}">
             <i class="bi bi-clock-history"></i> Riwayat Pengiriman
         </a>
         <a href="{{ route('kurir.profil') }}" class="nav-link {{ request()->routeIs('kurir.profil') ? 'active' : '' }}">

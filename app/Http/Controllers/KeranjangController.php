@@ -6,13 +6,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;  // Untuk debug
+use Illuminate\Support\Facades\Auth;
 use App\Models\Produk;
 use App\Models\Batch;
+use App\Models\Alamat;
+use App\Models\Kecamatan;
 
 class KeranjangController extends Controller
 {
     public function index()
     {
+        // Bersihkan session buy_now jika masuk ke halaman keranjang biasa
+        if (session()->has('buy_now')) {
+            session()->forget('buy_now');
+        }
+
         $keranjang = Session::get('cart', []);
 
         $totalProduk = count($keranjang);
@@ -24,7 +32,7 @@ class KeranjangController extends Controller
         return view('User.keranjang', compact('keranjang', 'totalProduk', 'subtotal'));
     }
 
-    public function add(Request $request)
+    public function addToCart(Request $request)
     {
         try {
             Log::info('Add to cart request:', $request->all());  // Debug input
@@ -50,14 +58,15 @@ class KeranjangController extends Controller
             }
 
             $productId = $request->input('product_id');
-            $batchId = $requestData['batch_id'];
-            // Convert empty string to null
-            if ($batchId === '' || $batchId === null) {
+            $batchId = $requestData['batch_id'] ?? null;
+            
+            // Convert empty string/non-numeric to null
+            if ($batchId === '' || !is_numeric($batchId)) {
                 $batchId = null;
             } else {
                 $batchId = (int) $batchId;
             }
-            $quantity = $request->input('quantity');
+            $quantity = (int) $request->input('quantity', 1);
 
             Log::info('Querying product', ['id' => $productId, 'batch_id' => $batchId]);
 
@@ -205,67 +214,194 @@ class KeranjangController extends Controller
         }
     }
 
+    /**
+     * Beli Sekarang - Meloncati keranjang, langsung ke checkout dengan 1 produk saja.
+     */
+    public function buyNow(Request $request)
+    {
+        try {
+            Log::info('Buy now request:', $request->all());
+
+            $requestData = $request->all();
+            if (isset($requestData['batch_id']) && ($requestData['batch_id'] === '' || $requestData['batch_id'] === null)) {
+                $requestData['batch_id'] = null;
+            }
+
+            $validator = Validator::make($requestData, [
+                'product_id' => 'required|integer|exists:produks,id',
+                'batch_id' => 'nullable|integer|exists:batches,id',
+                'quantity' => 'required|integer|min:1'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal: ' . implode(', ', $validator->errors()->all())
+                ], 422);
+            }
+
+            $productId = $requestData['product_id'];
+            $batchId = $requestData['batch_id'] ?? null;
+            $quantity = (int) $requestData['quantity'];
+
+            // Cek produk & stok
+            $produk = Produk::with(['satuan'])
+                ->where('status_tampil', 'Ditampilkan')
+                ->whereHas('batch', function ($q) use ($batchId) {
+                    $q->where('stok', '>', 0);
+                    if ($batchId) $q->where('id', $batchId);
+                })
+                ->find($productId);
+
+            if (!$produk) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Produk tidak tersedia.'
+                ], 404);
+            }
+
+            // Ambil batch tertua untuk harga
+            $batchQuery = Batch::where('id_produk', $productId)->where('stok', '>', 0);
+            if ($batchId) $batchQuery->where('id', $batchId);
+            else $batchQuery->orderBy('tgl_masuk', 'asc');
+            
+            $batchTertua = $batchQuery->first();
+            $totalStok = $batchQuery->sum('stok');
+
+            if ($quantity > $totalStok) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Stok tidak mencukupi. Tersedia: ' . $totalStok
+                ], 400);
+            }
+
+            // Siapkan data Tunggal untuk session 'buy_now'
+            // Formatnya adalah array of items agar sama dengan 'cart' tapi isinya cuma 1
+            $buyNowData = [
+                'item_direct' => [
+                    'product_id' => $productId,
+                    'batch_id' => $batchTertua->id, // Spesifik batch ID dari batch tertua jika tidak diinput
+                    'nama_produk' => $produk->nama_produk,
+                    'harga' => $batchTertua->harga_saat_ini,
+                    'gambar' => $produk->gambar ? asset('storage/' . $produk->gambar) : asset('images/default-product.jpg'),
+                    'satuan_berat' => ($produk->jumlah_satuan ?? 1) . ' ' . ($produk->satuan?->nama_satuan ?? 'pcs'),
+                    'quantity' => $quantity
+                ]
+            ];
+
+            // Simpan ke session mandiri
+            session(['buy_now' => $buyNowData]);
+            session()->save(); // Paksa simpan sebelum redirect di client-side
+
+            Log::info('Buy now data stored', [
+                'session_id' => session()->getId(), 
+                'buy_now_content' => $buyNowData,
+                'cart_content' => session('cart')
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Lanjut ke pembayaran...'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Buy now error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memproses pembelian: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function update(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'product_id' => 'required|integer|exists:produks,id',
-            'batch_id' => 'nullable|integer|exists:batches,id',
-            'quantity' => 'required|integer|min:1'
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'product_id' => 'required|integer|exists:produks,id',
+                'batch_id' => 'nullable|integer|exists:batches,id',
+                'quantity' => 'required|integer|min:1'
+            ]);
 
-        if ($validator->fails()) {
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal: ' . implode(', ', $validator->errors()->all())
+                ], 422);
+            }
+
+            $productId = $request->input('product_id');
+            $batchId = $request->input('batch_id');
+            $quantity = $request->input('quantity');
+
+            if (!Session::has('cart')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Keranjang kosong.'
+                ], 400);
+            }
+
+            $cart = Session::get('cart');
+
+            $cartKey = $productId;
+            if ($batchId) {
+                $cartKey = $productId . '_' . $batchId;
+            }
+
+            if (!isset($cart[$cartKey])) {
+                // Try flexible search (find by product_id regardless of batch key mismatch)
+                $foundKey = null;
+                foreach ($cart as $key => $item) {
+                    if ($item['product_id'] == $productId) {
+                        $foundKey = $key;
+                        break;
+                    }
+                }
+
+                if ($foundKey) {
+                    $cartKey = $foundKey;
+                    // Update batchId to match the found item's batch_id for stock check
+                    $batchId = $cart[$cartKey]['batch_id'] ?? null; 
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Item tidak ditemukan di keranjang.'
+                    ], 404);
+                }
+            }
+
+            // FIX: Ganti 'produk_id' ke 'id_produk' + pakai relation
+            $produk = Produk::find($productId);
+            if (!$produk) {
+                return response()->json(['success' => false, 'message' => 'Produk tidak ditemukan'], 404);
+            }
+
+            $batchQuery = $produk->batch()->where('stok', '>', 0);  // Pakai relation batch()
+            if ($batchId) {
+                $batchQuery->where('id', $batchId);
+            }
+            $totalStok = $batchQuery->sum('stok');
+            if ($quantity > $totalStok) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Stok tidak mencukupi. Stok tersedia: ' . $totalStok
+                ], 400);
+            }
+
+            $cart[$cartKey]['quantity'] = $quantity;
+            Session::put('cart', $cart);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Quantity berhasil diupdate!'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Update cart error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal: ' . implode(', ', $validator->errors()->all())
-            ], 422);
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            ], 500);
         }
-
-        $productId = $request->input('product_id');
-        $batchId = $request->input('batch_id');
-        $quantity = $request->input('quantity');
-
-        if (!Session::has('cart')) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Keranjang kosong.'
-            ], 400);
-        }
-
-        $cart = Session::get('cart');
-
-        $cartKey = $productId;
-        if ($batchId) {
-            $cartKey = $productId . '_' . $batchId;
-        }
-
-        if (!isset($cart[$cartKey])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Item tidak ditemukan di keranjang.'
-            ], 404);
-        }
-
-        // FIX: Ganti 'produk_id' ke 'id_produk' + pakai relation
-        $produk = Produk::find($productId);
-        $batchQuery = $produk->batch()->where('stok', '>', 0);  // Pakai relation batch()
-        if ($batchId) {
-            $batchQuery->where('id', $batchId);
-        }
-        $totalStok = $batchQuery->sum('stok');
-        if ($quantity > $totalStok) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Stok tidak mencukupi. Stok tersedia: ' . $totalStok
-            ], 400);
-        }
-
-        $cart[$cartKey]['quantity'] = $quantity;
-        Session::put('cart', $cart);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Quantity berhasil diupdate!'
-        ]);
     }
 
     /**
@@ -352,23 +488,4 @@ class KeranjangController extends Controller
         ]);
     }
 
-    /**
-     * Arahkan ke halaman checkout
-     */
-    public function checkout()
-    {
-        $keranjang = Session::get('cart', []);
-
-        if (empty($keranjang)) {
-            return redirect()->route('keranjang.index')->with('error', 'Keranjang kosong. Silakan tambahkan produk terlebih dahulu.');
-        }
-
-        // Hitung subtotal
-        $subtotal = 0;
-        foreach ($keranjang as $item) {
-            $subtotal += $item['harga'] * $item['quantity'];
-        }
-
-        return view('User.checkout', compact('keranjang', 'subtotal'));
-    }
 }

@@ -30,7 +30,7 @@ class BatchController extends Controller
                 // FORMAT TANGGAL
                 $batch->tgl_masuk_format = Carbon::parse($batch->tgl_masuk)->format('d/m/Y');
                 $batch->tgl_kadaluarsa_format = Carbon::parse($batch->tgl_kadaluwarsa)->format('d/m/Y');
-                $batch->tgl_perubahan_format = $batch->tgl_perubahan_harga ? Carbon::parse($batch->tgl_perubahan_harga)->format('d/m/Y') : '-';
+                $batch->tgl_perubahan_format = $batch->tgl_perubahan_harga ? Carbon::parse($batch->tgl_perubahan_harga)->format('d/m/Y H:i') : '-';
 
                 // SISA HARI
                 $today = Carbon::today();
@@ -145,25 +145,38 @@ class BatchController extends Controller
 
     public function update(Request $request, $id)
     {
+        $batch = Batch::findOrFail($id);
+
         $request->validate([
-            'tgl_masuk' => 'required|date',
-            'tgl_kadaluwarsa' => 'required|date|after_or_equal:tgl_masuk',
-            'stok' => 'required|integer|min:1',
+            'tgl_kadaluwarsa' => 'required|date',
+            'stok' => 'required|integer|min:0',
             'harga_normal' => 'required|integer|min:0',
             'harga_saat_ini' => 'required|integer|min:0',
         ]);
 
-        $batch = Batch::findOrFail($id);
+        $priceChanged = ((float)$batch->harga_normal !== (float)$request->harga_normal || (float)$batch->harga_saat_ini !== (float)$request->harga_saat_ini);
 
-        $batch->update([
-            'tgl_masuk' => $request->tgl_masuk,
+        $data = [
             'tgl_kadaluwarsa' => $request->tgl_kadaluwarsa,
             'stok' => $request->stok,
             'harga_normal' => $request->harga_normal,
             'harga_saat_ini' => $request->harga_saat_ini,
-            'tgl_perubahan_harga' => now(),
             'status_stok' => $this->hitungStatusStok($request->stok),
-        ]);
+        ];
+
+        if ($priceChanged) {
+            $data['tgl_perubahan_harga'] = now();
+            
+            if ($request->harga_saat_ini < $request->harga_normal) {
+                $data['keterangan_harga'] = 'diskon';
+            } elseif ($request->harga_saat_ini > $request->harga_normal) {
+                $data['keterangan_harga'] = 'harga naik';
+            } else {
+                $data['keterangan_harga'] = 'normal';
+            }
+        }
+
+        $batch->update($data);
 
         return back()->with('success', 'Batch berhasil diupdate');
     }
@@ -302,8 +315,8 @@ class BatchController extends Controller
             ->map(function ($batch) {
                 // FORMAT TANGGAL
                 $batch->tgl_masuk_format = Carbon::parse($batch->tgl_masuk)->format('d/m/Y');
-                $batch->tgl_kadaluarsa_format = Carbon::parse($batch->tgl_kadaluwarsa)->format('d/m/Y');
-                $batch->tgl_perubahan_format = $batch->tgl_perubahan_harga ? Carbon::parse($batch->tgl_perubahan_harga)->format('d/m/Y') : '-';
+                $batch->tgl_kadaluwarsa_format = Carbon::parse($batch->tgl_kadaluwarsa)->format('d/m/Y');
+                $batch->tgl_perubahan_format = $batch->tgl_perubahan_harga ? Carbon::parse($batch->tgl_perubahan_harga)->format('d/m/Y H:i') : '-';
 
                 // SISA HARI
                 $today = Carbon::today();

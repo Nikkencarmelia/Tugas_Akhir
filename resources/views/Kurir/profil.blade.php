@@ -325,8 +325,9 @@
                     <div class="mb-3">
                         <label for="kendaraan" class="form-label">Kendaraan</label>
                         <select class="form-select {{ $errors->has('jenis_kendaraan') ? 'is-invalid' : '' }}" id="kendaraan" name="jenis_kendaraan" required>
-                            <option value="motor" {{ ($kurir->jenis_kendaraan ?? '') == 'motor' ? 'selected' : '' }}>Motor</option>
-                            <option value="mobil" {{ ($kurir->jenis_kendaraan ?? '') == 'mobil' ? 'selected' : '' }}>Mobil</option>
+                            <option value="" {{ !isset($kurir->jenis_kendaraan) || $kurir->jenis_kendaraan == '' || is_null($kurir->jenis_kendaraan) ? 'selected' : '' }} disabled>-- Pilih Kendaraan --</option>
+                            <option value="motor" {{ (isset($kurir->jenis_kendaraan) && $kurir->jenis_kendaraan == 'motor') ? 'selected' : '' }}>Motor</option>
+                            <option value="mobil" {{ (isset($kurir->jenis_kendaraan) && $kurir->jenis_kendaraan == 'mobil') ? 'selected' : '' }}>Mobil</option>
                         </select>
                         @error('jenis_kendaraan')
                             <div class="invalid-feedback d-block">{{ $message }}</div>

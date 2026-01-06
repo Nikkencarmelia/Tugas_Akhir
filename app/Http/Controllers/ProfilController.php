@@ -108,9 +108,9 @@ class ProfilController extends Controller
         if (!$kurir) {
             $kurir = Kurir::create([
                 'id_user' => $user->id,
-                'jenis_kendaraan' => 'motor',  // Default
-                'status_antar' => 'siap'
+                'jenis_kendaraan' => null, // Placeholder agar tidak terisi otomatis
             ]);
+            $kurir->syncStatus();
             Log::info('Kurir auto-created for user ' . $user->id);
         }
 
@@ -141,13 +141,13 @@ class ProfilController extends Controller
             'no_telepon' => $request->no_telepon,
         ]);
 
-        Kurir::updateOrCreate(
+        $kurir = Kurir::updateOrCreate(
             ['id_user' => $user->id],
             [
                 'jenis_kendaraan' => $request->jenis_kendaraan,
-                'status_antar' => 'siap',
             ]
         );
+        $kurir->syncStatus();
 
         return redirect()
             ->route('kurir.profil', ['tab' => 'info'])

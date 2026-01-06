@@ -244,7 +244,7 @@
     <div class="mobile-header d-lg-none">
         <nav class="navbar navbar-expand-lg">
             <div class="container-fluid">
-                <a class="navbar-brand" href="/dashboard_produk">Staff Produk</a>
+                <a class="navbar-brand" href="/dashboard_produk">Super Admin</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
                     <i class="bi bi-list"></i>
                 </button>
@@ -260,23 +260,23 @@
         </div>
 
         <div class="offcanvas-body">
-            <a href="super_admin.dashboard" class="nav-link {{ request()->is('super_admin.dashboard') ? 'active' : '' }}">
+            <a href="{{ route('super_admin.dashboard') }}" class="nav-link {{ request()->routeIs('super_admin.dashboard') ? 'active' : '' }}">
                 <i class="bi bi-speedometer2"></i> Dashboard
             </a>
 
-            <a href="{{ route('super_admin.user.index') }}"class="nav-link {{ request()->routeIs('super_admin.user.index') ? 'active' : '' }}">
-                <i class="bi bi-people"></i>Manajemen User
+            <a href="{{ route('super_admin.pengguna.index') }}" class="nav-link {{ request()->routeIs('super_admin.pengguna.index') ? 'active' : '' }}">
+                <i class="bi bi-people"></i>Manajemen Pengguna
             </a>
 
             <a href="{{ route('super_admin.pengurus.index') }}"class="nav-link {{ request()->routeIs('super_admin.pengurus.*') ? 'active' : '' }}">
                 <i class="bi bi-person-badge"></i> Manajemen Pengurus
             </a>
 
-            <a href="/super_admin/manajemen_kurir" class="nav-link {{ request()->is('super_admin/manajemen_kurir') ? 'active' : '' }}">
+            <a href="{{ route('super_admin.manajemen_kurir.index') }}" class="nav-link {{ request()->routeIs('super_admin.manajemen_kurir.*') ? 'active' : '' }}">
                 <i class="bi bi-truck"></i> Manajemen Kurir
             </a>
 
-            <a href="/super_admin/laporan" class="nav-link {{ request()->is('super_admin/laporan') ? 'active' : '' }}">
+            <a href="{{ route('super_admin.laporan') }}" class="nav-link {{ request()->routeIs('super_admin.laporan') ? 'active' : '' }}">
                 <i class="bi bi-file-earmark-bar-graph"></i> Laporan
             </a>
 
@@ -289,23 +289,23 @@
     <!-- Desktop Sidebar -->
     <div class="sidebar-desktop d-none d-lg-block">
         <h4>Super Admin</h4>
-        <a href="super_admin.dashboard" class="nav-link {{ request()->is('super_admin.dashboard') ? 'active' : '' }}">
+        <a href="{{ route('super_admin.dashboard') }}" class="nav-link {{ request()->routeIs('super_admin.dashboard') ? 'active' : '' }}">
             <i class="bi bi-speedometer2"></i> Dashboard
         </a>
 
-        <a href="{{ route('super_admin.user.index') }}"class="nav-link {{ request()->routeIs('super_admin.user.index') ? 'active' : '' }}">
-            <i class="bi bi-people"></i>Manajemen User
+        <a href="{{ route('super_admin.pengguna.index') }}" class="nav-link {{ request()->routeIs('super_admin.pengguna.index') ? 'active' : '' }}">
+            <i class="bi bi-people"></i>Manajemen Pengguna
         </a>
 
         <a href="{{ route('super_admin.pengurus.index') }}"class="nav-link {{ request()->routeIs('super_admin.pengurus.*') ? 'active' : '' }}">
             <i class="bi bi-person-badge"></i> Manajemen Pengurus
         </a>
 
-        <a href="/super_admin/manajemen_kurir" class="nav-link {{ request()->is('super_admin/manajemen_kurir') ? 'active' : '' }}">
-            <i class="bi bi-truck"></i> Manajemen Kurir
-        </a>
+            <a href="{{ route('super_admin.manajemen_kurir.index') }}" class="nav-link {{ request()->routeIs('super_admin.manajemen_kurir.*') ? 'active' : '' }}">
+                <i class="bi bi-truck"></i> Manajemen Kurir
+            </a>
 
-        <a href="/super_admin/laporan" class="nav-link {{ request()->is('super_admin/laporan') ? 'active' : '' }}">
+        <a href="{{ route('super_admin.laporan') }}" class="nav-link {{ request()->routeIs('super_admin.laporan') ? 'active' : '' }}">
             <i class="bi bi-file-earmark-bar-graph"></i> Laporan
         </a>
 

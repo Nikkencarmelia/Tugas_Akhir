@@ -10,82 +10,142 @@
 
   <style>
     :root {
-      --primary-green: #16a34a;
-      --success: #198754;
-      --warning: #f59e0b;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-      --shadow-md: 0 4px 6px rgba(0,0,0,0.05);
-      --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
-      --border-radius: 16px;
-      --bg-light: #f8f9fa;
-      --text-muted: #6b7280;
+        --primary-green: #16a34a;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --border-light: #e5e7eb;
+        --text-muted: #6b7280;
+        --soft-green: #e9f7ef;
+        --soft-gray: #f3f4f6;
+        --soft-blue: #dbeafe;
     }
+
     body {
-      background: linear-gradient(135deg, #f5f7fa 0%, #e8f5e8 100%);
-      font-family: 'Inter', sans-serif;
+        background: #f5f7fa;
+        font-family: 'Inter', sans-serif;
     }
+
     .dashboard-header {
-      background: white; padding: 1.5rem 2rem; box-shadow: var(--shadow-md); margin-bottom: 2rem;
-      border-radius: 0 0 var(--border-radius) var(--border-radius);
+        background: white;
+        padding: 1.5rem 2rem;
+        box-shadow: var(--shadow-md);
+        border-bottom: 1px solid var(--border-light);
+        margin-bottom: 2rem;
     }
+
     .dashboard-title {
-      font-size: 1.75rem; font-weight: 700; color: var(--primary-green); margin: 0;
-      display: flex; align-items: center; gap: 0.5rem;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--primary-green);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
-    .dashboard-subtitle {
-      color: var(--text-muted); font-size: 0.875rem; margin: 0;
+
+    .dashboard-container {
+        padding: 0 2rem 2rem 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
     }
-    .search-bar {
-      max-width: 300px; border-radius: 50px; border: 1px solid #e9ecef;
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
     }
-    .user-profile {
-      display: flex; align-items: center; gap: 0.5rem; color: var(--text-muted);
-    }
-    .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--primary-green); color: white; display: flex; align-items: center; justify-content: center; }
+
     .stat-card {
-      transition: all 0.3s ease; border: none; border-radius: var(--border-radius);
-      box-shadow: var(--shadow-sm); background: white; overflow: hidden;
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-light);
+        position: relative;
+        overflow: hidden;
     }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; height: 4px;
+        background: var(--soft-green);
+    }
+
     .stat-card:hover {
-      transform: translateY(-4px); box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
     }
+
+    .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
     .stat-icon {
-      width: 3rem; height: 3rem; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center;
-      font-size: 1.25rem; color: white; margin-bottom: 0.75rem;
+        width: 3rem; height: 3rem; border-radius: 0.75rem;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.25rem;
+        background-color: var(--soft-gray);
+        color: #374151;
     }
-    .stat-card .stat-icon { background: var(--primary-green); }
-    .stat-card.completed .stat-icon { background: var(--success); }
-    .stat-card.active .stat-icon { background: var(--warning); }
-    .stat-label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
-    .stat-value { font-size: 2rem; font-weight: 700; color: #1f2937; margin: 0; }
-    .stat-change { font-size: 0.75rem; font-weight: 500; margin-top: 0.25rem; }
-    .stat-change.positive { color: var(--success); }
-    .stat-change.negative { color: #dc3545; }
+    
+    /* Specific Colors */
+    .stat-card.user .stat-icon { background-color: #dbeafe; color: #1e40af; }
+    .stat-card.user::before { background: #dbeafe; }
 
-    .chart-card { border-radius: var(--border-radius); box-shadow: var(--shadow-sm); overflow: hidden; }
-    .chart-header { padding: 1.5rem; border-bottom: 1px solid #e9ecef; background: white; }
-    .chart-title { font-size: 1rem; font-weight: 600; color: #374151; margin: 0; }
-    .chart-body { padding: 1.5rem; background: white; }
-    .top-products-table { font-size: 0.875rem; }
-    .top-products-table th { font-weight: 600; color: #374151; border-bottom: 2px solid #e9ecef; }
-    .top-products-table td { border-bottom: 1px solid #f1f3f4; }
-    .top-products-table .progress { height: 0.5rem; border-radius: 0.25rem; }
-    .top-products-table .progress-bar { background: var(--primary-green); }
+    .stat-card.kurir .stat-icon { background-color: #fef3c7; color: #92400e; }
+    .stat-card.kurir::before { background: #fef3c7; }
 
-    .revenue-breakdown {
-      display: flex; gap: 1rem; margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 0.5rem;
+    .stat-card.pengurus .stat-icon { background-color: #d1fae5; color: #065f46; }
+    .stat-card.pengurus::before { background: #d1fae5; }
+    
+    .stat-card.produk .stat-icon { background-color: #e0e7ff; color: #3730a3; }
+    .stat-card.produk::before { background: #e0e7ff; }
+
+
+    .stat-label {
+        font-size: 0.875rem; font-weight: 600; color: var(--text-muted);
+        text-transform: uppercase; letter-spacing: 0.025em;
     }
-    .breakdown-item { text-align: center; flex: 1; }
-    .breakdown-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.25rem; }
-    .breakdown-value { font-size: 1.25rem; font-weight: 600; color: #1f2937; }
+
+    .stat-value {
+        font-size: 2.25rem; font-weight: 700; color: #111827; margin: 0.25rem 0;
+    }
+
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .content-card {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-light);
+    }
+
+    .card-title {
+        font-size: 1.1rem; font-weight: 600; color: #374151; margin-bottom: 1rem; border-bottom: 1px solid #f3f4f6; padding-bottom: 0.75rem;
+    }
+
+    .simple-table {
+        width: 100%; border-collapse: collapse; font-size: 0.9rem;
+    }
+    .simple-table th { text-align: left; padding: 0.75rem; color: var(--text-muted); border-bottom: 1px solid #e5e7eb; font-weight: 600; }
+    .simple-table td { padding: 0.75rem; border-bottom: 1px solid #f3f4f6; color: #1f2937; }
+    .simple-table tr:last-child td { border-bottom: none; }
 
     @media (max-width: 768px) {
-      .dashboard-container { padding: 1rem; }
-      .stat-value { font-size: 1.5rem; }
-      .chart-body { padding: 1rem; }
-      .revenue-breakdown { flex-direction: column; gap: 0.5rem; }
-      .search-bar { max-width: 100%; margin-bottom: 1rem; }
-      .user-profile { justify-content: center; }
+        .content-grid { grid-template-columns: 1fr; }
+        .dashboard-container { padding: 1rem; }
     }
   </style>
 </head>
@@ -94,257 +154,121 @@
 @extends('components.super_admin')
 @section('content')
 
-<div class="container dashboard-container">
-  <!-- Header -->
-  <div class="dashboard-header">
-    <div class="row align-items-center">
-      <div class="col-md-6">
+    <!-- Header -->
+    <div class="dashboard-header">
         <h1 class="dashboard-title">
           <i class="bi bi-speedometer2"></i> Dashboard Super Admin
         </h1>
-        <p class="dashboard-subtitle">Selamat datang! Kelola Food Center dengan mudah.</p>
-      </div>
-      <div class="col-md-6 text-end">
-        <div class="d-flex justify-content-end align-items-center gap-3">
-          <div class="search-bar">
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-search"></i></span>
-              <input type="text" class="form-control border-0" placeholder="Cari user, produk, atau pesanan...">
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card user">
+                <div class="stat-header">
+                    <div class="stat-label">Total User</div>
+                    <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+                </div>
+                <div class="stat-value">{{ $total_user }}</div>
             </div>
-          </div>
-          <div class="user-profile">
-            <div class="user-avatar">
-              <i class="bi bi-person-circle"></i>
+
+            <div class="stat-card kurir">
+                <div class="stat-header">
+                    <div class="stat-label">Total Kurir</div>
+                    <div class="stat-icon"><i class="bi bi-truck"></i></div>
+                </div>
+                <div class="stat-value">{{ $total_kurir }}</div>
             </div>
-            <div>
-              <small class="d-block text-muted">Admin</small>
-              <small>Super Admin</small>
+
+            <div class="stat-card pengurus">
+                <div class="stat-header">
+                    <div class="stat-label">Total Pengurus</div>
+                    <div class="stat-icon"><i class="bi bi-person-badge"></i></div>
+                </div>
+                <div class="stat-value">{{ $total_pengurus }}</div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Stats Grid - 3 Atas, 3 Bawah -->
-  <div class="row g-4 mb-4">
-    <!-- Baris 1: 3 Card -->
-    <div class="col-lg-4 col-md-6">
-      <div class="card stat-card">
-        <div class="card-body text-center">
-          <div class="stat-icon">
-            <i class="bi bi-person-fill"></i>
-          </div>
-          <p class="stat-label">Total User</p>
-          <h4 class="stat-value">1,247</h4>
-          <small class="stat-change positive"><i class="bi bi-arrow-up"></i> +12% bulan ini</small>
+            <div class="stat-card produk">
+                <div class="stat-header">
+                    <div class="stat-label">Total Produk</div>
+                    <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
+                </div>
+                <div class="stat-value">{{ $total_produk }}</div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="col-lg-4 col-md-6">
-      <div class="card stat-card">
-        <div class="card-body text-center">
-          <div class="stat-icon">
-            <i class="bi bi-truck"></i>
-          </div>
-          <p class="stat-label">Total Kurir</p>
-          <h4 class="stat-value">45</h4>
-          <small class="stat-change positive"><i class="bi bi-arrow-up"></i> +5 baru</small>
-        </div>
-      </div>
-    </div>
-    <div class="col-lg-4 col-md-6">
-      <div class="card stat-card">
-        <div class="card-body text-center">
-          <div class="stat-icon">
-            <i class="bi bi-bag-check"></i>
-          </div>
-          <p class="stat-label">Total Produk</p>
-          <h4 class="stat-value">320</h4>
-          <small class="stat-change positive"><i class="bi bi-arrow-up"></i> +18 item</small>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="row g-4 mb-5">
-    <!-- Baris 2: 3 Card -->
-    <div class="col-lg-4 col-md-6">
-      <div class="card stat-card">
-        <div class="card-body text-center">
-          <div class="stat-icon">
-            <i class="bi bi-cart4"></i>
-          </div>
-          <p class="stat-label">Total Pesanan</p>
-          <h4 class="stat-value">856</h4>
-          <small class="stat-change negative"><i class="bi bi-arrow-down"></i> -3% minggu ini</small>
-        </div>
-      </div>
-    </div>
-    <div class="col-lg-4 col-md-6">
-      <div class="card stat-card completed">
-        <div class="card-body text-center">
-          <div class="stat-icon">
-            <i class="bi bi-check-circle-fill"></i>
-          </div>
-          <p class="stat-label">Pesanan Selesai</p>
-          <h4 class="stat-value">715</h4>
-          <small class="stat-change positive"><i class="bi bi-arrow-up"></i> +45 hari ini</small>
-        </div>
-      </div>
-    </div>
-    <div class="col-lg-4 col-md-6">
-      <div class="card stat-card active">
-        <div class="card-body text-center">
-          <div class="stat-icon">
-            <i class="bi bi-hourglass-split"></i>
-          </div>
-          <p class="stat-label">Pesanan Berjalan</p>
-          <h4 class="stat-value">141</h4>
-          <small class="stat-change negative"><i class="bi bi-arrow-down"></i> -12 pending</small>
-        </div>
-      </div>
-    </div>
-  </div>
+        <!-- Content Grid -->
+        <div class="content-grid">
+            <!-- Best Selling Products -->
+            <div class="content-card">
+                <h3 class="card-title"><i class="bi bi-trophy text-warning me-2"></i>Produk Terlaris (Berdasarkan Quantity)</h3>
+                <div class="table-responsive">
+                    <table class="simple-table">
+                        <thead>
+                            <tr>
+                                <th>Produk</th>
+                                <th>Kategori</th>
+                                <th class="text-end">Terjual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($top_products as $item)
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div style="width: 30px; height: 30px; background: #f3f4f6; border-radius: 4px; overflow: hidden;">
+                                            @php
+                                                $img = $item->produk->gambar ?? '';
+                                                $src = asset('images/default-product.png');
+                                                if(str_starts_with($img, 'images/')) $src = asset($img);
+                                                elseif($img) $src = asset('storage/' . $img);
+                                            @endphp
+                                            <img src="{{ $src }}" style="width:100%; height:100%; object-fit:cover;">
+                                        </div>
+                                        {{ $item->produk->nama_produk ?? 'Unknown' }}
+                                    </div>
+                                </td>
+                                <td>{{ $item->produk->kategori->nama_kategori ?? '-' }}</td>
+                                <td class="text-end fw-bold text-success">{{ $item->total_sold }}</td>
+                            </tr>
+                            @empty
+                            <tr><td colspan="3" class="text-center text-muted">Belum ada data penjualan.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-  <!-- Charts Row - Grafik Rata -->
-  <div class="row g-4 mb-5">
-    <div class="col-lg-6">
-      <div class="card chart-card" style="height: 100%;">
-        <div class="chart-header">
-          <h6 class="chart-title">
-            <i class="bi bi-graph-up"></i> Grafik Penjualan Bulanan
-          </h6>
+            <!-- Detailed Monthly Sales -->
+            <div class="content-card">
+                <h3 class="card-title"><i class="bi bi-graph-up-arrow text-success me-2"></i>Penjualan Bulanan</h3>
+                <div class="table-responsive">
+                    <table class="simple-table">
+                        <thead>
+                            <tr>
+                                <th>Bulan</th>
+                                <th class="text-center">Pesanan</th>
+                                <th class="text-end">Total Penjualan</th>
+                                <th class="text-end">Penjualan Bersih</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($monthly_sales as $sale)
+                            <tr>
+                                <td class="fw-medium">{{ $sale['month'] }}</td>
+                                <td class="text-center"><span class="badge bg-light text-dark border">{{ $sale['orders'] }}</span></td>
+                                <td class="text-end fw-bold text-primary">Rp {{ number_format($sale['total'], 0, ',', '.') }}</td>
+                                <td class="text-end fw-bold text-success">Rp {{ number_format($sale['net'], 0, ',', '.') }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div class="chart-body">
-          <canvas id="salesChart" height="200"></canvas>
-        </div>
-        <!-- Breakdown Pendapiran -->
-        <div class="revenue-breakdown">
-          <div class="breakdown-item">
-            <div class="breakdown-label">Total Pendapatan</div>
-            <div class="breakdown-value">Rp 1.2 M</div>
-          </div>
-          <div class="breakdown-item">
-            <div class="breakdown-label">Harga Produk</div>
-            <div class="breakdown-value">Rp 1.05 M</div>
-          </div>
-          <div class="breakdown-item">
-            <div class="breakdown-label">Ongkir</div>
-            <div class="breakdown-value">Rp 150 K</div>
-          </div>
-        </div>
-      </div>
     </div>
-    <div class="col-lg-6">
-      <div class="card chart-card" style="height: 100%;">
-        <div class="chart-header">
-          <h6 class="chart-title">
-            <i class="bi bi-bar-chart"></i> Produk Paling Banyak Dibeli
-          </h6>
-        </div>
-        <div class="chart-body">
-          <table class="table table-hover top-products-table mb-0">
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Produk</th>
-                <th>Popularitas</th>
-                <th>Jumlah Terjual</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>Beras Kutiran Premium</td>
-                <td>
-                  <div class="progress" style="height: 8px;">
-                    <div class="progress-bar" style="width: 80%"></div>
-                  </div>
-                </td>
-                <td><span class="badge bg-success">120 unit</span></td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>Sayur Pokcoy Segar</td>
-                <td>
-                  <div class="progress" style="height: 8px;">
-                    <div class="progress-bar" style="width: 65%"></div>
-                  </div>
-                </td>
-                <td><span class="badge bg-success">95 unit</span></td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>Ikan Patin Segar</td>
-                <td>
-                  <div class="progress" style="height: 8px;">
-                    <div class="progress-bar" style="width: 55%"></div>
-                  </div>
-                </td>
-                <td><span class="badge bg-success">82 unit</span></td>
-              </tr>
-              <tr>
-                <td>4</td>
-                <td>Telur Ayam Kampung</td>
-                <td>
-                  <div class="progress" style="height: 8px;">
-                    <div class="progress-bar" style="width: 45%"></div>
-                  </div>
-                </td>
-                <td><span class="badge bg-success">74 unit</span></td>
-              </tr>
-              <tr>
-                <td>5</td>
-                <td>Cabe Rawit Merah</td>
-                <td>
-                  <div class="progress" style="height: 8px;">
-                    <div class="progress-bar" style="width: 35%"></div>
-                  </div>
-                </td>
-                <td><span class="badge bg-success">68 unit</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  // Sales Chart - Total Pendapiran (line chart)
-  new Chart(document.getElementById('salesChart'), {
-    type: 'line',
-    data: {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
-      datasets: [{
-        label: 'Pendapiran (Rp)',
-        data: [12000000, 19000000, 30000000, 50000000, 75000000, 120000000],
-        borderColor: '#198754',
-        backgroundColor: 'rgba(25, 135, 84, 0.1)',
-        borderWidth: 3,
-        fill: true,
-        tension: 0.4
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: function(value) { return 'Rp ' + (value / 1000000).toFixed(0) + 'jt'; }
-          }
-        }
-      }
-    }
-  });
-</script>
 
 @endsection
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
