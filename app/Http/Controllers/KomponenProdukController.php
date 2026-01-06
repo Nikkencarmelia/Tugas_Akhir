@@ -18,10 +18,37 @@ class KomponenProdukController extends Controller
     {
         $activeTab = $request->get('tab', 'kategori');
 
+        // Kategori
+        $kategori = Kategori::withCount('produk')
+            ->when($request->search_kategori, function ($q) use ($request) {
+                $q->where('nama_kategori', 'like', '%' . $request->search_kategori . '%');
+            })
+            ->latest()
+            ->paginate(10, ['*'], 'page_kategori')
+            ->appends(['tab' => 'kategori', 'search_kategori' => $request->search_kategori]);
+
+        // Supplier
+        $supplier = Supplier::withCount('produk')
+            ->when($request->search_supplier, function ($q) use ($request) {
+                $q->where('nama_supplier', 'like', '%' . $request->search_supplier . '%');
+            })
+            ->latest()
+            ->paginate(10, ['*'], 'page_supplier')
+            ->appends(['tab' => 'supplier', 'search_supplier' => $request->search_supplier]);
+
+        // Satuan
+        $satuan = Satuan::withCount('produk')
+            ->when($request->search_satuan, function ($q) use ($request) {
+                $q->where('nama_satuan', 'like', '%' . $request->search_satuan . '%');
+            })
+            ->latest()
+            ->paginate(10, ['*'], 'page_satuan')
+            ->appends(['tab' => 'satuan', 'search_satuan' => $request->search_satuan]);
+
         return view('Staff_Produk.komponenProduk', [
-            'kategori' => Kategori::withCount('produk')->latest()->get(),
-            'supplier' => Supplier::withCount('produk')->latest()->get(),
-            'satuan'   => Satuan::withCount('produk')->latest()->get(),
+            'kategori' => $kategori,
+            'supplier' => $supplier,
+            'satuan'   => $satuan,
             'activeTab' => $activeTab
         ]);
     }

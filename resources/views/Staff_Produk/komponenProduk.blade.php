@@ -204,12 +204,14 @@
                     <i class="bi bi-plus-circle"></i> Tambah Kategori
                 </button>
             </div>
-            <div class="search-controls mb-3">
+            <form action="{{ route('produk.komponen.index') }}" method="GET" class="search-controls mb-3">
+                <input type="hidden" name="tab" value="kategori">
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <input type="text" id="searchKategori" class="form-control" placeholder="Cari kategori...">
+                    <input type="text" name="search_kategori" class="form-control" placeholder="Cari kategori..." value="{{ request('search_kategori') }}">
+                    <button type="submit" class="btn btn-outline-secondary">Cari</button>
                 </div>
-            </div>
+            </form>
             <div class="table-responsive">
                 <table class="table table-bordered align-middle" id="tableKategori">
                     <thead class="table-light">
@@ -221,9 +223,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($kategori as $index => $kat)
+                        @forelse($kategori as $index => $kat)
                             <tr data-id="{{ $kat->id }}">
-                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $kategori->firstItem() + $index }}</td>
                                 <td>{{ $kat->nama_kategori }}</td>
                                 <td><span class="badge bg-success">{{ $kat->produk_count }}</span></td>
                                 <td>
@@ -235,9 +237,16 @@
                                     </button>
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center py-3 text-muted">Tidak ada data kategori.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
+            </div>
+            <div class="d-flex justify-content-center mt-3">
+                {{ $kategori->links('pagination::bootstrap-5') }}
             </div>
         </div>
         <!-- ============================
@@ -250,12 +259,14 @@
                     <i class="bi bi-plus-circle"></i> Tambah Satuan
                 </button>
             </div>
-            <div class="search-controls mb-3">
+            <form action="{{ route('produk.komponen.index') }}" method="GET" class="search-controls mb-3">
+                <input type="hidden" name="tab" value="satuan">
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <input type="text" id="searchSatuan" class="form-control" placeholder="Cari satuan...">
+                    <input type="text" name="search_satuan" class="form-control" placeholder="Cari satuan..." value="{{ request('search_satuan') }}">
+                    <button type="submit" class="btn btn-outline-secondary">Cari</button>
                 </div>
-            </div>
+            </form>
             <div class="table-responsive">
                 <table class="table table-bordered align-middle" id="tableSatuan">
                     <thead class="table-light">
@@ -267,9 +278,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($satuan as $index => $sat)
+                        @forelse($satuan as $index => $sat)
                             <tr data-id="{{ $sat->id }}">
-                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $satuan->firstItem() + $index }}</td>
                                 <td>{{ $sat->nama_satuan }}</td>
                                 <td><span class="badge bg-info">{{ $sat->produk_count }}</span></td>
                                 <td>
@@ -281,9 +292,16 @@
                                     </button>
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center py-3 text-muted">Tidak ada data satuan.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
+            </div>
+            <div class="d-flex justify-content-center mt-3">
+                {{ $satuan->links('pagination::bootstrap-5') }}
             </div>
         </div>
         <!-- ============================
@@ -296,12 +314,14 @@
                     <i class="bi bi-plus-circle"></i> Tambah Supplier
                 </button>
             </div>
-            <div class="search-controls mb-3">
+            <form action="{{ route('produk.komponen.index') }}" method="GET" class="search-controls mb-3">
+                <input type="hidden" name="tab" value="supplier">
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <input type="text" id="searchSupplier" class="form-control" placeholder="Cari supplier...">
+                    <input type="text" name="search_supplier" class="form-control" placeholder="Cari supplier..." value="{{ request('search_supplier') }}">
+                    <button type="submit" class="btn btn-outline-secondary">Cari</button>
                 </div>
-            </div>
+            </form>
             <div class="table-responsive">
                 <table class="table table-bordered align-middle" id="tableSupplier">
                     <thead class="table-light">
@@ -313,9 +333,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($supplier as $index => $sup)
+                        @forelse($supplier as $index => $sup)
                             <tr data-id="{{ $sup->id }}">
-                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $supplier->firstItem() + $index }}</td>
                                 <td>{{ $sup->nama_supplier }}</td>
                                 <td><span class="badge bg-primary">{{ $sup->produk_count }}</span></td>
                                 <td>
@@ -327,9 +347,16 @@
                                     </button>
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center py-3 text-muted">Tidak ada data supplier.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
+            </div>
+            <div class="d-flex justify-content-center mt-3">
+                {{ $supplier->links('pagination::bootstrap-5') }}
             </div>
         </div>
     </div>
@@ -705,26 +732,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ================= SEARCH =================
-    function searchTable(inputId, tableId) {
-        document.getElementById(inputId).addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const rows = document.querySelectorAll(`#${tableId} tbody tr`);
-            let index = 1;
-            rows.forEach(row => {
-                const nama = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-                if (nama.includes(searchTerm)) {
-                    row.style.display = '';
-                    row.querySelector('td:first-child').textContent = index++;
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
-    }
-    searchTable('searchKategori', 'tableKategori');
-    searchTable('searchSatuan', 'tableSatuan');
-    searchTable('searchSupplier', 'tableSupplier');
+    /* Client-side search and listeners are removed or replaced by server-side query */
 
     // Auto-show toast success
     @if(session('success'))

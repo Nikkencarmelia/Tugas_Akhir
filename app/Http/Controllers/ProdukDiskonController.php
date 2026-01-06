@@ -73,7 +73,7 @@ class ProdukDiskonController extends Controller
         }
 
         $produkDiskon = $query->latest()->paginate(10)->withQueryString()
-            ->map(function ($produk) {
+            ->through(function ($produk) {
                 // Hitung total stok HANYA dari batch yang sedang diskon (harga_saat_ini < harga_normal)
                 $diskonStok = $produk->batch->filter(function ($batch) {
                     return $batch->harga_saat_ini < $batch->harga_normal;

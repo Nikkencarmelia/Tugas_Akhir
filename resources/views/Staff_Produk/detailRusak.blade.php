@@ -205,7 +205,7 @@
 
         <!-- FIXED: Dynamic Pagination -->
         <nav aria-label="Batch pagination" class="mt-4">
-            {{ $damaged_batches->appends(request()->query())->links() }}
+            {{ $damaged_batches->appends(request()->query())->links('pagination::bootstrap-5') }}
         </nav>
 
     </div>

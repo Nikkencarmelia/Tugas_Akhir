@@ -312,7 +312,7 @@
             </div>
 
             <nav aria-label="Batch pagination" class="mt-4">
-                {{ $batches->appends(['search' => request('search')])->links() }}
+                {{ $batches->appends(['search' => request('search')])->links('pagination::bootstrap-5') }}
             </nav>
 
         </div>
@@ -567,7 +567,10 @@
 
                     <div class="mb-3">
                         <label class="form-label">Bukti Foto</label>
-                        <input type="file" name="gambar" class="form-control" accept="image/*" required>
+                        <input type="file" name="gambar" id="inputFotoRusak" class="form-control" accept="image/*" required>
+                        <div class="mt-2 text-center">
+                            <img id="previewFotoRusak" src="#" alt="Preview Foto" class="img-fluid rounded border d-none" style="max-height: 200px; object-fit: contain;">
+                        </div>
                     </div>
 
                     <button type="submit" class="btn btn-danger w-100">Kirim Laporan</button>
@@ -728,6 +731,29 @@
         }
 
         document.addEventListener('DOMContentLoaded', colorizeBadges);
+        
+        // Preview Foto Rusak
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputFoto = document.getElementById('inputFotoRusak');
+            const previewFoto = document.getElementById('previewFotoRusak');
+
+            if (inputFoto && previewFoto) {
+                inputFoto.addEventListener('change', function() {
+                    const file = this.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            previewFoto.src = e.target.result;
+                            previewFoto.classList.remove('d-none');
+                        }
+                        reader.readAsDataURL(file);
+                    } else {
+                        previewFoto.src = '#';
+                        previewFoto.classList.add('d-none');
+                    }
+                });
+            }
+        });
         </script>
 
         <script>

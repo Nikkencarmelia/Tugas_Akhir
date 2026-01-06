@@ -63,6 +63,7 @@ class ProdukRusakCacatController extends Controller
         // FIXED: Get paginator first
         $paginator = Produk_Rusak::with(['batch', 'produk'])
             ->where('id_produk', $id_produk)
+            ->orderBy('tgl_rusak', 'desc')
             ->paginate(10);
 
         // FIXED: Extract total before mapping
@@ -70,7 +71,7 @@ class ProdukRusakCacatController extends Controller
 
         // FIXED: Map items while preserving pagination structure
         $mappedItems = $paginator->getCollection()->map(function ($rusak) use ($produk) {
-            $tanggalDitemukan = $rusak->tgl_rusak ? Carbon::parse($rusak->tgl_rusak)->format('Y-m-d') : now()->format('Y-m-d');
+            $tanggalDitemukan = $rusak->tgl_rusak ? Carbon::parse($rusak->tgl_rusak)->format('d/m/Y') : now()->format('d/m/Y');
             $tanggalMasukFallback = $rusak->batch->tgl_masuk ?? now()->format('Y-m-d');
             return [
                 'batch_id' => $rusak->batch->id ?? 0,

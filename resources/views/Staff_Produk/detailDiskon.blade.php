@@ -170,7 +170,7 @@
     </div>
     
     <nav aria-label="Batch pagination" class="mt-4">
-        {{ $batches->appends(['search' => request('search')])->links() }}
+        {{ $batches->appends(['search' => request('search')])->links('pagination::bootstrap-5') }}
     </nav>
 </div>
 
