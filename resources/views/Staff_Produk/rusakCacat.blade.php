@@ -63,7 +63,7 @@
                 <option value="all">Semua Supplier</option>
             </select>
             <div class="input-group search-wrapper" style="width: 300px;">
-                <input type="text" id="search-input" class="form-control" placeholder="Cari ID, nama, deskripsi, satuan...">
+                <input type="text" id="search-input" class="form-control" placeholder="Cari Kode Produk, nama, deskripsi, satuan...">
                 <button class="input-group-text border-start-0" type="button">
                     <i class="bi bi-search text-muted"></i>
                 </button>
@@ -76,7 +76,7 @@
             <table class="table align-middle">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>Kode Produk</th>
                         <th>Produk</th>
                         <th>Kategori</th>
                         <th>Satuan</th>
@@ -181,6 +181,7 @@
             if (!searchTerm) return matchKategori && matchSupplier;
 
             const matches = [
+                (p.kode_produk || '').toLowerCase().includes(searchTerm),
                 p.id.toString().includes(searchTerm),
                 p.nama_produk.toLowerCase().includes(searchTerm),
                 (p.deskripsi || '').toLowerCase().includes(searchTerm),
@@ -222,7 +223,7 @@
 
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${p.id}</td>
+                <td>${p.kode_produk || '-'}</td>
                 <td>
                     <div class="d-flex align-items-center">
                         <div class="img-container">

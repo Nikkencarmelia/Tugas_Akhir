@@ -80,7 +80,7 @@
                 <!-- Diisi JS -->
             </select>
             <div class="input-group search-wrapper" style="width: 300px;">
-                <input type="text" id="search-input" class="form-control" placeholder="Cari nama, kategori, supplier, stok...">
+                <input type="text" id="search-input" class="form-control" placeholder="Cari Kode Produk, nama, kategori, supplier, stok...">
                 <button class="input-group-text border-start-0" type="button">
                     <i class="bi bi-search text-muted"></i>
                 </button>
@@ -95,7 +95,7 @@
             <table class="table align-middle">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>Kode Produk</th>
                         <th>Produk</th>
                         <th>Kategori</th>
                         <th>Satuan</th>
@@ -244,8 +244,10 @@
             const satuanLengkap = `${p.jumlah_satuan || 1} ${getStringValue(p.satuan).toLowerCase()}`;
             if (searchTerm) {
                 const matches = [
-                    p.id.toString().includes(searchTerm),
-                    p.nama_produk.toLowerCase().includes(searchTerm),
+                (p.kode_produk || '').toLowerCase().includes(searchTerm),
+                (p.batch || []).some(b => (b.kode_batch || '').toLowerCase().includes(searchTerm)),
+                p.id.toString().includes(searchTerm),
+                p.nama_produk.toLowerCase().includes(searchTerm),
                     (p.deskripsi || '').toLowerCase().includes(searchTerm),
                     getStringValue(p.kategori).toLowerCase().includes(searchTerm),
                     supplierStr.includes(searchTerm),
@@ -296,7 +298,7 @@
 
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${p.id}</td>
+                <td>${p.kode_produk || '-'}</td>
                 <td>
                     <div class="d-flex align-items-center">
                         <div class="img-container">

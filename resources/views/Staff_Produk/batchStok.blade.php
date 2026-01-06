@@ -45,22 +45,21 @@
             }
 
             .table-card { background: var(--white); border-radius: .8rem; border: 1px solid var(--border-color); box-shadow: 0 2px 8px var(--shadow); overflow: hidden; }
-            .table { table-layout: fixed; }
-            .table th, .table td { font-size: .8rem; padding: .5rem .25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .table { table-layout: auto; }
+            .table th, .table td { font-size: .8rem; padding: .6rem .4rem; vertical-align: middle; }
             .table th { background: var(--green-soft); color: var(--green-text); font-weight: 600; font-size: .75rem; text-transform: uppercase; border-bottom: 2px solid var(--border-color); }
             .table td { vertical-align: middle; border-top: 1px solid var(--border-color); color: var(--text-dark); }
             .table tbody tr:hover { background-color: #F3F4F6; }
             .harga-normal { font-weight: 600; color: var(--text-dark); font-size: .8rem; }
-            .col-batch { width: 8%; }
-            .col-tgl-masuk { width: 10%; }
-            .col-tgl-exp { width: 10%; }
-            .col-sisa-hari { width: 8%; text-align: center; }
-            .col-harga-normal { width: 9%; }
-            .col-harga-saat { width: 9%; }
-            .col-tgl-perubahan { width: 10%; }
-            .col-ket-harga { width: 12%; }
-            .col-stok { width: 6%; text-align: center; }
-            .col-status-stok { width: 8%; }
+            .col-batch { width: 220px; }
+            .col-tgl-masuk { width: 100px; }
+            .col-tgl-exp { width: 100px; }
+            .col-sisa-hari { width: 100px; text-align: center; }
+            .col-harga-normal { width: 110px; }
+            .col-harga-saat { width: 110px; }
+            .col-ket-harga { width: 140px; }
+            .col-stok { width: 70px; text-align: center; }
+            .col-status-stok { width: 110px; }
             .col-aksi {
                 width: 10%;
                 position: relative;
@@ -181,7 +180,8 @@
 
                         <div class="col-md-8">
                             <h4 class="fw-bold">{{ $produk->nama_produk }}</h4>
-                            <p class="text-muted">{{ $produk->deskripsi }}</p>
+                            <p class="text-muted mb-1">{{ $produk->deskripsi }}</p>
+                            <span class="badge bg-secondary mb-3">{{ $produk->kode_produk }}</span>
 
                             <div class="row mt-3">
                                 <div class="col-6">
@@ -241,7 +241,7 @@
                 </div>
 
                 <form action="{{ url()->current() }}" method="GET" class="input-group batch-search">
-                    <input type="text" name="search" class="form-control" id="batchSearch" placeholder="Cari batch..." value="{{ request('search') }}">
+                    <input type="text" name="search" class="form-control" id="batchSearch" placeholder="Cari Kode Produk, nama, batch, harga..." value="{{ request('search') }}">
                     <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
                 </form>
             </div>
@@ -251,13 +251,12 @@
                     <table class="table align-middle table-sm" id="batchTable">
                         <thead>
                             <tr>
-                                <th class="col-batch">Batch</th>
+                                <th class="col-batch">Kode Batch</th>
                                 <th class="col-tgl-masuk">Tgl. Masuk</th>
                                 <th class="col-tgl-exp">Tgl. Kadaluarsa</th>
                                 <th class="col-sisa-hari">Sisa Hari</th>
                                 <th class="col-harga-normal">Harga Normal</th>
                                 <th class="col-harga-saat">Harga Saat Ini</th>
-                                <th class="col-tgl-perubahan">Tgl. Perubahan</th>
                                 <th class="col-ket-harga">Keterangan Harga</th>
                                 <th class="col-stok">Stok</th>
                                 <th class="col-status-stok">Status Stok</th>
@@ -267,13 +266,12 @@
                         <tbody>
                             @forelse($batches as $batch)
                                 <tr>
-                                    <td class="col-batch">Batch {{ $batch->id }}</td>
+                                    <td class="col-batch">{{ $batch->kode_batch }}</td>
                                     <td class="col-tgl-masuk">{{ $batch->tgl_masuk->format('d/m/Y') }}</td>
                                     <td class="col-tgl-exp">{{ $batch->tgl_kadaluwarsa->format('d/m/Y') }}</td>
                                     <td class="col-sisa-hari fw-bold {{ $batch->sisa_color }}">{{ $batch->sisa_text }}</td>
                                     <td class="col-harga-normal {{ $batch->harga_saat_ini < $batch->harga_normal ? 'text-decoration-line-through text-muted' : '' }}">{{ $batch->harga_normal_rp }}</td>
                                     <td class="col-harga-saat fw-bold {{ $batch->harga_saat_ini < $batch->harga_normal ? 'text-success' : ($batch->harga_saat_ini > $batch->harga_normal ? 'text-success' : '') }}">{{ $batch->harga_saat_ini_rp }}</td>
-                                    <td class="col-tgl-perubahan">{{ $batch->tgl_perubahan_format }}</td>
                                     <td class="col-ket-harga" title="{{ $batch->keterangan }}">
                                         @if($batch->harga_saat_ini < $batch->harga_normal)
                                             <span class="badge-harga-diskon">{{ $batch->keterangan }}</span>
@@ -303,7 +301,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="11" class="text-center py-4 text-muted">Belum ada batch untuk produk ini.</td>
+                                    <td colspan="10" class="text-center py-4 text-muted">Belum ada batch untuk produk ini.</td>
                                 </tr>
                             @endforelse
                         </tbody>

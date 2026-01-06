@@ -93,6 +93,7 @@ class LaporanController extends Controller
                 'pemesanans.created_at as tanggal_transaksi',
                 'pemesanans.kode_pesanan',
                 'batches.id as batch_id',
+                'batches.kode_batch',
                 'detail_pesanans.nama_produk',
                 'detail_pesanans.gambar',
                 'detail_pesanans.quantity as jumlah_dibeli',
@@ -145,7 +146,7 @@ class LaporanController extends Controller
                 $sisa_batch = $all_batches->where('stok', '>', 0)->count();
                 
                 $batch_aktif_obj = $all_batches->where('stok', '>', 0)->sortBy('id')->first();
-                $batch_aktif = $batch_aktif_obj ? 'Batch #' . $batch_aktif_obj->id : 'Batch Habis';
+                $kode_batch_aktif = $batch_aktif_obj ? $batch_aktif_obj->kode_batch : 'Batch Habis';
                 $is_batch_habis = $batch_aktif_obj ? false : true;
 
                 // Transaksi di bulan terpilih
@@ -183,7 +184,7 @@ class LaporanController extends Controller
                     'satuan' => $p->satuan->nama_satuan ?? 'Pcs',
                     'total_batch' => $total_batch,
                     'sisa_batch' => $sisa_batch,
-                    'batch_aktif' => $batch_aktif,
+                    'kode_batch_aktif' => $kode_batch_aktif,
                     'is_batch_habis' => $is_batch_habis,
                     'stok_masuk' => $stok_masuk_bulan_ini,
                     'stok_keluar_dibeli' => $stok_dibeli,

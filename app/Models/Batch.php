@@ -11,6 +11,7 @@ class Batch extends Model
 
     protected $fillable = [
         'id_produk',
+        'kode_batch',
         'tgl_masuk',
         'stok',
         'status_stok',

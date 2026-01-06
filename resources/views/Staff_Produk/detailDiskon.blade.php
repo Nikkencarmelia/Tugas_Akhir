@@ -94,7 +94,8 @@
                 </div>
                 <div class="col-md-8">
                     <h4 class="fw-bold">{{ $produk->nama_produk }}</h4>
-                    <p class="text-muted">{{ $produk->deskripsi }}</p>
+                    <p class="text-muted mb-1">{{ $produk->deskripsi }}</p>
+                    <span class="badge bg-secondary mb-3">{{ $produk->kode_produk }}</span>
                     <div class="row mt-3">
                         <div class="col-6">
                             <p><strong>Supplier:</strong> <span class="badge-supplier">{{ $produk->supplier }}</span></p>
@@ -122,7 +123,7 @@
             <small class="text-muted">Batch yang sedang mendapatkan promo diskon</small>
         </div>
         <form action="{{ url()->current() }}" method="GET" class="input-group batch-search">
-            <input type="text" name="search" class="form-control" placeholder="Cari batch..." id="batchSearch" value="{{ request('search') }}">
+            <input type="text" name="search" class="form-control" placeholder="Cari Kode Produk, nama, batch, harga..." id="batchSearch" value="{{ request('search') }}">
             <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
         </form>
     </div>
@@ -133,20 +134,20 @@
             <table class="table align-middle mb-0">
                 <thead>
                     <tr>
-                        <th>Batch</th>
-                        <th>Tanggal Masuk</th>
-                        <th>Tanggal Kadaluarsa</th>
-                        <th>Sisa Hari</th>
+                        <th width="25%">Kode Batch</th>
+                        <th width="12%">Tanggal Masuk</th>
+                        <th width="12%">Tanggal Kadaluarsa</th>
+                        <th class="text-center" width="10%">Sisa Hari</th>
                         <th>Harga Normal</th>
                         <th>Harga Diskon</th>
                         <th>Stok</th>
-                        <th>Status Stok</th>
+                        <th width="12%">Status Stok</th>
                     </tr>
                 </thead>
                 <tbody id="batchTableBody">
                     @forelse($batches as $batch)
                         <tr>
-                            <td><strong>Batch {{ $batch->id }}</strong></td>
+                            <td>{{ $batch->kode_batch }}</td>
                             <td>{{ $batch->tgl_masuk_format }}</td>
                             <td>{{ $batch->tgl_kadaluwarsa_format }}</td>
                             <td class="text-center fw-bold {{ $batch->sisa_color }}" title="Debug: Raw Diff={{ $batch->diff ?? 'N/A' }} hari">

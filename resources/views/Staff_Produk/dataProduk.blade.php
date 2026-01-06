@@ -103,7 +103,7 @@
             <table class="table align-middle">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>Kode Produk</th>
                         <th>Produk</th>
                         <th>Kategori</th>
                         <th>Satuan</th>
@@ -320,6 +320,7 @@
 
             const satuanLengkap = `${p.jumlah_satuan || 1} ${getStringValue(p.satuan).toLowerCase()}`;
             const matches = [
+                (p.kode_produk || '').toLowerCase().includes(searchTerm),
                 p.id.toString().includes(searchTerm),
                 p.nama_produk.toLowerCase().includes(searchTerm),
                 (p.deskripsi || '').toLowerCase().includes(searchTerm),
@@ -372,7 +373,7 @@
 
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${p.id}</td>
+                <td>${p.kode_produk || '-'}</td>
                 <td>
                     <div class="d-flex align-items-center">
                         <div class="img-container">

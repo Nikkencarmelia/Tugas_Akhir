@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('batches', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_produk')->constrained('produks')->onDelete('cascade');
+            $table->string('kode_batch')->nullable()->unique();
             $table->date('tgl_masuk');
             $table->integer('stok');
             $table->enum('status_stok', ['tersedia', 'menipis', 'habis']);

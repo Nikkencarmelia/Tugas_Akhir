@@ -26,7 +26,8 @@ class ProdukDiskonController extends Controller
 
             $query->where(function ($q) use ($search, $searchLower) {
                 // Search di field produk utama (partial match)
-                $q->where('id', 'like', "%$search%")
+                $q->where('kode_produk', 'like', "%$search%")
+                  ->orWhere('id', 'like', "%$search%")
                   ->orWhere('nama_produk', 'like', "%$search%")
                   ->orWhere('deskripsi', 'like', "%$search%")
                   ->orWhere('status_tampil', 'like', "%$search%") // Tambah status tampil (e.g., "Ditampilkan" partial)

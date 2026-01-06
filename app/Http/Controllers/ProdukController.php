@@ -96,7 +96,8 @@ class ProdukController extends Controller
             $searchLower = strtolower($search);
 
             $query->where(function ($q) use ($search, $searchLower) {
-                $q->where('id', 'like', "%$search%")
+                $q->where('kode_produk', 'like', "%$search%")
+                  ->orWhere('id', 'like', "%$search%")
                   ->orWhere('nama_produk', 'like', "%$search%")
                   ->orWhere('deskripsi', 'like', "%$search%")
                   ->orWhere('status_tampil', 'like', "%$search%")
@@ -158,7 +159,7 @@ class ProdukController extends Controller
             $gambarPath = $request->file('gambar')->store('produk', 'public');
         }
 
-        Produk::create([
+        $produk = Produk::create([
             'nama_produk'               => $request->nama_produk,
             'id_kategori'               => $request->id_kategori,
             'id_satuan'                 => $request->id_satuan,
@@ -169,6 +170,10 @@ class ProdukController extends Controller
             'status_tampil'             => $request->status_tampil,
             'gambar'                    => $gambarPath,
         ]);
+
+        // Generate Kode Produk: PRD-001, PRD-002, dst.
+        $kode = 'PRD-' . str_pad($produk->id, 3, '0', STR_PAD_LEFT);
+        $produk->update(['kode_produk' => $kode]);
 
         // LANGSUNG KE DATA PRODUK + TOAST MUNCUL DI SANA
         return redirect()->route('produk.data')->with('success', 'Produk berhasil ditambahkan!');

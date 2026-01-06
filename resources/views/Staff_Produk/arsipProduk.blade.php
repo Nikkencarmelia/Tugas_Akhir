@@ -79,7 +79,7 @@
                     <option value="all">Semua Kategori</option>
                 </select>
                 <div class="input-group search-wrapper" style="width: 300px;">
-                    <input type="text" id="search-input" class="form-control" placeholder="Cari ID, nama, deskripsi, satuan...">
+                    <input type="text" id="search-input" class="form-control" placeholder="Cari Kode Produk, nama, deskripsi, satuan...">
                     <button class="input-group-text border-start-0" type="button">
                         <i class="bi bi-search text-muted"></i>
                     </button>
@@ -96,7 +96,7 @@
                 <thead>
                     <tr>
                         <th class="text-center"><input type="checkbox" id="check-all-products"></th>
-                        <th>ID</th>
+                        <th>Kode Produk</th>
                         <th>Produk</th>
                         <th>Kategori</th>
                         <th>Satuan</th>
@@ -306,6 +306,7 @@
             if (!searchTerm) return matchSupplier && matchKategori;
 
             const matches = [
+                (p.kode_produk || '').toLowerCase().includes(searchTerm),
                 p.id.toString().includes(searchTerm),
                 p.nama_produk.toLowerCase().includes(searchTerm),
                 (p.deskripsi || '').toLowerCase().includes(searchTerm),
@@ -356,7 +357,7 @@
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td class="text-center"><input type="checkbox" class="product-checkbox" data-id="${p.id}"></td>
-                <td>${p.id}</td>
+                <td>${p.kode_produk || '-'}</td>
                 <td>
                     <div class="d-flex align-items-center">
                         <div class="img-container">

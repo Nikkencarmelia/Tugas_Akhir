@@ -158,7 +158,7 @@
                 <div class="col-md">
                     <div class="input-group">
                         <span class="input-group-text bg-white border-success-subtle"><i class="fas fa-search text-success"></i></span>
-                        <input type="text" id="searchInput" class="form-control border-success-subtle" placeholder="Cari nama produk, batch, atau pembeli...">
+                        <input type="text" id="searchInput" class="form-control border-success-subtle" placeholder="Cari nama produk, Kode Batch, atau pembeli...">
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -181,7 +181,7 @@
                     <thead>
                         <tr>
                             <th>Tanggal Transaksi</th>
-                            <th>ID Batch</th>
+                            <th>Kode Batch</th>
                             <th>Kode Pesanan</th>
                             <th>Produk</th>
                             <th>Kategori</th>
@@ -195,7 +195,7 @@
                         @forelse($penjualan ?? [] as $index => $item)
                         <tr data-date="{{ strtotime($item['tanggal_transaksi'] ?? '') }}" data-produk="{{ strtolower($item['nama_produk'] ?? '') }}" data-batch="{{ $item['batch_id'] }}">
                             <td>{{ date('d M Y, H:i', strtotime($item['tanggal_transaksi'] ?? '')) }}</td>
-                            <td>Batch #{{ $item['batch_id'] ?? '' }}</td>
+                            <td>{{ $item['kode_batch'] ?? '' }}</td>
                             <td>{{ $item['kode_pesanan'] }}</td>
                             <td class="product-cell">
                                 <div class="d-flex align-items-center">
@@ -338,7 +338,7 @@
                             <th>Kategori</th>
                             <th>Total Batch</th>
                             <th>Sisa Batch</th>
-                            <th>Batch Aktif</th>
+                            <th>Kode Batch Aktif</th>
                             <th>Stok Masuk</th>
                             <th>Stok Keluar</th>
                             <th>Sisa Stok</th>
@@ -373,7 +373,7 @@
                                 @if($item['is_batch_habis'])
                                     <span class="badge bg-danger">Batch Habis</span>
                                 @else
-                                    <span class="badge bg-success">{{ $item['batch_aktif'] }}</span>
+                                    <span class="badge bg-success">{{ $item['kode_batch_aktif'] }}</span>
                                 @endif
                             </td>
                             <td class="text-primary fw-bold">+{{ $item['stok_masuk'] ?? 0 }}</td>

@@ -427,7 +427,7 @@
                                             $statusTampilClass = strtolower(str_replace([' ', '_'], '_', $p->status_tampil ?? 'draft'));
                                         @endphp
                                         <tr>
-                                            <td>{{ $p->id }}</td>
+                                            <td>{{ $p->kode_produk }}</td>
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     <div class="img-container">

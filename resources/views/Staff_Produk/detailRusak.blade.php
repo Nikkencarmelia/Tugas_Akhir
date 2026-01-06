@@ -134,7 +134,8 @@
                     </div>
                     <div class="col-md-8">
                         <h4 class="fw-bold">{{ $produk->nama_produk ?? '-' }}</h4>
-                        <p class="text-muted">{{ $produk->deskripsi ?? '-' }}</p>
+                        <p class="text-muted mb-1">{{ $produk->deskripsi ?? '-' }}</p>
+                        <span class="badge bg-secondary mb-3">{{ $produk->kode_produk }}</span>
 
                         <div class="row mt-3">
                             <div class="col-6">
@@ -157,7 +158,7 @@
             </div>
 
             <div class="input-group batch-search">
-                <input type="text" class="form-control" id="batchSearch" placeholder="Cari batch rusak...">
+                <input type="text" class="form-control" id="batchSearch" placeholder="Cari Kode Produk, nama, batch, keterangan...">
                 <button class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
             </div>
         </div>
@@ -167,7 +168,7 @@
                 <table class="table align-middle" id="batchTable">
                     <thead>
                         <tr>
-                            <th>Batch</th>
+                            <th width="25%">Kode Batch</th>
                             <th>Tanggal Masuk</th>
                             <th>Harga saat ini</th>
                             <th>Jumlah Rusak</th>
@@ -180,7 +181,7 @@
                     <tbody>
                         @forelse($damaged_batches as $batch)
                         <tr>
-                            <td>Batch {{ $batch['batch_id'] }}</td>
+                            <td>{{ $batch['kode_batch'] ?? 'Batch '.$batch['batch_id'] }}</td>
                             <td>{{ $batch['tanggal_masuk'] }}</td>
                             <td class="harga-normal">{{ $batch['harga_normal'] }}</td>
                             <td>{{ $batch['jumlah_rusak'] ?? 0 }} unit</td>

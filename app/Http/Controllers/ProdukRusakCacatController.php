@@ -75,6 +75,7 @@ class ProdukRusakCacatController extends Controller
             $tanggalMasukFallback = $rusak->batch->tgl_masuk ?? now()->format('Y-m-d');
             return [
                 'batch_id' => $rusak->batch->id ?? 0,
+                'kode_batch' => $rusak->batch->kode_batch ?? '-',
                 'tanggal_masuk' => $rusak->batch->tgl_masuk_format ?? Carbon::parse($tanggalMasukFallback)->format('d/m/Y'),
                 'harga_normal' => 'Rp ' . number_format($rusak->batch->harga_normal ?? 0, 0, ',', '.'),
                 'jumlah_rusak' => $rusak->jumlah_rusak ?? 0,

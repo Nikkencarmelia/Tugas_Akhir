@@ -10,6 +10,7 @@ class Produk extends Model
     use HasFactory;
 
     protected $fillable = [
+        'kode_produk',
         'id_kategori',
         'id_satuan',
         'id_supplier',

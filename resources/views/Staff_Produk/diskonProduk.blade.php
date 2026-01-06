@@ -102,7 +102,7 @@
 
             <!-- Search Input -->
             <div class="input-group search-wrapper" style="width: 300px;">
-                <input type="text" name="search" class="form-control" placeholder="Cari ID, nama, deskripsi..." value="{{ request('search') }}">
+                <input type="text" name="search" class="form-control" placeholder="Cari Kode Produk, nama, deskripsi..." value="{{ request('search') }}">
                 <button class="input-group-text border-start-0" type="submit">
                     <i class="bi bi-search text-muted"></i>
                 </button>
@@ -115,7 +115,7 @@
             <table class="table align-middle">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>Kode Produk</th>
                         <th>Produk</th>
                         <th>Kategori</th>
                         <th>Satuan</th>
@@ -133,7 +133,7 @@
                             $kategoriStr = $p->kategori;
                         @endphp
                         <tr>
-                            <td>{{ $p->id }}</td>
+                            <td>{{ $p->kode_produk }}</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="img-container">
@@ -165,7 +165,7 @@
                                     data-status="{{ $p->status_tampil }}">
                                     <i class="bi bi-eye"></i>
                                 </button>
-                                <a href="{{ route('produk.batch.diskon', $p->id) }}" class="btn-action btn-batch">
+                                <a href="{{ route('produk.detailDiskon', $p->id) }}" class="btn-action btn-batch">
                                     <i class="bi bi-layers"></i>
                                 </a>
                             </td>
@@ -255,15 +255,20 @@ function colorizeSingle(badgeEl, text) {
 function colorizeBadges() {
     document.querySelectorAll('.badge-supplier, .badge-kategori').forEach(badge => {
         const text = badge.textContent.trim().toLowerCase();
-        colorizeSingle(badge, text);
+        if (text && text !== '-') colorizeSingle(badge, text);
     });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     colorizeBadges();
 
-    // Modal Event Listener
-    const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+    // Modal Event Listener - Robust handling
+    const modalEl = document.getElementById('detailModal');
+    if (!modalEl) return;
+    
+    // Use a single instance for everything
+    let detailModal = null;
+
     document.querySelectorAll('.btn-detail').forEach(btn => {
         btn.addEventListener('click', function() {
             const d = this.dataset;
@@ -280,12 +285,27 @@ document.addEventListener('DOMContentLoaded', () => {
             statusBadge.textContent = d.status;
             statusBadge.className = `badge-status badge-${d.status.toLowerCase().replace(/ /g,'_')}`;
 
+            // Lazy init modal to avoid conflicts
+            if (!detailModal) {
+                detailModal = new bootstrap.Modal(modalEl);
+            }
+            
             detailModal.show();
+            
+            // Re-colorize modal badges
             setTimeout(() => {
                 colorizeSingle(document.getElementById('detailSupplier'), d.supplier);
                 colorizeSingle(document.getElementById('detailKategori'), d.kategori);
             }, 50);
         });
+    });
+
+    // Cleanup backdrop on hide if it gets stuck
+    modalEl.addEventListener('hidden.bs.modal', function () {
+        document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
     });
 });
 </script>
