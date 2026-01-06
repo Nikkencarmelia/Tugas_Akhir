@@ -240,10 +240,10 @@
                     <small class="text-muted">Kelola batch stok produk</small>
                 </div>
 
-                <div class="input-group batch-search">
-                    <input type="text" class="form-control" id="batchSearch" placeholder="Cari batch...">
-                    <button class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
-                </div>
+                <form action="{{ url()->current() }}" method="GET" class="input-group batch-search">
+                    <input type="text" name="search" class="form-control" id="batchSearch" placeholder="Cari batch..." value="{{ request('search') }}">
+                    <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
+                </form>
             </div>
 
             <div class="table-card">
@@ -312,17 +312,7 @@
             </div>
 
             <nav aria-label="Batch pagination" class="mt-4">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">«</a>
-                    </li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">»</a>
-                    </li>
-                </ul>
+                {{ $batches->appends(['search' => request('search')])->links() }}
             </nav>
 
         </div>
@@ -646,8 +636,57 @@
             document.getElementById('hargaForm').action = `/staff_produk/batch/naik/${batchId}`;
         }
 
+        // AJAX LIVE SEARCH
+        const searchInput = document.getElementById('batchSearch');
+        let timeout = null;
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(timeout);
+                const query = this.value;
+
+                timeout = setTimeout(() => {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('search', query);
+                    url.searchParams.delete('page'); // Reset to page 1 on new search
+
+                    fetch(url)
+                        .then(response => response.text())
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            
+                            // Update Table
+                            const newTable = doc.querySelector('#batchTable tbody');
+                            const currentTable = document.querySelector('#batchTable tbody');
+                            
+                            if (newTable && currentTable) {
+                                currentTable.innerHTML = newTable.innerHTML;
+                            }
+
+                            // Update Pagination
+                            const newNav = doc.querySelector('nav[aria-label="Batch pagination"]');
+                            const currentNav = document.querySelector('nav[aria-label="Batch pagination"]');
+                            
+                            if (newNav && currentNav) {
+                                currentNav.innerHTML = newNav.innerHTML;
+                            }
+                            
+                            // Update URL without reload
+                            window.history.pushState({}, '', url);
+                            
+                            // Re-init badges color
+                            colorizeBadges();
+                        })
+                        .catch(err => console.error('Search failed', err));
+                }, 500); // Debounce 500ms
+            });
+        }
+
         // Event listener untuk diskon
         document.addEventListener('DOMContentLoaded', function() {
+            // FUNGSI SEARCH (Removed - uses server side)
+
             const discountPercent = document.getElementById('discountPercent');
             if (discountPercent) {
                 discountPercent.addEventListener('input', function() {

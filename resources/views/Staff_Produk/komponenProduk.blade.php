@@ -46,49 +46,43 @@
             .order-status{display:flex;align-items:center;gap:.5rem;padding:6px 12px;border-radius:20px;font-size:13px;font-weight:500;margin-bottom:1rem;}
             .status-menunggu-cari-kurir{background:#fff3cd;color:#856404;border:1px solid #ffeaa7;}
             @media(max-width:768px){.orders-header{flex-direction:column;gap:1rem;text-align:center}.order-header{flex-direction:column;gap:.5rem;align-items:flex-start}.order-product{flex-direction:column;text-align:center}.order-actions{justify-content:center}.select-controls{flex-wrap:wrap;gap:0.5rem;justify-content:flex-start;}.select-controls .input-group{max-width:200px !important;}.select-controls .form-select{max-width:140px !important;}}
-            /* Modern Modal Styles */
+            /* Modern Modal Styles (Synced with Profil) */
             .modal-content {
-                border-radius: 20px;
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+                border-radius: 12px;
                 border: none;
-                overflow: hidden;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             }
             .modal-header {
-                background: linear-gradient(135deg, #198754, #20c997);
+                background: #198754;
                 color: white;
-                border-bottom: none;
-                padding: 1.5rem 2rem;
-                border-radius: 20px 20px 0 0 !important;
+                border-radius: 12px 12px 0 0 !important;
+                padding: 1rem 1.5rem;
             }
             .modal-header .btn-close {
                 filter: invert(1);
-                opacity: 0.8;
-            }
-            .modal-header .btn-close:hover {
-                opacity: 1;
             }
             .modal-title {
                 font-weight: 600;
                 font-size: 1.25rem;
             }
             .modal-body {
-                padding: 2rem;
-                background: #fafbfc;
+                padding: 1.5rem;
+                background: #fff;
             }
             .modal-body .form-label {
                 font-weight: 500;
-                color: #495057;
-                font-size: 0.875rem;
+                color: #2a522a;
+                margin-bottom: 0.5rem;
             }
             .modal-body .form-control, .modal-body .form-select {
-                border-radius: 10px;
-                border: 1px solid #e9ecef;
-                padding: 0.75rem 1rem;
-                transition: all 0.2s ease;
+                border-radius: 8px;
+                border: 1px solid #ced4da;
+                padding: 10px 12px;
+                transition: border-color 0.2s ease;
             }
             .modal-body .form-control:focus, .modal-body .form-select:focus {
                 border-color: #198754;
-                box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.1);
+                box-shadow: 0 0 0 0.2rem rgba(25,135,84,0.1);
             }
             .table {
                 background: white;
@@ -104,32 +98,34 @@
                 padding: 1rem;
                 border-bottom: 2px solid #e9ecef;
             }
-            .table tbody tr {
-                transition: background-color 0.2s ease;
-            }
             .table tbody tr:hover {
                 background: #f8f9fa;
             }
             .table tbody td {
                 padding: 1rem;
-                vertical-align: middle;
                 border-color: #f1f3f4;
             }
             .btn-primary {
-                border-radius: 10px;
-                padding: 0.5rem 1rem;
-                font-weight: 500;
-                transition: all 0.2s ease;
+                background: #198754;
+                border: none;
+                border-radius: 20px;
+                padding: 10px 24px;
+                font-weight: 600;
             }
             .btn-primary:hover {
+                background: #157347;
                 transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+            }
+            .btn-secondary {
+                border-radius: 20px;
+                padding: 10px 24px;
+                font-weight: 500;
             }
             .modal-footer {
-                background: #f8f9fa;
-                border-top: 1px solid #e9ecef;
-                padding: 1.5rem 2rem;
-                border-radius: 0 0 20px 20px;
+                padding: 1rem 1.5rem;
+                border-top: 1px solid #dee2e6;
+                border-radius: 0 0 12px 12px;
+                background: #fff;
             }
             /* Custom Tab Buttons Style */
             .orders-tabs{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;}
@@ -166,6 +162,14 @@
             }
             .alert { border-radius: 10px; }
             .no-options { color: #dc3545; font-weight: 500; }
+            /* Danger Header for Delete Modal */
+            .modal-header-danger {
+                background: #dc3545;
+                color: white;
+                border-radius: 12px 12px 0 0 !important;
+                padding: 1rem 1.5rem;
+            }
+            .modal-header-danger .btn-close { filter: invert(1); }
         </style>
     </head>
     <body>
@@ -185,15 +189,15 @@
     @endif
     <!-- Custom Tab Buttons -->
     <div class="orders-tabs mb-4">
-        <a href="#" class="orders-tab active" data-tab="kategori">Kategori</a>
-        <a href="#" class="orders-tab" data-tab="satuan">Satuan</a>
-        <a href="#" class="orders-tab" data-tab="supplier">Supplier</a>
+        <a href="{{ route('produk.komponen.index', ['tab' => 'kategori']) }}" class="orders-tab {{ $activeTab == 'kategori' ? 'active' : '' }}" data-tab="kategori">Kategori</a>
+        <a href="{{ route('produk.komponen.index', ['tab' => 'satuan']) }}" class="orders-tab {{ $activeTab == 'satuan' ? 'active' : '' }}" data-tab="satuan">Satuan</a>
+        <a href="{{ route('produk.komponen.index', ['tab' => 'supplier']) }}" class="orders-tab {{ $activeTab == 'supplier' ? 'active' : '' }}" data-tab="supplier">Supplier</a>
     </div>
     <div class="tab-content">
         <!-- ============================
              TAB 1 — KATEGORI
         =============================-->
-        <div class="tab-panel active" id="kategori">
+        <div class="tab-panel {{ $activeTab == 'kategori' ? 'active' : '' }}" id="kategori">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-semibold">Data Kategori</h5>
                 <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalKategori">
@@ -239,7 +243,7 @@
         <!-- ============================
              TAB 2 — SATUAN
         =============================-->
-        <div class="tab-panel" id="satuan">
+        <div class="tab-panel {{ $activeTab == 'satuan' ? 'active' : '' }}" id="satuan">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-semibold">Data Satuan</h5>
                 <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalSatuan">
@@ -285,7 +289,7 @@
         <!-- ============================
              TAB 3 — SUPPLIER
         =============================-->
-        <div class="tab-panel" id="supplier">
+        <div class="tab-panel {{ $activeTab == 'supplier' ? 'active' : '' }}" id="supplier">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-semibold">Data Supplier</h5>
                 <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalSupplier">
@@ -610,9 +614,9 @@
 <div class="modal fade" id="modalDeleteConfirm" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
+            <div class="modal-header modal-header-danger">
                 <h5 class="modal-title">Konfirmasi Hapus</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <p>Apakah Anda yakin ingin menghapus <strong id="deleteName"></strong>?</p>
@@ -649,13 +653,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // TAMBAHAN: Tab Switching
     const tabs = document.querySelectorAll('.orders-tab');
     const panels = document.querySelectorAll('.tab-panel');
+    
+    function activateTab(tabName) {
+        tabs.forEach(t => {
+            t.classList.remove('active');
+            if(t.dataset.tab === tabName) t.classList.add('active');
+        });
+        panels.forEach(p => {
+            p.classList.remove('active');
+            if(p.id === tabName) p.classList.add('active');
+        });
+    }
+
     tabs.forEach(tab => {
         tab.addEventListener('click', e => {
             e.preventDefault();
-            tabs.forEach(t => t.classList.remove('active'));
-            panels.forEach(p => p.classList.remove('active'));
-            tab.classList.add('active');
-            document.getElementById(tab.dataset.tab).classList.add('active');
+            activateTab(tab.dataset.tab);
         });
     });
 
@@ -730,24 +743,35 @@ document.addEventListener('DOMContentLoaded', function() {
         const submitBtn = document.getElementById(`submitMove${capitalType}`);
         const batalBtn = document.getElementById(`batalMove${capitalType}`);
 
-        // Reset select: hapus semua option kecuali placeholder
-        select.querySelectorAll('option:not([value=""])').forEach(opt => opt.remove());
+        // Capture placeholder logic
+        const placeholderText = `Pilih ${capitalType} Lain`;
+        
+        // ROBUST RESET: Clear entirely and re-add placeholder
+        select.innerHTML = ''; 
+        const placeholderOpt = document.createElement('option');
+        placeholderOpt.value = "";
+        placeholderOpt.textContent = placeholderText;
+        select.appendChild(placeholderOpt);
 
+        const addedIds = new Set();
         let hasOptions = false;
+
         allRows.forEach(row => {
-            if (row.dataset.id != excludeId) {
+            const id = row.dataset.id;
+            // Only add if not excluded and not already added
+            if (id != excludeId && !addedIds.has(id)) {
                 const opt = document.createElement('option');
-                opt.value = row.dataset.id;
+                opt.value = id;
                 opt.textContent = row.querySelector('td:nth-child(2)').textContent.trim();
                 select.appendChild(opt);
+                
+                addedIds.add(id);
                 hasOptions = true;
             }
         });
 
-        // PERBAIKAN: Set default ke placeholder supaya kotak utama kosong, hilangkan "double" visual
-        if (hasOptions) {
-            select.selectedIndex = 0;  // Pilih placeholder "Pilih Kategori Lain"
-        }
+        // Set default to placeholder
+        select.selectedIndex = 0;
 
         if (!hasOptions) {
             noOptionsDiv.style.display = 'block';
@@ -778,28 +802,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const capitalType = capitalize(type);
 
         if (count === 0) {
-            if (confirm(`Yakin hapus ${type}?`)) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = destroyUrl;
-                const inputs = [
-                    {name: '_token', value: "{{ csrf_token() }}", type: 'hidden'},
-                    {name: '_method', value: 'DELETE', type: 'hidden'}
-                ];
-                inputs.forEach(i => {
-                    const input = document.createElement('input');
-                    input.type = i.type;
-                    input.name = i.name;
-                    input.value = i.value;
-                    form.appendChild(input);
-                });
-                document.body.appendChild(form);
-                form.submit();
-            }
+            document.getElementById('deleteName').textContent = nama;
+            // Simpan URL di tombol konfirmasi
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            confirmBtn.dataset.url = destroyUrl; 
+            
+            // Show Modal
+            new bootstrap.Modal(document.getElementById('modalDeleteConfirm')).show();
         } else {
             document.getElementById(`moveSourceId${capitalType}`).value = id;
             populateMoveSelect(capitalType, id);
-            document.getElementById(`moveCount${capitalType}`).textContent = `${count} produk`;
+            document.getElementById(`moveCount${capitalType}`).textContent = count;
             document.getElementById(`moveModalTitle${capitalType}`).textContent = `Pindahkan Produk dari "${nama}" ke ${type} lain`;
             new bootstrap.Modal(document.getElementById(`modalMove${capitalType}`)).show();
         }
@@ -814,6 +827,29 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     document.querySelectorAll('.btn-delete-sup').forEach(btn => {
         btn.addEventListener('click', () => handleDelete('supplier', btn));
+    });
+
+    // Action listener for Confirm Delete Button
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        const url = this.dataset.url;
+        if(url) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = url;
+            const inputs = [
+                {name: '_token', value: "{{ csrf_token() }}", type: 'hidden'},
+                {name: '_method', value: 'DELETE', type: 'hidden'}
+            ];
+            inputs.forEach(i => {
+                const input = document.createElement('input');
+                input.type = i.type;
+                input.name = i.name;
+                input.value = i.value;
+                form.appendChild(input);
+            });
+            document.body.appendChild(form);
+            form.submit();
+        }
     });
 });
 </script>

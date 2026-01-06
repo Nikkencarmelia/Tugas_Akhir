@@ -33,7 +33,7 @@
             background: var(--white); padding: 1.5rem 2rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
         .batch-header h3 { color: #2a522a; margin: 0; display: flex; align-items: center; gap: .5rem; }
-        .batch-search { width: 300px !important; max-width: 100%; }
+        .batch-search { width: 500px !important; max-width: 500px !important; }
 
         .table-card { background: var(--white); border-radius: .8rem; border: 1px solid var(--border-color); box-shadow: 0 2px 8px var(--shadow); overflow: hidden; }
         .table th { background: var(--green-soft); color: var(--green-text); font-weight: 600; font-size: .85rem; text-transform: uppercase; letter-spacing: .3px; }
@@ -121,10 +121,10 @@
             <h3> Daftar Batch Diskon <span class="badge bg-success ms-2">{{ $batches->count() }}</span></h3>
             <small class="text-muted">Batch yang sedang mendapatkan promo diskon</small>
         </div>
-        <div class="input-group batch-search">
-            <input type="text" class="form-control" placeholder="Cari batch..." id="searchBatch">
-            <button class="btn btn-outline-secondary" type="button" onclick="applyBatchSearch()">Search</button>
-        </div>
+        <form action="{{ url()->current() }}" method="GET" class="input-group batch-search">
+            <input type="text" name="search" class="form-control" placeholder="Cari batch..." id="batchSearch" value="{{ request('search') }}">
+            <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
+        </form>
     </div>
 
     <!-- TABEL BATCH DISKON -->
@@ -148,7 +148,7 @@
                         <tr>
                             <td><strong>Batch {{ $batch->id }}</strong></td>
                             <td>{{ $batch->tgl_masuk_format }}</td>
-                            <td>{{ $batch->tgl_kadaluarsa_format }}</td>
+                            <td>{{ $batch->tgl_kadaluwarsa_format }}</td>
                             <td class="text-center fw-bold {{ $batch->sisa_color }}" title="Debug: Raw Diff={{ $batch->diff ?? 'N/A' }} hari">
                                 {{ $batch->sisa_text }}
                             </td>
@@ -168,13 +168,60 @@
             </table>
         </div>
     </div>
+    
+    <nav aria-label="Batch pagination" class="mt-4">
+        {{ $batches->appends(['search' => request('search')])->links() }}
+    </nav>
 </div>
 
 <script>
-function applyBatchSearch() {
-    // Implementasi JS filter jika diperlukan, tapi sementara kosong
-    console.log('Search applied');
+// AJAX LIVE SEARCH
+const searchInput = document.getElementById('batchSearch');
+let timeout = null;
+
+if (searchInput) {
+    searchInput.addEventListener('input', function() {
+        clearTimeout(timeout);
+        const query = this.value;
+
+        timeout = setTimeout(() => {
+            const url = new URL(window.location.href);
+            url.searchParams.set('search', query);
+            url.searchParams.delete('page');
+
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    
+                    const newTable = doc.querySelector('#batchTableBody');
+                    const currentTable = document.querySelector('#batchTableBody');
+                    
+                    if (newTable && currentTable) {
+                        currentTable.innerHTML = newTable.innerHTML;
+                    }
+
+                    const newNav = doc.querySelector('nav[aria-label="Batch pagination"]');
+                    const currentNav = document.querySelector('nav[aria-label="Batch pagination"]');
+                    
+                    if (newNav && currentNav) {
+                        currentNav.innerHTML = newNav.innerHTML;
+                    }
+                    
+                    window.history.pushState({}, '', url);
+                    colorizeBadges();
+                })
+                .catch(err => console.error('Search failed', err));
+        }, 500);
+    });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // REMOVED JS SEARCH - Handled by server-side
+
+    colorizeBadges();
+});
 
 // Colorize badges supplier & kategori (mirip halaman sebelumnya)
 function colorizeBadges() {

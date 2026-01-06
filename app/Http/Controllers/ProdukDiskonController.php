@@ -127,19 +127,33 @@ class ProdukDiskonController extends Controller
         return view('Staff_Produk.diskonProduk', compact('produkDiskon'));
     }
 
-    public function detailDiskon($id_produk)
+    public function detailDiskon($id_produk, Request $request)
     {
         $produk = Produk::with(['kategori', 'supplier', 'satuan'])->findOrFail($id_produk);
 
-        $batches = Batch::where('id_produk', $id_produk)
-            ->whereColumn('harga_saat_ini', '<', 'harga_normal') // Hanya batch yang sedang diskon
-            ->latest()
-            ->get()
-            ->map(function ($batch) {
+        $query = Batch::where('id_produk', $id_produk)
+            ->whereColumn('harga_saat_ini', '<', 'harga_normal'); // Hanya batch yang sedang diskon
+
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('id', 'like', "%{$search}%")
+                  ->orWhere('harga_normal', 'like', "%{$search}%")
+                  ->orWhere('harga_saat_ini', 'like', "%{$search}%")
+                  ->orWhere('stok', 'like', "%{$search}%")
+                  ->orWhere('keterangan_harga', 'like', "%{$search}%")
+                  ->orWhere('tgl_masuk', 'like', "%{$search}%")
+                  ->orWhere('tgl_kadaluwarsa', 'like', "%{$search}%");
+            });
+        }
+
+        $batches = $query->latest()
+            ->paginate(10)
+            ->through(function ($batch) {
                 // FORMAT TANGGAL
                 $batch->tgl_masuk_format = Carbon::parse($batch->tgl_masuk)->format('d/m/Y');
-                $batch->tgl_kadaluarsa_format = Carbon::parse($batch->tgl_kadaluwarsa)->format('d/m/Y');
-                $batch->tgl_perubahan_format = $batch->tgl_perubahan_harga ? Carbon::parse($batch->tgl_perubahan_harga)->format('d/m/Y') : '-';
+                $batch->tgl_kadaluwarsa_format = Carbon::parse($batch->tgl_kadaluwarsa)->format('d/m/Y');
+                $batch->tgl_perubahan_format = $batch->tgl_perubahan_harga ? Carbon::parse($batch->tgl_perubahan_harga)->format('d/m/Y H:i') : '-';
 
                 // SISA HARI
                 $today = Carbon::today();
@@ -190,7 +204,10 @@ class ProdukDiskonController extends Controller
                 return $batch;
             });
 
-        $total_stok = $batches->sum('stok');
+        // Hitung total stok (dari semua batch diskon, bukan page ini saja)
+        $total_stok = Batch::where('id_produk', $id_produk)
+            ->whereColumn('harga_saat_ini', '<', 'harga_normal')
+            ->sum('stok');
         $status_stok = $total_stok <= 0 ? 'Habis' : ($total_stok <= 10 ? 'Menipis' : 'Tersedia');
 
         // Fallback untuk produk (mirip produkDiskon)

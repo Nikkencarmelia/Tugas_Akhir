@@ -41,6 +41,9 @@
         .product-info small { color: var(--text-muted); display: block; font-size: .8rem; }
         .badge-status { padding: .3rem .9rem; border-radius: 1rem; font-size: .75rem; font-weight: 600; display: inline-block; margin-right: .25rem; line-height: 1.5; }
         .badge-diarsipkan { background: #E5E7EB; color: #374151; }
+        .badge-tersedia { background: #DBEAFE; color: #1E40AF; }
+        .badge-menipis { background: #FEF3C7; color: #92400E; }
+        .badge-habis { background: #FEE2E2; color: #991B1B; }
         .btn-action { border: none; border-radius: .4rem; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: .85rem; margin-right: .25rem; transition: .25s ease; text-decoration: none; }
         .btn-action:hover { transform: scale(1.1); }
         .btn-detail { background: var(--green-primary); }
@@ -163,7 +166,7 @@
                         <p id="detailDeskripsi" class="text-muted"></p>
                         <div class="row">
                             <div class="col-6">
-                                <p class="mb-1"><strong>Supplier:</strong> <span id="detailSupplier" class="badge-supplier"></span></p>
+                                <p class="mb-1"><strong>Supplier:</strong> <span id="detailSupplier" class="badge-kategori"></span></p>
                                 <p class="mb-1"><strong>Satuan:</strong> <span id="detailSatuan"></span></p>
                             </div>
                             <div class="col-6">

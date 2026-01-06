@@ -161,7 +161,7 @@
                         <p id="detailDeskripsi" class="text-muted"></p>
                         <div class="row">
                             <div class="col-6">
-                                <p class="mb-1"><strong>Supplier:</strong> <span id="detailSupplier" class="badge-supplier"></span></p>
+                                <p class="mb-1"><strong>Supplier:</strong> <span id="detailSupplier" class="badge-kategori"></span></p>
                                 <p class="mb-1"><strong>Satuan:</strong> <span id="detailSatuan"></span></p>
                             </div>
                             <div class="col-6">

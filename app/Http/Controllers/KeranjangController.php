@@ -11,11 +11,133 @@ use App\Models\Produk;
 use App\Models\Batch;
 use App\Models\Alamat;
 use App\Models\Kecamatan;
+use App\Models\Keranjang;
 
 class KeranjangController extends Controller
 {
+    /**
+     * Sync cart dari session ke database (untuk user yang login)
+     */
+    private function syncCartToDatabase()
+    {
+        if (!Auth::check()) {
+            return;
+        }
+
+        $user = Auth::user();
+        $cart = Session::get('cart', []);
+
+        // Ambil semua cart keys yang ada di session
+        $sessionCartKeys = [];
+        foreach ($cart as $key => $item) {
+            $sessionCartKeys[] = [
+                'id_produk' => $item['product_id'],
+                'id_batch' => $item['batch_id'] ?? null,
+            ];
+        }
+
+        // Hapus item yang tidak ada lagi di session
+        $existingKeranjangs = Keranjang::where('id_user', $user->id)->get();
+        foreach ($existingKeranjangs as $keranjang) {
+            $found = false;
+            foreach ($sessionCartKeys as $key) {
+                if ($keranjang->id_produk == $key['id_produk'] && 
+                    $keranjang->id_batch == $key['id_batch']) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $keranjang->delete();
+            }
+        }
+
+        // Update atau create item dari session ke database
+        foreach ($cart as $item) {
+            Keranjang::updateOrCreate(
+                [
+                    'id_user' => $user->id,
+                    'id_produk' => $item['product_id'],
+                    'id_batch' => $item['batch_id'] ?? null,
+                ],
+                [
+                    'quantity' => $item['quantity'],
+                ]
+            );
+        }
+    }
+
+    /**
+     * Load cart dari database ke session (untuk user yang login)
+     */
+    private function loadCartFromDatabase()
+    {
+        if (!Auth::check()) {
+            return;
+        }
+
+        $user = Auth::user();
+        $keranjangs = Keranjang::with(['produk.satuan', 'batch'])
+            ->where('id_user', $user->id)
+            ->get();
+
+        $cart = [];
+        foreach ($keranjangs as $keranjang) {
+            $produk = $keranjang->produk;
+            if (!$produk || $produk->status_tampil !== 'Ditampilkan') {
+                continue; // Skip produk yang tidak ditampilkan
+            }
+
+            // Cek stok masih tersedia
+            $batchQuery = Batch::where('id_produk', $produk->id)->where('stok', '>', 0);
+            if ($keranjang->id_batch) {
+                $batchQuery->where('id', $keranjang->id_batch);
+            }
+            $totalStok = $batchQuery->sum('stok');
+
+            if ($totalStok <= 0) {
+                continue; // Skip jika stok habis
+            }
+
+            // Ambil batch untuk harga
+            $batchQueryForPrice = Batch::where('id_produk', $produk->id)->where('stok', '>', 0);
+            if ($keranjang->id_batch) {
+                $batchQueryForPrice->where('id', $keranjang->id_batch);
+            } else {
+                $batchQueryForPrice->orderBy('tgl_masuk', 'asc');
+            }
+            $batchTertua = $batchQueryForPrice->first();
+
+            if (!$batchTertua) {
+                continue;
+            }
+
+            $cartKey = $produk->id;
+            if ($keranjang->id_batch) {
+                $cartKey = $produk->id . '_' . $keranjang->id_batch;
+            }
+
+            $cart[$cartKey] = [
+                'product_id' => $produk->id,
+                'batch_id' => $keranjang->id_batch,
+                'nama_produk' => $produk->nama_produk,
+                'harga' => $batchTertua->harga_saat_ini,
+                'gambar' => $produk->gambar ? asset('storage/' . $produk->gambar) : asset('images/default-product.jpg'),
+                'satuan_berat' => ($produk->jumlah_satuan ?? 1) . ' ' . ($produk->satuan?->nama_satuan ?? 'pcs'),
+                'quantity' => min($keranjang->quantity, $totalStok) // Pastikan tidak melebihi stok
+            ];
+        }
+
+        Session::put('cart', $cart);
+    }
+
     public function index()
     {
+        // Load cart dari database jika user login
+        if (Auth::check()) {
+            $this->loadCartFromDatabase();
+        }
+
         // Bersihkan session buy_now jika masuk ke halaman keranjang biasa
         if (session()->has('buy_now')) {
             session()->forget('buy_now');
@@ -192,6 +314,12 @@ class KeranjangController extends Controller
             }
 
             Session::put('cart', $cart);
+            
+            // Sync ke database jika user login
+            if (Auth::check()) {
+                $this->syncCartToDatabase();
+            }
+            
             Log::info('Cart updated successfully', ['key' => $cartKey, 'cart_size' => count($cart)]);
 
             $cartCount = array_sum(array_column($cart, 'quantity'));
@@ -390,6 +518,11 @@ class KeranjangController extends Controller
             $cart[$cartKey]['quantity'] = $quantity;
             Session::put('cart', $cart);
 
+            // Sync ke database jika user login
+            if (Auth::check()) {
+                $this->syncCartToDatabase();
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Quantity berhasil diupdate!'
@@ -440,6 +573,11 @@ class KeranjangController extends Controller
 
         Session::put('cart', $cart);
 
+        // Sync ke database jika user login
+        if (Auth::check()) {
+            $this->syncCartToDatabase();
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Item berhasil dihapus dari keranjang!'
@@ -469,6 +607,11 @@ class KeranjangController extends Controller
         unset($cart[$id]);
         Session::put('cart', $cart);
 
+        // Sync ke database jika user login
+        if (Auth::check()) {
+            $this->syncCartToDatabase();
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Item berhasil dihapus dari keranjang!'
@@ -481,6 +624,11 @@ class KeranjangController extends Controller
     public function clear()
     {
         Session::forget('cart');
+
+        // Hapus dari database juga jika user login
+        if (Auth::check()) {
+            Keranjang::where('id_user', Auth::id())->delete();
+        }
 
         return response()->json([
             'success' => true,

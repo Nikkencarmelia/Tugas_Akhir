@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Kelola Ongkir & Daerah</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -49,19 +50,19 @@
         .status-menunggu-cari-kurir{background:#fff3cd;color:#856404;border:1px solid #ffeaa7;}
         @media(max-width:768px){.orders-header{flex-direction:column;gap:1rem;text-align:center}.order-header{flex-direction:column;gap:.5rem;align-items:flex-start}.order-product{flex-direction:column;text-align:center}.order-actions{justify-content:center}.select-controls{flex-wrap:wrap;gap:0.5rem;justify-content:flex-start;}.select-controls .input-group{max-width:200px !important;}.select-controls .form-select{max-width:140px !important;}}
 
-        /* Modern Modal Styles */
+        /* Modern Modal Styles - Synced with User/profil.blade.php */
         .modal-content {
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
             border: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             overflow: hidden;
         }
         .modal-header {
-            background: linear-gradient(135deg, #198754, #20c997);
+            background: #198754;
             color: white;
             border-bottom: none;
-            padding: 1.5rem 2rem;
-            border-radius: 20px 20px 0 0 !important;
+            padding: 1rem 1.5rem;
+            border-radius: 12px 12px 0 0 !important;
         }
         .modal-header .btn-close {
             filter: invert(1);
@@ -131,8 +132,8 @@
         .modal-footer {
             background: #f8f9fa;
             border-top: 1px solid #e9ecef;
-            padding: 1.5rem 2rem;
-            border-radius: 0 0 20px 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 0 0 12px 12px;
         }
 
         /* Custom Tab Buttons Style */
@@ -167,6 +168,14 @@
         .alert {
             border-radius: 10px;
         }
+        /* Update Modal Header for Delete */
+        .modal-header-danger {
+            background: #dc3545;
+            color: white;
+            border-radius: 12px 12px 0 0 !important;
+            padding: 1rem 1.5rem;
+        }
+        .modal-header-danger .btn-close { filter: invert(1); }
     </style>
 </head>
 <body>
@@ -232,13 +241,11 @@
                                         <button class="btn btn-warning btn-sm btn-edit-kec" data-bs-toggle="modal" data-bs-target="#modalKecamatan" data-id="{{ $item->id }}" data-nama="{{ $item->nama_kecamatan }}" data-ongkir-mobil="{{ $item->ongkir_minimal_mobil }}" data-ongkir-motor="{{ $item->ongkir_minimal_motor }}">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <form action="{{ route('staff_purchasing.kecamatan.destroy', $item->id) }}" method="POST" style="display: inline-block;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus kecamatan ini?')">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
+                                        <button class="btn btn-danger btn-sm btn-delete-kec" 
+                                            data-url="{{ route('staff_purchasing.kecamatan.destroy', $item->id) }}" 
+                                            data-nama="{{ $item->nama_kecamatan }}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             @empty
@@ -305,13 +312,11 @@
                                         <button class="btn btn-warning btn-sm btn-edit-kel" data-bs-toggle="modal" data-bs-target="#modalKelurahan" data-id="{{ $item->id }}" data-nama="{{ $item->nama_kelurahan }}" data-kec="{{ $item->id_kecamatan }}">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <form action="{{ route('staff_purchasing.kelurahan.destroy', $item->id) }}" method="POST" style="display: inline-block;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus kelurahan ini?')">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
+                                        <button class="btn btn-danger btn-sm btn-delete-kel" 
+                                            data-url="{{ route('staff_purchasing.kelurahan.destroy', $item->id) }}" 
+                                            data-nama="{{ $item->nama_kelurahan }}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             @empty
@@ -387,13 +392,11 @@
                                         <button class="btn btn-warning btn-sm btn-edit-kp" data-bs-toggle="modal" data-bs-target="#modalKodePos" data-id="{{ $item->id }}" data-kode="{{ $item->kode_pos }}" data-kel="{{ $item->id_kelurahan }}">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <form action="{{ route('staff_purchasing.kodepos.destroy', $item->id) }}" method="POST" style="display: inline-block;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus kode pos ini?')">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
+                                        <button class="btn btn-danger btn-sm btn-delete-kp" 
+                                            data-url="{{ route('staff_purchasing.kodepos.destroy', $item->id) }}" 
+                                            data-nama="{{ $item->kode_pos }}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             @empty
@@ -516,6 +519,26 @@
         </div>
     </div>
 
+    {{-- Modal Konfirmasi Hapus --}}
+    <div class="modal fade" id="modalDeleteConfirm" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header modal-header-danger">
+                    <h5 class="modal-title">Konfirmasi Hapus</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Apakah Anda yakin ingin menghapus <strong id="deleteName"></strong>?</p>
+                    <p class="text-danger small mb-0"><i class="bi bi-exclamation-triangle"></i> Data yang dihapus tidak dapat dikembalikan.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Hapus</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Container -->
     <div class="toast-container">
         <div id="toastSuccess" class="toast align-items-center text-white bg-success border-0" role="alert" data-bs-autohide="true" data-bs-delay="5000">
@@ -598,6 +621,49 @@
             document.getElementById('formKecamatan').dataset.defaultAction = `{{ route('staff_purchasing.kecamatan.store') }}`;
             document.getElementById('formKelurahan').dataset.defaultAction = `{{ route('staff_purchasing.kelurahan.store') }}`;
             document.getElementById('formKodePos').dataset.defaultAction = `{{ route('staff_purchasing.kodepos.store') }}`;
+            
+            // Delete Logic
+            let deleteUrl = '';
+            
+            function setupDeleteListener(selector) {
+                document.querySelectorAll(selector).forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        deleteUrl = this.dataset.url;
+                        const nama = this.dataset.nama;
+                        document.getElementById('deleteName').textContent = nama;
+                        new bootstrap.Modal(document.getElementById('modalDeleteConfirm')).show();
+                    });
+                });
+            }
+
+            setupDeleteListener('.btn-delete-kec');
+            setupDeleteListener('.btn-delete-kel');
+            setupDeleteListener('.btn-delete-kp');
+
+            document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+                if (deleteUrl) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = deleteUrl;
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').content; // Note: Ensure meta tag exists or use @csrf blade equivalent in JS injection
+                    
+                    const inputs = [
+                        {name: '_token', value: '{{ csrf_token() }}', type: 'hidden'},
+                        {name: '_method', value: 'DELETE', type: 'hidden'}
+                    ];
+                    
+                    inputs.forEach(i => {
+                        const input = document.createElement('input');
+                        input.type = i.type;
+                        input.name = i.name;
+                        input.value = i.value;
+                        form.appendChild(input);
+                    });
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
         });
 
         document.addEventListener('click', function(e) {

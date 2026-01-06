@@ -14,12 +14,15 @@ class KomponenProdukController extends Controller
      * INDEX
      * Halaman kelola Kategori, Supplier, Satuan
      */
-    public function index()
+    public function index(Request $request)
     {
+        $activeTab = $request->get('tab', 'kategori');
+
         return view('Staff_Produk.komponenProduk', [
             'kategori' => Kategori::withCount('produk')->latest()->get(),
             'supplier' => Supplier::withCount('produk')->latest()->get(),
             'satuan'   => Satuan::withCount('produk')->latest()->get(),
+            'activeTab' => $activeTab
         ]);
     }
 
@@ -36,7 +39,7 @@ class KomponenProdukController extends Controller
             'nama_kategori' => $nama,
         ]);
 
-        return back()->with('success', "Kategori dengan nama \"{$nama}\" telah dibuat!");
+        return redirect()->route('produk.komponen.index', ['tab' => 'kategori'])->with('success', "Kategori dengan nama \"{$nama}\" telah dibuat!");
     }
 
     public function updateKategori(Request $request, $id)
@@ -58,7 +61,7 @@ class KomponenProdukController extends Controller
         // Jika pakai FK, skip ini
         // Produk::where('nama_kategori', $namaLama)->update(['nama_kategori' => $namaBaru]);
 
-        return back()->with('success', "Kategori dengan nama \"{$namaBaru}\" telah diubah!");
+        return redirect()->route('produk.komponen.index', ['tab' => 'kategori'])->with('success', "Kategori dengan nama \"{$namaBaru}\" telah diubah!");
     }
 
     public function destroyKategori($id)
@@ -66,13 +69,13 @@ class KomponenProdukController extends Controller
         $kategori = Kategori::withCount('produk')->findOrFail($id);
 
         if ($kategori->produk_count > 0) {
-            return back()->with('error', 'Kategori tidak dapat dihapus karena masih digunakan oleh produk. Pindahkan dulu semua produk ke kategori lain.');
+            return redirect()->route('produk.komponen.index', ['tab' => 'kategori'])->with('error', 'Kategori tidak dapat dihapus karena masih digunakan oleh produk. Pindahkan dulu semua produk ke kategori lain.');
         }
 
         $nama = $kategori->nama_kategori;
         $kategori->delete();
 
-        return back()->with('success', "Kategori dengan nama \"{$nama}\" telah dihapus!");
+        return redirect()->route('produk.komponen.index', ['tab' => 'kategori'])->with('success', "Kategori dengan nama \"{$nama}\" telah dihapus!");
     }
 
     // TAMBAHAN: Move semua produk dari source kategori ke target
@@ -92,7 +95,7 @@ class KomponenProdukController extends Controller
         // Hapus source setelah move
         $source->delete();
 
-        return back()->with('success', "Berhasil memindahkan {$movedCount} produk dari \"{$source->nama_kategori}\" ke \"{$target->nama_kategori}\". Kategori \"{$source->nama_kategori}\" telah dihapus!");
+        return redirect()->route('produk.komponen.index', ['tab' => 'kategori'])->with('success', "Berhasil memindahkan {$movedCount} produk dari \"{$source->nama_kategori}\" ke \"{$target->nama_kategori}\". Kategori \"{$source->nama_kategori}\" telah dihapus!");
     }
 
     // ================= SUPPLIER =================
@@ -109,7 +112,7 @@ class KomponenProdukController extends Controller
             'nama_supplier' => $nama,
         ]);
 
-        return back()->with('success', "Supplier dengan nama \"{$nama}\" telah dibuat!");
+        return redirect()->route('produk.komponen.index', ['tab' => 'supplier'])->with('success', "Supplier dengan nama \"{$nama}\" telah dibuat!");
     }
 
     public function updateSupplier(Request $request, $id)
@@ -129,7 +132,7 @@ class KomponenProdukController extends Controller
         // Update di produk jika nama disimpan di sana (asumsi FK, skip jika pure FK)
         // Produk::where('nama_supplier', $namaLama)->update(['nama_supplier' => $namaBaru]);
 
-        return back()->with('success', "Supplier dengan nama \"{$namaBaru}\" telah diubah!");
+        return redirect()->route('produk.komponen.index', ['tab' => 'supplier'])->with('success', "Supplier dengan nama \"{$namaBaru}\" telah diubah!");
     }
 
     public function destroySupplier($id)
@@ -137,13 +140,13 @@ class KomponenProdukController extends Controller
         $supplier = Supplier::withCount('produk')->findOrFail($id);
 
         if ($supplier->produk_count > 0) {
-            return back()->with('error', 'Supplier tidak dapat dihapus karena masih digunakan oleh produk. Pindahkan dulu semua produk ke supplier lain.');
+            return redirect()->route('produk.komponen.index', ['tab' => 'supplier'])->with('error', 'Supplier tidak dapat dihapus karena masih digunakan oleh produk. Pindahkan dulu semua produk ke supplier lain.');
         }
 
         $nama = $supplier->nama_supplier;
         $supplier->delete();
 
-        return back()->with('success', "Supplier dengan nama \"{$nama}\" telah dihapus!");
+        return redirect()->route('produk.komponen.index', ['tab' => 'supplier'])->with('success', "Supplier dengan nama \"{$nama}\" telah dihapus!");
     }
 
     // TAMBAHAN: Move semua produk dari source supplier ke target
@@ -163,7 +166,7 @@ class KomponenProdukController extends Controller
         // Hapus source setelah move
         $source->delete();
 
-        return back()->with('success', "Berhasil memindahkan {$movedCount} produk dari \"{$source->nama_supplier}\" ke \"{$target->nama_supplier}\". Supplier \"{$source->nama_supplier}\" telah dihapus!");
+        return redirect()->route('produk.komponen.index', ['tab' => 'supplier'])->with('success', "Berhasil memindahkan {$movedCount} produk dari \"{$source->nama_supplier}\" ke \"{$target->nama_supplier}\". Supplier \"{$source->nama_supplier}\" telah dihapus!");
     }
 
     // ================= SATUAN (NAMA SAJA) =================
@@ -179,7 +182,7 @@ class KomponenProdukController extends Controller
             'nama_satuan' => $nama,
         ]);
 
-        return back()->with('success', "Satuan dengan nama \"{$nama}\" telah dibuat!");
+        return redirect()->route('produk.komponen.index', ['tab' => 'satuan'])->with('success', "Satuan dengan nama \"{$nama}\" telah dibuat!");
     }
 
     public function updateSatuan(Request $request, $id)
@@ -199,7 +202,7 @@ class KomponenProdukController extends Controller
         // Update di produk jika nama disimpan di sana (asumsi FK, skip jika pure FK)
         // Produk::where('nama_satuan', $namaLama)->update(['nama_satuan' => $namaBaru]);
 
-        return back()->with('success', "Satuan dengan nama \"{$namaBaru}\" telah diubah!");
+        return redirect()->route('produk.komponen.index', ['tab' => 'satuan'])->with('success', "Satuan dengan nama \"{$namaBaru}\" telah diubah!");
     }
 
     public function destroySatuan($id)
@@ -207,13 +210,13 @@ class KomponenProdukController extends Controller
         $satuan = Satuan::withCount('produk')->findOrFail($id);
 
         if ($satuan->produk_count > 0) {
-            return back()->with('error', 'Satuan tidak dapat dihapus karena masih digunakan oleh produk. Pindahkan dulu semua produk ke satuan lain.');
+            return redirect()->route('produk.komponen.index', ['tab' => 'satuan'])->with('error', 'Satuan tidak dapat dihapus karena masih digunakan oleh produk. Pindahkan dulu semua produk ke satuan lain.');
         }
 
         $nama = $satuan->nama_satuan;
         $satuan->delete();
 
-        return back()->with('success', "Satuan dengan nama \"{$nama}\" telah dihapus!");
+        return redirect()->route('produk.komponen.index', ['tab' => 'satuan'])->with('success', "Satuan dengan nama \"{$nama}\" telah dihapus!");
     }
 
     // TAMBAHAN: Move semua produk dari source satuan ke target
@@ -233,7 +236,7 @@ class KomponenProdukController extends Controller
         // Hapus source setelah move
         $source->delete();
 
-        return back()->with('success', "Berhasil memindahkan {$movedCount} produk dari \"{$source->nama_satuan}\" ke \"{$target->nama_satuan}\". Satuan \"{$source->nama_satuan}\" telah dihapus!");
+        return redirect()->route('produk.komponen.index', ['tab' => 'satuan'])->with('success', "Berhasil memindahkan {$movedCount} produk dari \"{$source->nama_satuan}\" ke \"{$target->nama_satuan}\". Satuan \"{$source->nama_satuan}\" telah dihapus!");
     }
 }
 
