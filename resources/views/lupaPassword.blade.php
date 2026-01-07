@@ -60,7 +60,6 @@
                 <div class="col-md-6 p-5 left-box d-flex flex-column justify-content-center">
                     <h2 class="fw-bold mb-2">Food Center</h2>
                     <p>Dinas Ketahanan Pangan Kabupaten Kutai Barat</p>
-                    <img src="https://i.imgur.com/n8f8k0v.png" class="img-fluid mt-auto" style="max-height:250px">
                 </div>
 
                 <!-- KANAN -->
@@ -104,7 +103,7 @@
                         </div>
 
                         <button type="submit" class="btn w-100 text-white mb-3" style="background:#2A522A">
-                            Kirim Link Reset Password
+                            Kirim Link Reset Kata Sandi
                         </button>
                     </form>
 

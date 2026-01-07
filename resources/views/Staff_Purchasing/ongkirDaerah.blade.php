@@ -507,7 +507,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Kode Pos</label>
-                            <input type="text" class="form-control" id="kodePos" name="kode_pos" maxlength="5" pattern="[0-9]{5}" placeholder="01234" title="Kode pos harus 5 digit angka (leading zero diperbolehkan)" required>
+                            <input type="text" class="form-control" id="kodePos" name="kode_pos" maxlength="5" pattern="[0-9]{5}" title="Kode pos harus 5 digit angka (leading zero diperbolehkan)" required>
                         </div>
                     </div>
                     <div class="modal-footer">

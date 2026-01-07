@@ -196,7 +196,7 @@ class ProdukController extends Controller
         $produk = Produk::findOrFail($id);
 
         $request->validate([
-            'nama_produk'              => 'required|string|max:255|unique:produks,nama_produk,' . $id,
+            'nama_produk'              => 'required|string|max:255',
             'id_kategori'              => 'required|exists:kategoris,id',
             'id_satuan'                => 'required|exists:satuans,id',
             'id_supplier'              => 'required|exists:suppliers,id',
@@ -232,34 +232,53 @@ class ProdukController extends Controller
     }
 
     public function destroy($id)
-{
-    try {
-        $produk = Produk::withCount('batch')->findOrFail($id);
+    {
+        try {
+            $produk = Produk::withCount('batch')->findOrFail($id);
 
-        if ($produk->batch_count > 0) {
+            if ($produk->batch_count > 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak dapat menghapus produk karena masih memiliki batch.'
+                ], 422);
+            }
+
+            if ($produk->gambar && Storage::disk('public')->exists($produk->gambar)) {
+                Storage::disk('public')->delete($produk->gambar);
+            }
+
+            $produk->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Produk berhasil dihapus.'
+            ], 200); // penting: status code eksplisit
+        } catch (\Exception $e) {
+            \Log::error('Delete produk error: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Tidak dapat menghapus produk karena masih memiliki batch.'
-            ], 422);
+                'message' => 'Terjadi kesalahan server.'
+            ], 500);
         }
-
-        if ($produk->gambar && Storage::disk('public')->exists($produk->gambar)) {
-            Storage::disk('public')->delete($produk->gambar);
-        }
-
-        $produk->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Produk berhasil dihapus.'
-        ], 200); // penting: status code eksplisit
-    } catch (\Exception $e) {
-        \Log::error('Delete produk error: ' . $e->getMessage());
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Terjadi kesalahan server.'
-        ], 500);
     }
-}
+
+    /**
+     * Check if product name exists (for soft warning)
+     */
+    public function checkProductName(Request $request)
+    {
+        $name = $request->query('name');
+        $excludeId = $request->query('exclude_id');
+
+        $query = Produk::where('nama_produk', $name);
+        
+        if ($excludeId) {
+            $query->where('id', '!=', $excludeId);
+        }
+
+        $exists = $query->exists();
+
+        return response()->json(['exists' => $exists]);
+    }
 }

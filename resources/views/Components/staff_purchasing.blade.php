@@ -158,19 +158,79 @@
         <!-- Mobile Sidebar (Offcanvas) -->
         <div class="sidebar-mobile offcanvas offcanvas-start" tabindex="-1" id="sidebarOffcanvas">
             <div class="offcanvas-header">
-                <h5 class="offcanvas-title">Staff Purchasing</h5>
+                <h5 class="offcanvas-title text-white">Staff Purchasing</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
             </div>
 
             <div class="offcanvas-body">
-                @include('components.staff_purchasing_nav')
+                <a href="/purchasing/dashboard" class="nav-link {{ request()->is('purchasing/dashboard') ? 'active' : '' }}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+
+                <a href="/purchasing/pesanan_masuk" class="nav-link {{ request()->is('purchasing/pesanan_masuk') ? 'active' : '' }}">
+                    <i class="bi bi-bag-check"></i> Pesanan Masuk
+                </a>
+
+                <a href="/purchasing/cari_kurir" class="nav-link {{ request()->is('purchasing/cari_kurir') ? 'active' : '' }}">
+                    <i class="bi bi-truck"></i> Cari Kurir
+                </a>
+
+                <a href="/purchasing/konfirmasi_pembayaran" class="nav-link {{ request()->is('purchasing/konfirmasi_pembayaran') ? 'active' : '' }}">
+                    <i class="bi bi-cash-coin"></i> Konfirmasi Pembayaran
+                </a>
+
+                <a href="/purchasing/pesanan_berjalan" class="nav-link {{ request()->is('purchasing/pesanan_berjalan') ? 'active' : '' }}">
+                    <i class="bi bi-hourglass-split"></i> Pesanan Berjalan
+                </a>
+
+                <a href="/purchasing/kelola_ongkir" class="nav-link {{ request()->is('purchasing/kelola_ongkir') ? 'active' : '' }}">
+                    <i class="bi bi-geo-alt"></i> Kelola Ongkir & Daerah
+                </a>
+
+                <a href="/purchasing/riwayat_pesanan" class="nav-link {{ request()->is('purchasing/riwayat_pesanan') ? 'active' : '' }}">
+                    <i class="bi bi-clock-history"></i> Riwayat Pesanan
+                </a>
+
+                <button type="button" class="nav-link bg-transparent border-0 w-100 text-start text-white" data-bs-toggle="modal" data-bs-target="#logoutModal" style="color: inherit;">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
             </div>
         </div>
 
         <!-- Desktop Sidebar (Fixed) -->
         <div class="sidebar-desktop d-none d-lg-block">
             <h4>Staff Purchasing</h4>
-            @include('components.staff_purchasing_nav')
+            <a href="/purchasing/dashboard" class="nav-link {{ request()->is('purchasing/dashboard') ? 'active' : '' }}">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+
+            <a href="/purchasing/pesanan_masuk" class="nav-link {{ request()->is('purchasing/pesanan_masuk') ? 'active' : '' }}">
+                <i class="bi bi-bag-check"></i> Pesanan Masuk
+            </a>
+
+            <a href="/purchasing/cari_kurir" class="nav-link {{ request()->is('purchasing/cari_kurir') ? 'active' : '' }}">
+                <i class="bi bi-truck"></i> Cari Kurir
+            </a>
+
+            <a href="/purchasing/konfirmasi_pembayaran" class="nav-link {{ request()->is('purchasing/konfirmasi_pembayaran') ? 'active' : '' }}">
+                <i class="bi bi-cash-coin"></i> Konfirmasi Pembayaran
+            </a>
+
+            <a href="/purchasing/pesanan_berjalan" class="nav-link {{ request()->is('purchasing/pesanan_berjalan') ? 'active' : '' }}">
+                <i class="bi bi-hourglass-split"></i> Pesanan Berjalan
+            </a>
+
+            <a href="/purchasing/kelola_ongkir" class="nav-link {{ request()->is('purchasing/kelola_ongkir') ? 'active' : '' }}">
+                <i class="bi bi-geo-alt"></i> Kelola Ongkir & Daerah
+            </a>
+
+            <a href="/purchasing/riwayat_pesanan" class="nav-link {{ request()->is('purchasing/riwayat_pesanan') ? 'active' : '' }}">
+                <i class="bi bi-clock-history"></i> Riwayat Pesanan
+            </a>
+
+            <button type="button" class="nav-link bg-transparent border-0 w-100 text-start" data-bs-toggle="modal" data-bs-target="#logoutModal" style="color: inherit;">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
         </div>
 
         <!-- Main Content (Single Source of Truth) -->
@@ -214,6 +274,30 @@
             </div>
         </div>
 
+        <!-- Logout Confirmation Modal -->
+        <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header bg-danger text-white border-0">
+                        <h5 class="modal-title fw-bold" id="logoutModalLabel">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>Konfirmasi Logout
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4 text-center">
+                        <h5 class="mb-0">Apakah Anda yakin ingin keluar dari akun?</h5>
+                    </div>
+                    <div class="modal-footer border-0 justify-content-center">
+                        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Batal</button>
+                        <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-danger px-4">Ya, Logout</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
             /**
@@ -241,6 +325,12 @@
                 });
 
                 modal.show();
+            };
+
+            // Logout function helper
+            window.logout = function() {
+                const modalLogout = new bootstrap.Modal(document.getElementById('logoutModal'));
+                modalLogout.show();
             };
 
             // Auto-show Toast from Session

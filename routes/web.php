@@ -150,6 +150,7 @@ Route::prefix('staff_produk')->middleware('auth')->name('produk.')->group(functi
     Route::get('/edit_produk/{id}', [ProdukController::class, 'edit'])->name('edit');
     Route::put('/update_produk/{id}', [ProdukController::class, 'update'])->name('update');
     Route::delete('/delete/{id}', [ProdukController::class, 'destroy'])->name('destroy');
+    Route::get('/check-name', [ProdukController::class, 'checkProductName'])->name('check-name');
 
     //Batch
     Route::get('/produk/{id_produk}/batch', [BatchController::class, 'index'])->name('batch.index');

@@ -229,7 +229,7 @@
             .toggle-password {
                 position: absolute;
                 right: 15px;
-                top: 70%;
+                top: 50%;
                 transform: translateY(-50%);
                 cursor: pointer;
                 color: #6c757d;
@@ -290,7 +290,7 @@
                 <p class="profile-email">{{ $user->email ?? 'email@example.com' }}</p>
                 <div class="profile-nav">
                     <a href="#info" class="nav-link-profile {{ ($activeTab ?? 'info') == 'info' ? 'active' : '' }}" data-section="info"><i class="fas fa-user"></i> Informasi Pribadi</a>
-                    <a href="#password" class="nav-link-profile {{ ($activeTab ?? 'info') == 'password' ? 'active' : '' }}" data-section="password"><i class="fas fa-lock"></i> Ubah Password</a>
+                    <a href="#password" class="nav-link-profile {{ ($activeTab ?? 'info') == 'password' ? 'active' : '' }}" data-section="password"><i class="fas fa-lock"></i> Ubah Kata Sandi</a>
                     <button class="btn btn-outline-secondary btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
                 </div>
             </div>
@@ -339,34 +339,46 @@
                 </form>
             </div>
 
-            <!-- ===================== UBAH PASSWORD ===================== -->
+            <!-- ===================== UBAH KATA SANDI ===================== -->
             <div id="password" class="profile-section {{ ($activeTab ?? 'info') == 'password' ? 'active' : '' }}">
-                <h2 class="section-title"><i class="fas fa-lock me-2"></i>Ubah Password</h2>
+                <h2 class="section-title"><i class="fas fa-lock me-2"></i>Ubah Kata Sandi</h2>
                 <form id="passwordForm" method="POST" action="{{ route('kurir.profil.password') }}" class="form-section">
                     @csrf
                     @method('PUT')
                     <div class="mb-3 position-relative">
-                        <label for="passwordLama" class="form-label">Password Lama</label>
-                        <input type="password" class="form-control pe-5 {{ $errors->has('password_lama') ? 'is-invalid' : '' }}" id="passwordLama" name="password_lama" required>
-                        <i class="fas fa-eye toggle-password" data-target="passwordLama"></i>
+                        <label for="passwordLama" class="form-label">Kata Sandi Lama</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control pe-5 {{ $errors->has('password_lama') ? 'is-invalid' : '' }}" id="passwordLama" name="password_lama" placeholder="Kata Sandi Lama" required style="border-right: none;">
+                            <span class="input-group-text bg-white" style="border-left: none; cursor: pointer;">
+                                <i class="fas fa-eye-slash toggle-password" data-target="passwordLama"></i>
+                            </span>
+                        </div>
                         @error('password_lama')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="mb-3 position-relative">
-                        <label for="passwordBaru" class="form-label">Password Baru</label>
-                        <input type="password" class="form-control pe-5 {{ $errors->has('password_baru') ? 'is-invalid' : '' }}" id="passwordBaru" name="password_baru" required minlength="6">
-                        <i class="fas fa-eye toggle-password" data-target="passwordBaru"></i>
+                        <label for="passwordBaru" class="form-label">Kata Sandi Baru</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control pe-5 {{ $errors->has('password_baru') ? 'is-invalid' : '' }}" id="passwordBaru" name="password_baru" placeholder="Kata Sandi Baru" required minlength="6" style="border-right: none;">
+                            <span class="input-group-text bg-white" style="border-left: none; cursor: pointer;">
+                                <i class="fas fa-eye-slash toggle-password" data-target="passwordBaru"></i>
+                            </span>
+                        </div>
                         @error('password_baru')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="mb-3 position-relative">
-                        <label for="konfirmasiPassword" class="form-label">Konfirmasi Password Baru</label>
-                        <input type="password" class="form-control pe-5 {{ $errors->has('password_baru_confirmation') ? 'is-invalid' : '' }}" id="konfirmasiPassword" name="password_baru_confirmation" required>
-                        <i class="fas fa-eye toggle-password" data-target="konfirmasiPassword"></i>
+                        <label for="konfirmasiPassword" class="form-label">Konfirmasi Kata Sandi Baru</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control pe-5 {{ $errors->has('password_baru_confirmation') ? 'is-invalid' : '' }}" id="konfirmasiPassword" name="password_baru_confirmation" placeholder="Konfirmasi Kata Sandi Baru" required style="border-right: none;">
+                            <span class="input-group-text bg-white" style="border-left: none; cursor: pointer;">
+                                <i class="fas fa-eye-slash toggle-password" data-target="konfirmasiPassword"></i>
+                            </span>
+                        </div>
                         @error('password_baru_confirmation')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
@@ -374,7 +386,7 @@
 
                     <div class="text-center mt-4">
                         <button type="button" class="btn btn-success text-white btn-save" id="btnUbahPassword">
-                            <i class="fas fa-key me-1"></i> Ubah Password
+                            <i class="fas fa-key me-1"></i> Ubah Kata Sandi
                         </button>
                     </div>
                 </form>
@@ -385,11 +397,11 @@
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content border-success">
                         <div class="modal-header bg-success text-white">
-                            <h5 class="modal-title" id="konfirmasiPasswordLabel"><i class="fas fa-key me-2"></i>Konfirmasi Perubahan Password</h5>
+                            <h5 class="modal-title" id="konfirmasiPasswordLabel"><i class="fas fa-key me-2"></i>Konfirmasi Perubahan Kata Sandi</h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            Apakah kamu yakin ingin mengubah password? Pastikan sudah diisi dengan benar.
+                            Apakah kamu yakin ingin mengubah kata sandi? Pastikan sudah diisi dengan benar.
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
@@ -399,27 +411,7 @@
                 </div>
             </div>
 
-            <!-- ===================== MODAL KONFIRMASI LOGOUT ===================== -->
-            <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content border-success">
-                        <div class="modal-header bg-success text-white">
-                            <h5 class="modal-title" id="logoutLabel"><i class="fas fa-sign-out-alt me-2"></i>Konfirmasi Logout</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            Apakah kamu yakin ingin logout? Kamu akan keluar dari akun ini.
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-                            <form method="POST" action="{{ route('logout') }}" style="display: inline;">
-                                @csrf
-                                <button type="submit" class="btn btn-success text-white">Ya, Logout</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
 
         </div>
 
@@ -480,19 +472,15 @@
                         const input = document.getElementById(icon.dataset.target);
                         if (input.type === 'password') {
                             input.type = 'text';
-                            icon.classList.replace('fa-eye', 'fa-eye-slash');
+                            icon.classList.replace('fa-eye-slash', 'fa-eye');
                         } else {
                             input.type = 'password';
-                            icon.classList.replace('fa-eye-slash', 'fa-eye');
+                            icon.classList.replace('fa-eye', 'fa-eye-slash');
                         }
                     });
                 });
 
-                // === LOGOUT ===
-                window.logout = function() {
-                    const modalLogout = new bootstrap.Modal(document.getElementById('logoutModal'));
-                    modalLogout.show();
-                };
+
             });
         </script>
 

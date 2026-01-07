@@ -324,7 +324,7 @@
                 <i class="bi bi-archive"></i> Produk Diarsipkan
             </a>
 
-            <a href="{{ route('produk.rusak_cacat.index') }}" class="nav-link {{ request()->is('staff_produk/rusak') ? 'active' : '' }}">
+            <a href="{{ route('produk.rusak_cacat.index') }}" class="nav-link {{ request()->is('staff_produk/rusak_cacat*') ? 'active' : '' }}">
                 <i class="bi bi-exclamation-triangle"></i> Produk Rusak/Cacat
             </a>
 
@@ -342,25 +342,24 @@
             @yield('content')
         </div>
 
-        <!-- MODAL KONFIRMASI LOGOUT -->
+        <!-- Logout Confirmation Modal -->
         <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="logoutModalLabel">
-                            <i class="bi bi-exclamation-triangle text-warning me-2"></i>
-                            Konfirmasi Logout
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header bg-danger text-white border-0">
+                        <h5 class="modal-title fw-bold" id="logoutModalLabel">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>Konfirmasi Logout
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
-                        <p class="mb-0">Apakah Anda yakin ingin keluar dari akun? Anda akan diarahkan ke halaman login.</p>
+                    <div class="modal-body p-4 text-center">
+                        <h5 class="mb-0">Apakah Anda yakin ingin keluar dari akun?</h5>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <div class="modal-footer border-0 justify-content-center">
+                        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Batal</button>
                         <form method="POST" action="{{ route('logout') }}" style="display: inline;">
                             @csrf
-                            <button type="submit" class="btn btn-danger">Ya, Logout</button>
+                            <button type="submit" class="btn btn-danger px-4">Ya, Logout</button>
                         </form>
                     </div>
                 </div>
@@ -369,6 +368,12 @@
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
+            // Logout function helper
+            window.logout = function() {
+                const modalLogout = new bootstrap.Modal(document.getElementById('logoutModal'));
+                modalLogout.show();
+            };
+
             // Optional: JS untuk handle logout trigger (kalau butuh custom, misalnya close offcanvas dulu)
             document.addEventListener('DOMContentLoaded', function() {
                 document.querySelectorAll('.logout-trigger').forEach(trigger => {

@@ -54,7 +54,10 @@
 
         <div class="mb-3">
             <label>Nama Produk</label>
-            <input type="text" class="form-control" name="nama_produk" value="{{ old('nama_produk', $produk->nama_produk) }}" required>
+            <input type="text" class="form-control" name="nama_produk" id="nama_produk" value="{{ old('nama_produk', $produk->nama_produk) }}" required>
+            <div id="nameWarning" class="text-warning mt-1 d-none" style="font-size: 0.85rem;">
+                <i class="bi bi-exclamation-triangle"></i> Nama ini sudah ada di produk lain, anda bisa mengganti atau melanjutkan memakai nama ini.
+            </div>
         </div>
 
         <div class="row">
@@ -138,6 +141,36 @@
                 } else {
                     imagePreview.style.display = 'none';
                 }
+            });
+        }
+
+        // Product Name Check (Soft Warning)
+        const nameInput = document.getElementById('nama_produk');
+        const nameWarning = document.getElementById('nameWarning');
+        let timeout = null;
+
+        if (nameInput && nameWarning) {
+            nameInput.addEventListener('input', function() {
+                clearTimeout(timeout);
+                const name = this.value.trim();
+                
+                if (name.length < 3) {
+                    nameWarning.classList.add('d-none');
+                    return;
+                }
+
+                timeout = setTimeout(() => {
+                    fetch(`{{ route('produk.check-name') }}?name=${encodeURIComponent(name)}&exclude_id={{ $produk->id }}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.exists) {
+                                nameWarning.classList.remove('d-none');
+                            } else {
+                                nameWarning.classList.add('d-none');
+                            }
+                        })
+                        .catch(err => console.error('Error checking name:', err));
+                }, 500);
             });
         }
     });

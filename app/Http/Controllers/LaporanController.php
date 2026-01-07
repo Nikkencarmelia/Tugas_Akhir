@@ -19,7 +19,7 @@ class LaporanController extends Controller
     public function dashboardSuperAdmin()
     {
         // 1. Stats Cards
-        $total_user = User::where('role', 'user')->count();
+        $total_user = User::count();
         $total_kurir = User::where('role', 'kurir')->count();
         $total_pengurus = Pengurus::count();
         $total_produk = Produk::count();

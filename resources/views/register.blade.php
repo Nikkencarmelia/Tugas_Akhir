@@ -9,6 +9,7 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Noto+Sans+Javanese:wght@400..700&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Noto+Sans+Javanese:wght@400..700&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
             body {
                 background-color: #F7F7F9;
@@ -59,7 +60,6 @@
             <div class="col-md-6 p-5 left-box d-flex flex-column justify-content-center">
                 <h2 class="mb-2 fw-bold">Food Center</h2>
                 <p>Dinas Ketahanan Pangan Kabupaten Kutai Barat</p>
-                <img src="https://i.imgur.com/n8f8k0v.png" alt="Illustration" class="img-fluid mt-auto" style="max-height: 250px;">
             </div>
             <!-- KANAN -->
             <div class="col-md-6 p-5 right-box">
@@ -102,16 +102,26 @@
                     @enderror
                 </div>
                 <div class="mb-3">
-                    <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Password" required>
-                    @error('password')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <div class="input-group">
+                        <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" placeholder="Kata Sandi" style="border-right: none;" required>
+                        <span class="input-group-text bg-white" style="border-left: none; cursor: pointer;" onclick="togglePassword('password', 'eyeIcon')">
+                            <i class="fas fa-eye-slash text-muted" id="eyeIcon"></i>
+                        </span>
+                        @error('password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
                 <div class="mb-3">
-                    <input type="password" name="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror" placeholder="Konfirmasi Password" required>
-                    @error('password_confirmation')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <div class="input-group">
+                        <input type="password" name="password_confirmation" id="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror" placeholder="Konfirmasi Kata Sandi" style="border-right: none;" required>
+                        <span class="input-group-text bg-white" style="border-left: none; cursor: pointer;" onclick="togglePassword('password_confirmation', 'eyeIconConfirm')">
+                            <i class="fas fa-eye-slash text-muted" id="eyeIconConfirm"></i>
+                        </span>
+                        @error('password_confirmation')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
                 <button type="submit" class="btn w-100 mb-3 text-white" style="background-color: #2A522A">Daftar</button>
                 <p class="text-center small text-muted">Atau Daftar dengan</p>
@@ -125,6 +135,22 @@
             </div>
             </div>
         </div>
+        </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            function togglePassword(inputId, iconId) {
+                const passwordInput = document.getElementById(inputId);
+                const eyeIcon = document.getElementById(iconId);
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    eyeIcon.classList.remove('fa-eye-slash');
+                    eyeIcon.classList.add('fa-eye');
+                } else {
+                    passwordInput.type = 'password';
+                    eyeIcon.classList.remove('fa-eye');
+                    eyeIcon.classList.add('fa-eye-slash');
+                }
+            }
+        </script>
     </body>
 </html>

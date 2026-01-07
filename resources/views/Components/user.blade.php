@@ -5,7 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
         <!-- font -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -150,8 +151,7 @@
         <nav class="navbar navbar-expand-lg @yield('navbar-class', 'white')">
             <div class="container-fluid">
                 <a class="navbar-brand" href="#">Food Center</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav" aria-controls="navbarNav"
+                <button class="navbar-toggler" type="button" id="navbarToggler" aria-controls="navbarNav"
                     aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -230,10 +230,7 @@
                             </ul>
                         </li>
                         <li class="nav-item ms-2">
-                            <form method="POST" action="{{ route('logout') }}" class="d-inline">
-                                @csrf
-                                <button type="submit" class="btn btn-secondary shadow-sm" style="border-radius: 20px; padding: 8px 16px; font-weight: 500; font-size: 14px;">Logout</button>
-                            </form>
+                            <button type="button" class="btn btn-secondary shadow-sm" data-bs-toggle="modal" data-bs-target="#logoutModal" style="border-radius: 20px; padding: 8px 16px; font-weight: 500; font-size: 14px;">Logout</button>
                         </li>
                         @endauth
                         @guest
@@ -288,8 +285,57 @@
             </div>
         </footer>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Logout Confirmation Modal -->
+        <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header bg-danger text-white border-0">
+                        <h5 class="modal-title fw-bold" id="logoutModalLabel">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>Konfirmasi Logout
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4 text-center">
+                        <h5 class="mb-0">Apakah Anda yakin ingin keluar dari akun?</h5>
+                    </div>
+                    <div class="modal-footer border-0 justify-content-center">
+                        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Batal</button>
+                        <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-danger px-4">Ya, Logout</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <script>
+            // Logout function helper
+            window.logout = function() {
+                const modalLogout = new bootstrap.Modal(document.getElementById('logoutModal'));
+                modalLogout.show();
+            };
+
+            // === ROBUST NAVBAR TOGGLE ===
+            document.addEventListener('DOMContentLoaded', function() {
+                const toggler = document.getElementById('navbarToggler');
+                const collapseEl = document.getElementById('navbarNav');
+                
+                if (toggler && collapseEl) {
+                    const bsCollapse = new bootstrap.Collapse(collapseEl, { toggle: false });
+                    
+                    toggler.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        bsCollapse.toggle();
+                    });
+
+                    // Pastikan icon/state sinkron saat tutup (misal klik di luar atau resize)
+                    collapseEl.addEventListener('show.bs.collapse', () => toggler.setAttribute('aria-expanded', 'true'));
+                    collapseEl.addEventListener('hide.bs.collapse', () => toggler.setAttribute('aria-expanded', 'false'));
+                }
+            });
+
             // Check if current page is landing page
             const isLandingPage = document.querySelector('.navbar').classList.contains('transparent');
             
