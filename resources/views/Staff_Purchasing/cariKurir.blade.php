@@ -107,18 +107,6 @@
 @section('content')
 <div class="container py-5">
     
-    <!-- Toast & Alerts -->
-    <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index:9999;">
-        <div id="toastCari" class="toast align-items-center text-bg-success border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex"><div class="toast-body fw-semibold"><i class="fa-solid fa-circle-check me-2"></i>Kurir telah dipilih!</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>
-        </div>
-        @if(session('success'))
-        <div id="toastSuccessInit" class="toast show align-items-center text-bg-success border-0 shadow-lg" role="alert">
-            <div class="d-flex"><div class="toast-body fw-semibold"><i class="fa-solid fa-circle-check me-2"></i>{{ session('success') }}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>
-        </div>
-        @endif
-    </div>
-
     <!-- Header -->
     <div class="orders-header">
         <h3><i class="fa fa-truck"></i>Cari Kurir</h3>
@@ -184,7 +172,7 @@
             <div class="modal-body">
                 <!-- Filters in Modal -->
                 <div class="row mb-3">
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <label class="form-label">Cari Kurir</label>
                         <div class="input-group">
                             <span class="input-group-text bg-white">
@@ -193,15 +181,7 @@
                             <input type="text" class="form-control" id="searchKurir" placeholder="Cari nama kurir">
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Jenis Kendaraan</label>
-                        <select class="form-select" id="filterKendaraan">
-                            <option value="">Semua</option>
-                            <option value="motor">Motor</option>
-                            <option value="mobil">Mobil</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                          <label class="form-label">Status Online</label>
                          <select class="form-select" id="filterOnline">
                              <option value="">Semua</option>
@@ -209,6 +189,7 @@
                              <option value="tidak_aktif">Tidak Aktif</option>
                          </select>
                     </div>
+                    <input type="hidden" id="filterKendaraan">
                 </div>
 
                 <div class="table-responsive">
@@ -219,8 +200,10 @@
                         <tbody id="kurirTableBody">
                             @forelse($kurirs as $kurir)
                             <tr data-nama="{{ strtolower($kurir->nama_lengkap) }}" 
+                                data-telp="{{ strtolower($kurir->no_telepon) }}"
                                 data-kendaraan="{{ $kurir->kurir->jenis_kendaraan ?? 'Motor' }}" 
-                                data-statusonline="{{ $kurir->status_online ?? 'aktif' }}">
+                                data-statusonline="{{ $kurir->status_online ?? 'aktif' }}"
+                                data-statusantar="{{ strtolower($kurir->kurir->status_antar ?? 'siap') }}">
                                 <td>{{ $kurir->nama_lengkap }}</td>
                                 <td>{{ $kurir->no_telepon }}</td>
                                 <td>{{ ucfirst($kurir->kurir->jenis_kendaraan ?? '-') }}</td>
@@ -284,26 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Modal data passing
-    const modalCariKurir = document.getElementById('modalCariKurir');
-    const filterKendaraan = document.getElementById('filterKendaraan');
-    
-    modalCariKurir.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const kodePesanan = button.getAttribute('data-kode');
-        const kendaraanPesanan = button.getAttribute('data-kendaraan');
-        
-        modalCariKurir.querySelectorAll('.modalKodePesanan').forEach(input => input.value = kodePesanan);
-        
-        // Auto-set filter kendaraan berdasarkan pesanan
-        if (kendaraanPesanan && (kendaraanPesanan === 'motor' || kendaraanPesanan === 'mobil')) {
-            filterKendaraan.value = kendaraanPesanan.toLowerCase();
-        } else {
-            filterKendaraan.value = ''; // Reset jika tidak ada/tidak valid
-        }
-        
-        filterKurirTable(); // Trigger filter with vehicle filter
-    });
+
 
     // Filter Logic (Main)
     const searchInput = document.getElementById('searchInput');
@@ -342,10 +306,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Kurir Filter (Modal)
     const searchKurir = document.getElementById('searchKurir');
     const filterOnline = document.getElementById('filterOnline');
+    const filterKendaraan = document.getElementById('filterKendaraan');
     const kurirTableBody = document.getElementById('kurirTableBody');
+    const modalCariKurir = document.getElementById('modalCariKurir');
 
     function filterKurirTable() {
-        const searchText = searchKurir.value.toLowerCase();
+        if(!modalCariKurir.classList.contains('show') && !modalCariKurir.classList.contains('showing')) {
+             // If modal is not active, don't necessarily need to filter, but let's keep it robust
+        }
+
+        const searchText = searchKurir.value.toLowerCase().trim();
         const online = filterOnline.value.toLowerCase();
         const kendaraan = filterKendaraan.value.toLowerCase();
         const rows = kurirTableBody.querySelectorAll('tr');
@@ -354,10 +324,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!row.dataset.nama) return;
             
             const nameMatch = row.dataset.nama.includes(searchText);
+            const telpMatch = row.dataset.telp.includes(searchText);
+            const kndraanMatch = row.dataset.kendaraan.toLowerCase().includes(searchText);
+            const statusAntarMatch = row.dataset.statusantar.replace('_', ' ').includes(searchText);
+            const onlineStatusMatch = row.dataset.statusonline.toLowerCase().includes(searchText);
+            
+            const searchMatch = nameMatch || telpMatch || kndraanMatch || statusAntarMatch || onlineStatusMatch;
             const onlineMatch = online === "" || row.dataset.statusonline.toLowerCase() === online;
             const kendaraanMatch = kendaraan === "" || row.dataset.kendaraan.toLowerCase() === kendaraan;
 
-            if (nameMatch && onlineMatch && kendaraanMatch) {
+            if (searchMatch && onlineMatch && kendaraanMatch) {
                 row.style.display = "";
             } else {
                 row.style.display = "none";
@@ -367,7 +343,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     searchKurir.addEventListener('input', filterKurirTable);
     filterOnline.addEventListener('change', filterKurirTable);
-    filterKendaraan.addEventListener('change', filterKurirTable);
+
+    // Handle Modal Show to set Order context
+    if (modalCariKurir) {
+        modalCariKurir.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            if (!button) return;
+
+            const kode = button.getAttribute('data-kode');
+            const kendaraan = button.getAttribute('data-kendaraan');
+
+            // Update hidden fields
+            const modalKodeInput = modalCariKurir.querySelector('.modalKodePesanan');
+            if (modalKodeInput) modalKodeInput.value = kode;
+            if (filterKendaraan) filterKendaraan.value = kendaraan || "";
+
+            // Reset other filters for a fresh look
+            searchKurir.value = "";
+            filterOnline.value = "";
+
+            // Apply filter immediately
+            filterKurirTable();
+        });
+    }
 
     document.querySelectorAll('.btnPilihKurir').forEach(btn => btn.addEventListener('click', () => {
          // Show toast logic if needed

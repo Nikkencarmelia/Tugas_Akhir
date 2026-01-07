@@ -157,7 +157,7 @@
                          else $src = asset('storage/'.$img);
                     }
                 @endphp
-                <div class="order-card" data-date="{{ strtotime($created_at) }}">
+                <div class="order-card" data-date="{{ $order->updated_at->timestamp }}">
                     <div class="order-header">
                         <div class="d-flex align-items-start gap-3">
                             <div class="order-meta">
@@ -376,8 +376,8 @@
                                         
                                         if(in_array($status, ['dibatalkan', 'ditolak_staff', 'ditolak_kurir'])) {
                                             $statusClass = 'status-dibatalkan';
-                                            if($status == 'ditolak_staff') $statusLabel = 'Ditolak Staff';
-                                            elseif($status == 'ditolak_kurir') $statusLabel = 'Ditolak Kurir';
+                                            $statusLabel = 'Dibatalkan';
+                                            if($status == 'ditolak_kurir') $statusLabel = 'Ditolak Kurir';
                                         }
                                         elseif($status == 'menunggu_konfirmasi_kurir') {
                                             $statusClass = 'status-menunggu_konfirmasi_kurir';
@@ -514,7 +514,7 @@
                                 <div class="mt-2 text-danger">
                                       <span class="order-status status-dibatalkan py-1 px-2" style="font-size: 12px; margin: 0; display: inline-flex;">
                                          <i class="fas fa-times-circle"></i> 
-                                         Ditolak Staff
+                                         Dibatalkan
                                       </span>
                                 </div>
                             </div>
@@ -538,6 +538,15 @@
 
                     <div class="order-actions">
                         <a href="{{ route('staff_purchasing.detail_pesanan', $id) }}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-eye me-1"></i>Lihat Detail</a>
+                        @php
+                            $bukti = $isObj ? ($order->transaksi->bukti_pembayaran ?? null) : ($order['transaksi']['bukti_pembayaran'] ?? null);
+                        @endphp
+                        @if($bukti)
+                            <button type="button" class="btn btn-outline-info btn-sm btnLihatBukti" 
+                                data-bukti="{{ asset('storage/' . $bukti) }}">
+                                <i class="fa-solid fa-file-invoice-dollar me-1"></i>Lihat Bukti Pembayaran
+                            </button>
+                        @endif
                     </div>
                 </div>
             @empty
@@ -545,6 +554,21 @@
             @endforelse
         </div>
 
+    </div>
+</div>
+
+<!-- Modal Bukti Pembayaran -->
+<div class="modal fade" id="modalBukti" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bukti Pembayaran</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="imgBukti" src="" alt="Bukti Pembayaran" class="img-fluid rounded shadow">
+            </div>
+        </div>
     </div>
 </div>
 
@@ -627,6 +651,17 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput.addEventListener('input', filterOrders);
     sortSelect.addEventListener('change', filterOrders);
     filterOrders();
+
+    // Modal Bukti Pembayaran Logic
+    const modalBukti = new bootstrap.Modal(document.getElementById('modalBukti'));
+    const imgBukti = document.getElementById('imgBukti');
+    
+    document.querySelectorAll('.btnLihatBukti').forEach(btn => {
+        btn.addEventListener('click', () => {
+            imgBukti.src = btn.dataset.bukti;
+            modalBukti.show();
+        });
+    });
 });
 </script>
 @endsection

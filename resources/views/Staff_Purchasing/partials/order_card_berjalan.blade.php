@@ -43,8 +43,8 @@
                         
                         if(in_array($status, ['dibatalkan', 'ditolak_staff', 'ditolak_kurir'])) {
                             $statusClass = 'status-dibatalkan';
-                            if($status == 'ditolak_staff') $statusLabel = 'Ditolak Staff';
-                            elseif($status == 'ditolak_kurir') $statusLabel = 'Ditolak Kurir';
+                            $statusLabel = 'Dibatalkan';
+                            if($status == 'ditolak_kurir') $statusLabel = 'Ditolak Kurir';
                         }
                         elseif(in_array($status, ['menunggu_konfirmasi_pembayaran', 'menunggu_verifikasi_pembayaran', 'menunggu_pembayaran_diverifikasi'])) {
                             $statusClass = 'status-verif';

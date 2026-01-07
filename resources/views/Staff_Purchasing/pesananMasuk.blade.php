@@ -81,26 +81,6 @@
 @section('content')
 <div class="container py-5">
 
-    <!-- Toast Notification -->
-    <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index: 9999;">
-        @if(session('success'))
-        <div id="toastSuccess" class="toast show text-bg-success border-0 shadow-lg" role="alert" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body fw-semibold"><i class="fa-solid fa-circle-check me-2"></i>{{ session('success') }}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-        @endif
-        @if(session('error'))
-        <div id="toastError" class="toast show text-bg-danger border-0 shadow-lg" role="alert" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body fw-semibold"><i class="fa-solid fa-circle-exclamation me-2"></i>{{ session('error') }}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-        @endif
-    </div>
-
     <!-- Header -->
     <div class="orders-header">
         <h3><i class="bi bi-bag-check"></i>Pesanan Masuk <span class="badge bg-success ms-2" id="countBadge">{{ count($pengiriman_masuk) }}</span></h3>
@@ -202,8 +182,8 @@
                                     
                                     if(in_array($status, ['dibatalkan', 'ditolak_staff', 'ditolak_kurir'])) {
                                         $statusClass = 'status-dibatalkan';
-                                        if($status == 'ditolak_staff') $statusLabel = 'Ditolak Staff';
-                                        elseif($status == 'ditolak_kurir') $statusLabel = 'Ditolak Kurir';
+                                        $statusLabel = 'Dibatalkan';
+                                        if($status == 'ditolak_kurir') $statusLabel = 'Ditolak Kurir';
                                     }
                                     elseif(in_array($status, ['menunggu_konfirmasi_pembayaran', 'menunggu_verifikasi_pembayaran', 'menunggu_pembayaran_diverifikasi'])) {
                                         $statusClass = 'status-verif';
@@ -282,12 +262,10 @@
                         <i class="fa-solid fa-check me-1"></i>Terima
                     </button>
 
-                     <form action="{{ route('staff_purchasing.tolak_pesanan', $order->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Tolak pesanan ini? Stok akan dikembalikan.')">
-                        @csrf
-                        <button type="submit" class="btn btn-danger btn-sm">
-                            <i class="fa-solid fa-xmark me-1"></i>Tolak
-                        </button>
-                    </form>
+                     <button type="button" class="btn btn-danger btn-sm btnTolakSingle" 
+                        data-action="{{ route('staff_purchasing.tolak_pesanan', $order->id) }}">
+                        <i class="fa-solid fa-xmark me-1"></i>Tolak
+                    </button>
 
                     <a href="{{ route('staff_purchasing.detail_pesanan', $order->id) }}" class="btn btn-outline-primary btn-sm">
                         <i class="fa-solid fa-eye me-1"></i>Lihat Detail
@@ -407,6 +385,16 @@
         document.querySelectorAll('.btnTerimaSingle').forEach(btn => {
             btn.addEventListener('click', function() {
                 window.confirmAction('Apakah Anda yakin ingin menerima pesanan ini?', () => {
+                    const form = document.getElementById('singleActionForm');
+                    form.action = this.dataset.action;
+                    form.submit();
+                });
+            });
+        });
+
+        document.querySelectorAll('.btnTolakSingle').forEach(btn => {
+            btn.addEventListener('click', function() {
+                window.confirmAction('Apakah Anda yakin ingin menolak pesanan ini dan mengembalikan stok?', () => {
                     const form = document.getElementById('singleActionForm');
                     form.action = this.dataset.action;
                     form.submit();

@@ -178,6 +178,18 @@
             @yield('content')
         </div>
 
+        <!-- Toast Notifications -->
+        <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1060;">
+            <div id="statusToast" class="toast align-items-center border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body fw-semibold">
+                        <!-- Message will be injected here -->
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+
         <!-- Universal Confirmation Modal -->
         <div class="modal fade" id="universalConfirmModal" tabindex="-1" aria-labelledby="universalConfirmModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -230,6 +242,29 @@
 
                 modal.show();
             };
+
+            // Auto-show Toast from Session
+            document.addEventListener('DOMContentLoaded', function() {
+                const successMsg = "{{ session('success') }}";
+                const errorMsg = "{{ session('error') }}";
+                const toastEl = document.getElementById('statusToast');
+                
+                if (successMsg || errorMsg) {
+                    const toastBody = toastEl.querySelector('.toast-body');
+                    toastBody.textContent = successMsg || errorMsg;
+                    
+                    if (successMsg) {
+                        toastEl.classList.add('text-bg-success');
+                        toastEl.classList.remove('text-bg-danger');
+                    } else {
+                        toastEl.classList.add('text-bg-danger');
+                        toastEl.classList.remove('text-bg-success');
+                    }
+                    
+                    const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+                    toast.show();
+                }
+            });
         </script>
     </body>
 </html>

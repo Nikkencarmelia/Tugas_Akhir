@@ -41,6 +41,8 @@
             elseif($status == 'sedang_diantar') $statusClass = 'status-dikirim';
 
             $statusLabel = ucwords(str_replace('_', ' ', $status));
+            if(in_array($status, ['dibatalkan', 'ditolak_staff', 'ditolak_kurir'])) $statusLabel = 'Dibatalkan';
+            
             if($status == 'ditolak_staff') $statusLabel = 'Pesanan Dibatalkan oleh Staff';
             elseif($status == 'ditolak_kurir') $statusLabel = 'Pesanan Ditolak Kurir';
             elseif(in_array($status, ['menunggu_konfirmasi_pembayaran', 'menunggu_verifikasi_pembayaran'])) $statusLabel = 'Menunggu Verifikasi Pembayaran';

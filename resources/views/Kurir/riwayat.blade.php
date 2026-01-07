@@ -63,8 +63,7 @@
 
     <!-- SELESAI -->
     <div id="selesai" class="tab-panel active">
-      @forelse($riwayat as $order)
-      @if($order->status_pesanan == 'selesai')
+      @forelse($selesai as $order)
       @php
           $firstItem = $order->detailPesanan->first();
           $productName = $firstItem ? ($firstItem->produk->nama_produk ?? $firstItem->nama_produk) : 'Produk';
@@ -91,7 +90,6 @@
             <div class="order-number mb-2">#{{ $order->kode_pesanan }}</div>
             <div class="mb-2 small text-muted"><i class="fa-regular fa-calendar me-1"></i>{{ $order->created_at->format('d M Y') }}</div>
             <div class="d-flex flex-wrap gap-1">
-                {{-- No vehicle badge in Riwayat per user request --}}
                 <span class="alamat-badge">
                     <i class="fa-solid fa-location-dot"></i>
                     {{ $kelurahan }} - {{ $order->alamat_lengkap }}
@@ -132,7 +130,6 @@
           <a href="{{ route('kurir.detail_pesanan', $order->id) }}?tab=selesai" class="btn btn-outline-success btn-sm"><i class="fa-solid fa-eye me-1"></i>Lihat Detail</a>
         </div>
       </div>
-      @endif
       @empty
       <div class="text-center py-5 text-muted">Tidak ada riwayat pengiriman selesai.</div>
       @endforelse
@@ -140,10 +137,22 @@
 
     <!-- DITOLAK / DIBATALKAN -->
     <div id="ditolak" class="tab-panel">
-      {{-- 1. Riwayat Pembatalan dari Pemesanan --}}
-      @foreach($riwayat as $order)
-      @if($order->status_pesanan == 'dibatalkan')
+      @forelse($dibatalkan as $item)
       @php
+          $isTugasKurir = $item instanceof \App\Models\TugasKurir;
+          $order = $isTugasKurir ? $item->pemesanan : $item;
+          if(!$order) continue;
+
+          if ($isTugasKurir) {
+              $statusLabel = 'Dibatalkan oleh Anda';
+              $statusIcon = 'fa-person-circle-xmark';
+              $dateDisplay = $item->created_at; // Waktu saat kurir menolak
+          } else {
+              $statusLabel = ($order->status_pesanan == 'ditolak_staff') ? 'Pesanan Dibatalkan oleh Staff' : 'Pesanan Dibatalkan';
+              $statusIcon = 'fa-times-circle';
+              $dateDisplay = $order->updated_at; // Waktu saat dibatalkan
+          }
+
           $firstItem = $order->detailPesanan->first();
           $productName = $firstItem ? ($firstItem->produk->nama_produk ?? $firstItem->nama_produk) : 'Produk';
           $supplierName = $firstItem && $firstItem->produk && $firstItem->produk->supplier ? $firstItem->produk->supplier->nama_supplier : 'Non-Supplier';
@@ -160,16 +169,13 @@
           $penerima = $order->nama_penerima ?? ($order->user->name ?? '-');
           $telepon = $order->no_telepon ?? ($order->user->no_telepon ?? '-');
           $kelurahan = $order->nama_kelurahan ?? '-';
-          $metode = $order->opsi_pengiriman;
-          $kendaraan = $order->kendaraan;
       @endphp
       <div class="order-card">
         <div class="order-header">
           <div class="order-meta">
             <div class="order-number mb-2">#{{ $order->kode_pesanan }}</div>
-            <div class="mb-2 small text-muted"><i class="fa-regular fa-calendar me-1"></i>{{ $order->created_at->format('d M Y') }}</div>
+            <div class="mb-2 small text-muted"><i class="fa-regular fa-calendar me-1"></i>{{ $dateDisplay->format('d M Y, H:i') }}</div>
             <div class="d-flex flex-wrap gap-1">
-                {{-- No vehicle badge in Riwayat per user request --}}
                 <span class="alamat-badge">
                     <i class="fa-solid fa-location-dot"></i>
                     {{ $kelurahan }} - {{ $order->alamat_lengkap }}
@@ -186,7 +192,7 @@
           </div>
           <div class="text-end">
              <div class="order-status status-dibatalkan">
-                <i class="fas fa-times-circle me-1"></i> Dibatalkan
+                <i class="fas {{ $statusIcon }} me-1"></i> {{ $statusLabel }}
              </div>
              <div class="text-danger fw-bold small mt-2">
                 Rp {{ number_format($order->ongkir, 0, ',', '.') }}
@@ -210,78 +216,9 @@
           <a href="{{ route('kurir.detail_pesanan', $order->id) }}?tab=ditolak" class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-eye me-1"></i>Lihat Detail</a>
         </div>
       </div>
-      @endif
-      @endforeach
-
-      {{-- 2. Riwayat Ditolak dari tugas_kurir --}}
-      @foreach($riwayat_ditolak as $reject)
-      @php
-          $order = $reject->pemesanan;
-          if(!$order) continue;
-          $firstItem = $order->detailPesanan->first();
-          $productName = $firstItem ? ($firstItem->produk->nama_produk ?? $firstItem->nama_produk) : 'Produk';
-          $supplierName = $firstItem && $firstItem->produk && $firstItem->produk->supplier ? $firstItem->produk->supplier->nama_supplier : 'Non-Supplier';
-          $imagePath = $firstItem->gambar ?? '';
-          if (str_starts_with($imagePath, 'images/')) {
-              $src = asset($imagePath);
-          } elseif (!str_contains($imagePath, 'http') && !str_starts_with($imagePath, 'storage/') && $imagePath) {
-              $src = asset('storage/' . $imagePath);
-          } else {
-              $src = $imagePath ? asset($imagePath) : asset('images/default-product.png');
-          }
-      @endphp
-      <div class="order-card">
-        <div class="order-header">
-          <div class="order-meta">
-            <div class="order-number mb-2">#{{ $order->kode_pesanan }}</div>
-            <div class="mb-2 small text-muted"><i class="fa-regular fa-calendar me-1"></i>{{ $reject->created_at->format('d M Y') }}</div>
-            <div class="d-flex flex-wrap gap-1">
-                {{-- No vehicle badge in Riwayat per user request --}}
-                <span class="alamat-badge">
-                    <i class="fa-solid fa-location-dot"></i>
-                    {{ $kelurahan }} - {{ $order->alamat_lengkap }}
-                </span>
-                <span class="penerima-badge">
-                    <i class="fa-solid fa-user"></i>
-                    {{ Str::limit($penerima, 15) }}
-                </span>
-                <span class="phone-badge">
-                    <i class="fa-solid fa-phone"></i>
-                    {{ $telepon }}
-                </span>
-            </div>
-          </div>
-          <div class="text-end">
-             <div class="order-status status-dibatalkan">
-                <i class="fas fa-person-circle-xmark me-1"></i> Ditolak oleh Anda
-             </div>
-             <div class="text-danger fw-bold small mt-2">
-                Rp {{ number_format($order->ongkir, 0, ',', '.') }}
-             </div>
-          </div>
-        </div>
-        <div class="order-product">
-          <div class="img-container">
-            <img src="{{ $src }}" alt="Produk">
-            <span class="badge-supplier">{{ $supplierName }}</span>
-          </div>
-          <div class="order-product-details">
-            <h6>{{ $productName }}</h6>
-            <small>{{ $firstItem->quantity ?? 1 }} x Rp {{ number_format($firstItem->harga_satuan ?? 0, 0, ',', '.') }}</small>
-            @if($order->detailPesanan->count() > 1)
-              <div class="produk-lain">+ {{ $order->detailPesanan->count() - 1 }} produk lain</div>
-            @endif
-          </div>
-        </div>
-        <div class="order-actions">
-          <a href="{{ route('kurir.detail_pesanan', $order->id) }}?tab=ditolak" class="btn btn-outline-danger btn-sm"><i class="fa-solid fa-eye me-1"></i>Lihat Detail</a>
-        </div>
-      </div>
-      @endforeach
-
-      @if($riwayat->where('status_pesanan', 'dibatalkan')->count() == 0 && $riwayat_ditolak->count() == 0)
-        <div class="text-center py-5 text-muted">Tidak ada riwayat ditolak atau dibatalkan.</div>
-      @endif
+      @empty
+      <div class="text-center py-5 text-muted">Tidak ada riwayat ditolak atau dibatalkan.</div>
+      @endforelse
     </div>
 
   </div>

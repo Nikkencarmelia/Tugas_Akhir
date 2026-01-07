@@ -297,20 +297,31 @@ class PemesananController extends Controller
     {
         $userId = Auth::id();
         
-        // 1. Ambil dari Pemesanan (Selesai, Dibatalkan)
-        $riwayat = Pemesanan::with(['user', 'detailPesanan.produk', 'alamat'])
+        // 1. Ambil yang Selesai
+        $selesai = Pemesanan::with(['user', 'detailPesanan.produk', 'alamat'])
             ->where('id_kurir', $userId)
-            ->whereIn('status_pesanan', ['selesai', 'dibatalkan'])
+            ->where('status_pesanan', 'selesai')
             ->latest('updated_at')
             ->get();
 
-        // 2. Ambil Riwayat Ditolak dari tugas_kurir
-        $riwayat_ditolak = TugasKurir::with(['pemesanan.user', 'pemesanan.detailPesanan.produk', 'pemesanan.alamat'])
+        // 2. Ambil yang Dibatalkan (oleh Staff atau sistem) dari tabel Pemesanan
+        $riwayat_p = Pemesanan::with(['user', 'detailPesanan.produk', 'alamat'])
             ->where('id_kurir', $userId)
-            ->latest('updated_at')
+            ->whereIn('status_pesanan', ['dibatalkan', 'ditolak_staff'])
             ->get();
 
-        return view('Kurir.riwayat', compact('riwayat', 'riwayat_ditolak'));
+        // 3. Ambil Riwayat Ditolak Kurir dari tugas_kurir
+        $riwayat_t = TugasKurir::with(['pemesanan.user', 'pemesanan.detailPesanan.produk', 'pemesanan.alamat'])
+            ->where('id_kurir', $userId)
+            ->get();
+
+        // Gabungkan 2 & 3 untuk tab Dibatalkan agar urut berdasarkan waktu terbaru (paling atas)
+        // Kita gunakan collection merge dan sortByDesc
+        $dibatalkan = $riwayat_p->concat($riwayat_t)->sortByDesc(function($item) {
+            return $item->updated_at;
+        });
+
+        return view('Kurir.riwayat', compact('selesai', 'dibatalkan'));
     }
 
     public function kurirTerima(Request $request, Pemesanan $pemesanan)
@@ -318,7 +329,7 @@ class PemesananController extends Controller
         // Update status to 'menunggu_pembayaran' as requested
         $pemesanan->update(['status_pesanan' => 'menunggu_pembayaran']); 
         
-        return back()->with('success', 'Pengiriman diterima. Menunggu pembayaran user.');
+        return back()->with('success', 'pesanan akan diproses lebih lanjut oleh staff');
     }
 
     public function kurirTolak(Request $request, Pemesanan $pemesanan)
@@ -333,7 +344,7 @@ class PemesananController extends Controller
             'status_pesanan' => 'ditolak_kurir',
             'id_kurir' => null // Unassign so it can be reassigned
         ]);
-        return back()->with('success', 'Pengiriman ditolak. Pesanan kembali ke purchasing.');
+        return back()->with('success', 'Pengiriman ditolak. Pesanan dikembalikan ke staff.');
     }
 
     public function kurirTerimaDipilih(Request $request)
@@ -429,10 +440,10 @@ class PemesananController extends Controller
         if ($pemesanan->status_pesanan == 'menunggu_konfirmasi') {
             if ($pemesanan->opsi_pengiriman == 'dipick_up') {
                 $pemesanan->update(['status_pesanan' => 'menunggu_pembayaran']);
-                return redirect()->route('staff_purchasing.pesanan_berjalan')->with('success', 'Pesanan Pick Up diterima. Menunggu pembayaran user.');
+                return back()->with('success', 'Pesanan Pick Up diterima. Menunggu pembayaran user.');
             } else {
                 $pemesanan->update(['status_pesanan' => 'menunggu_cari_kurir']);
-                return redirect()->route('staff_purchasing.cari_kurir')->with('success', 'Pesanan diterima. Silakan cari kurir.');
+                return back()->with('success', 'Pesanan diterima. Silakan cari kurir.');
             }
         }
 
@@ -456,7 +467,7 @@ class PemesananController extends Controller
                 ->update(['status_pesanan' => 'menunggu_cari_kurir']);
         });
 
-        return redirect()->route('staff_purchasing.cari_kurir')->with('success', 'Semua pesanan berhasil diterima.');
+        return back()->with('success', 'Semua pesanan berhasil diterima.');
     }
 
     /**
@@ -481,7 +492,7 @@ class PemesananController extends Controller
                 ->update(['status_pesanan' => 'menunggu_cari_kurir']);
         });
 
-        return redirect()->route('staff_purchasing.cari_kurir')->with('success', 'Pesanan terpilih berhasil diterima.');
+        return back()->with('success', 'Pesanan terpilih berhasil diterima.');
     }
 
     /**
@@ -677,7 +688,7 @@ class PemesananController extends Controller
             $pemesanan = Pemesanan::create([
                 'id_user'           => Auth::id(),
                 'id_alamat'         => $validated['id_alamat'] ?? null,
-                'kode_pesanan'      => 'ORD-' . Str::upper(Str::random(10)),
+                'kode_pesanan'      => 'ORD-' . now()->format('dmY') . '-' . str_pad(Pemesanan::count() + 1, 3, '0', STR_PAD_LEFT),
                 'opsi_pengiriman'   => $validated['opsi_pengiriman'],
                 'nama_penerima'     => $validated['nama_penerima'],
                 'no_telepon'        => $validated['no_telepon'],
@@ -840,7 +851,7 @@ class PemesananController extends Controller
             ? 'Pesanan telah selesai (diambil pelanggan).' 
             : 'Pesanan diserahkan ke kurir (Siap Diantar).';
         
-        return redirect()->route('staff_purchasing.riwayat')->with('success', $message);
+        return back()->with('success', $message);
     }
 
 
@@ -862,8 +873,8 @@ class PemesananController extends Controller
             ->get();
 
         // 3. Dibatalkan
-    $dibatalkan = Pemesanan::with(['detailPesanan.produk', 'user', 'alamat'])
-        ->where('status_pesanan', 'ditolak_staff')
+    $dibatalkan = Pemesanan::with(['detailPesanan.produk', 'user', 'alamat', 'transaksi'])
+        ->whereIn('status_pesanan', ['dibatalkan', 'ditolak_staff', 'ditolak_kurir'])
         ->latest('updated_at')
         ->get();
 
@@ -918,8 +929,8 @@ class PemesananController extends Controller
             }
         }
 
-        $pemesanan->update(['status_pesanan' => 'dibatalkan']);
-        return back()->with('success', 'Pembayaran ditolak. Pesanan dibatalkan dan stok dikembalikan.');
+        $pemesanan->update(['status_pesanan' => 'ditolak_staff']);
+        return back()->with('success', 'Pembayaran ditolak. Pesanan dibatalkan oleh staff dan stok dikembalikan.');
     }
 
     public function tolakPesanan(Pemesanan $pemesanan)
@@ -944,8 +955,8 @@ class PemesananController extends Controller
             }
         }
 
-        $pemesanan->update(['status_pesanan' => 'dibatalkan']);
-        return back()->with('success', 'Pesanan ditolak, dibatalkan, dan stok dikembalikan.');
+        $pemesanan->update(['status_pesanan' => 'ditolak_staff']);
+        return back()->with('success', 'Pesanan ditolak, dibatalkan oleh staff, dan stok dikembalikan.');
     }
 
     // === ADMIN METHODS ===
@@ -1063,7 +1074,7 @@ class PemesananController extends Controller
 
         $pemesanan->update(['status_pesanan' => 'dibatalkan']);
 
-        return redirect()->route('pemesanan.index')->with('success', 'Pesanan berhasil dibatalkan.');
+        return redirect()->route('pemesanan.riwayat.pesanan', ['tab' => 'dibatalkan'])->with('success', 'Pesanan berhasil dibatalkan.');
     }
 
 

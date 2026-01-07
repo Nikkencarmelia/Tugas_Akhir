@@ -79,18 +79,6 @@
 @section('content')
 <div class="container py-5">
 
-    <!-- Toast Notification -->
-    <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index: 9999;">
-        @if(session('success'))
-        <div class="toast show text-bg-success border-0 shadow-lg" role="alert">
-            <div class="d-flex">
-                <div class="toast-body fw-semibold"><i class="fa-solid fa-circle-check me-2"></i>{{ session('success') }}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-        @endif
-    </div>
-
     <!-- Header -->
     <div class="orders-header">
         <h3><i class="fa-solid fa-file-invoice-dollar"></i> Konfirmasi Pembayaran 

@@ -325,6 +325,25 @@
     <!-- Content logic already handled above in hybrid style -->
     @endsection
 
+    <!-- Cancellation Confirmation Modal -->
+    <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-bottom-0 pt-4 px-4">
+                    <h5 class="modal-title fw-bold" id="cancelOrderModalLabel">Konfirmasi Pembatalan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body px-4 pb-4">
+                    Apakah Anda yakin ingin membatalkan pesanan ini? Stok yang telah dikurangi akan dikembalikan ke gudang.
+                </div>
+                <div class="modal-footer border-top-0 px-4 pb-4">
+                    <button type="button" class="btn btn-light px-4 fw-semibold" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" id="confirmCancelBtn" class="btn btn-danger px-4 fw-semibold">Ya, Batalkan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -391,8 +410,8 @@
                         $('#panel-selesai').html(data.selesai);
                         $('#panel-dibatalkan').html(data.dibatalkan);
                         
-                        // Update counts if user wants them back (currently hidden in tab links)
-                        // updating logic here if needed
+                        // Re-initialize confirmCancel buttons for new AJAX content
+                        // (Wait, they are onlick so it's fine)
                     }
                 });
             }
@@ -404,32 +423,39 @@
                 fetchFilteredData(url);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
-        });
 
-        // Global function for cancellation from partial
-        function confirmCancel(url) {
-            if (confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = url;
-                
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-                const csrfInput = document.createElement('input');
-                csrfInput.type = 'hidden';
-                csrfInput.name = '_token';
-                csrfInput.value = csrfToken;
-                
-                const methodInput = document.createElement('input');
-                methodInput.type = 'hidden';
-                methodInput.name = '_method';
-                methodInput.value = 'DELETE';
-                
-                form.appendChild(csrfInput);
-                form.appendChild(methodInput);
-                document.body.appendChild(form);
-                form.submit();
+            // Modal handling
+            let cancelUrl = '';
+            window.confirmCancel = function(url) {
+                cancelUrl = url;
+                const modal = new bootstrap.Modal(document.getElementById('cancelOrderModal'));
+                modal.show();
             }
-        }
+
+            $('#confirmCancelBtn').on('click', function() {
+                if (cancelUrl) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = cancelUrl;
+                    
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = '_token';
+                    csrfInput.value = csrfToken;
+                    
+                    const methodInput = document.createElement('input');
+                    methodInput.type = 'hidden';
+                    methodInput.name = '_method';
+                    methodInput.value = 'DELETE';
+                    
+                    form.appendChild(csrfInput);
+                    form.appendChild(methodInput);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        });
     </script>
 </body>
 </html>
