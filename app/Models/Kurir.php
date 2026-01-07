@@ -20,9 +20,6 @@ class Kurir extends Model
         return $this->belongsTo(User::class, 'id_user');
     }
 
-    /**
-     * Synchronizes the courier's work status based on online status and active deliveries.
-     */
     public function syncStatus()
     {
         $hasActiveDeliveries = \App\Models\Pemesanan::where('id_kurir', $this->id_user)
@@ -31,6 +28,7 @@ class Kurir extends Model
 
         if ($hasActiveDeliveries) {
             $this->update(['status_antar' => 'sedang_antar']);
+
             return;
         }
 

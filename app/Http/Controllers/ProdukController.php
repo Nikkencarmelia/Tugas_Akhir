@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Produk;
 use App\Models\Kategori;
-use App\Models\Supplier;
+use App\Models\Produk;
 use App\Models\Satuan;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -23,23 +23,23 @@ class ProdukController extends Controller
 
             $query->where(function ($q) use ($search, $searchLower) {
                 $q->where('id', 'like', "%$search%")
-                  ->orWhere('nama_produk', 'like', "%$search%")
-                  ->orWhere('deskripsi', 'like', "%$search%")
-                  ->orWhere('status_tampil', 'like', "%$search%")
-                  ->orWhere('jumlah_satuan', 'like', "%$search%");
+                    ->orWhere('nama_produk', 'like', "%$search%")
+                    ->orWhere('deskripsi', 'like', "%$search%")
+                    ->orWhere('status_tampil', 'like', "%$search%")
+                    ->orWhere('jumlah_satuan', 'like', "%$search%");
 
-                $q->orWhereHas('kategori', fn($sub) => $sub->where('nama_kategori', 'like', "%$search%"));
-                $q->orWhereHas('supplier', fn($sub) => $sub->where('nama_supplier', 'like', "%$search%"));
-                $q->orWhereHas('satuan', fn($sub) => $sub->where('nama_satuan', 'like', "%$search%"));
+                $q->orWhereHas('kategori', fn ($sub) => $sub->where('nama_kategori', 'like', "%$search%"));
+                $q->orWhereHas('supplier', fn ($sub) => $sub->where('nama_supplier', 'like', "%$search%"));
+                $q->orWhereHas('satuan', fn ($sub) => $sub->where('nama_satuan', 'like', "%$search%"));
 
                 $q->orWhere(function ($sub) use ($searchLower) {
                     if (stripos($searchLower, 'terse') !== false || $searchLower === 'tersedia') {
-                        $sub->whereHas('batch', fn($b) => $b->havingRaw('SUM(stok) > 10'));
+                        $sub->whereHas('batch', fn ($b) => $b->havingRaw('SUM(stok) > 10'));
                     } elseif (stripos($searchLower, 'menip') !== false || $searchLower === 'menipis') {
-                        $sub->whereHas('batch', fn($b) => $b->havingRaw('SUM(stok) > 0 AND SUM(stok) <= 10'));
+                        $sub->whereHas('batch', fn ($b) => $b->havingRaw('SUM(stok) > 0 AND SUM(stok) <= 10'));
                     } elseif (stripos($searchLower, 'hab') !== false || $searchLower === 'habis') {
                         $sub->whereDoesntHave('batch')
-                            ->orWhereHas('batch', fn($b) => $b->havingRaw('SUM(stok) = 0'));
+                            ->orWhereHas('batch', fn ($b) => $b->havingRaw('SUM(stok) = 0'));
                     }
                 });
             });
@@ -47,16 +47,15 @@ class ProdukController extends Controller
 
         $produkBaru = $query->take(5)->get();
 
-        $totalProduk   = Produk::count();
-        $totalTampil   = Produk::where('status_tampil', 'Ditampilkan')->count();
-        $totalArsip    = Produk::where('status_tampil', 'Diarsipkan')->count();
+        $totalProduk = Produk::count();
+        $totalTampil = Produk::where('status_tampil', 'Ditampilkan')->count();
+        $totalArsip = Produk::where('status_tampil', 'Diarsipkan')->count();
 
-        // FIX: SELECT cuma produks.id di subquery, biar GROUP BY aman
         $totalMenipis = DB::table(DB::raw('(SELECT produks.id FROM produks LEFT JOIN batches ON produks.id = batches.id_produk GROUP BY produks.id HAVING SUM(COALESCE(batches.stok, 0)) > 0 AND SUM(COALESCE(batches.stok, 0)) <= 10) as temp'))
-                        ->count();
+            ->count();
 
         $totalHabis = DB::table(DB::raw('(SELECT produks.id FROM produks LEFT JOIN batches ON produks.id = batches.id_produk GROUP BY produks.id HAVING SUM(COALESCE(batches.stok, 0)) = 0) as temp'))
-                        ->count();
+            ->count();
 
         return view('Staff_Produk.dashboard', compact('produkBaru', 'totalProduk', 'totalTampil', 'totalArsip', 'totalMenipis', 'totalHabis'));
     }
@@ -77,12 +76,12 @@ class ProdukController extends Controller
             $statusStok = $request->status_stok;
             $query->where(function ($q) use ($statusStok) {
                 if ($statusStok === 'Tersedia') {
-                    $q->whereHas('batch', fn($b) => $b->havingRaw('SUM(stok) > 10'));
+                    $q->whereHas('batch', fn ($b) => $b->havingRaw('SUM(stok) > 10'));
                 } elseif ($statusStok === 'Menipis') {
-                    $q->whereHas('batch', fn($b) => $b->havingRaw('SUM(stok) > 0 AND SUM(stok) <= 10'));
+                    $q->whereHas('batch', fn ($b) => $b->havingRaw('SUM(stok) > 0 AND SUM(stok) <= 10'));
                 } elseif ($statusStok === 'Habis') {
                     $q->whereDoesntHave('batch')
-                      ->orWhereHas('batch', fn($b) => $b->havingRaw('SUM(stok) = 0'));
+                        ->orWhereHas('batch', fn ($b) => $b->havingRaw('SUM(stok) = 0'));
                 }
             });
         }
@@ -97,24 +96,24 @@ class ProdukController extends Controller
 
             $query->where(function ($q) use ($search, $searchLower) {
                 $q->where('kode_produk', 'like', "%$search%")
-                  ->orWhere('id', 'like', "%$search%")
-                  ->orWhere('nama_produk', 'like', "%$search%")
-                  ->orWhere('deskripsi', 'like', "%$search%")
-                  ->orWhere('status_tampil', 'like', "%$search%")
-                  ->orWhere('jumlah_satuan', 'like', "%$search%");
+                    ->orWhere('id', 'like', "%$search%")
+                    ->orWhere('nama_produk', 'like', "%$search%")
+                    ->orWhere('deskripsi', 'like', "%$search%")
+                    ->orWhere('status_tampil', 'like', "%$search%")
+                    ->orWhere('jumlah_satuan', 'like', "%$search%");
 
-                $q->orWhereHas('kategori', fn($sub) => $sub->where('nama_kategori', 'like', "%$search%"));
-                $q->orWhereHas('supplier', fn($sub) => $sub->where('nama_supplier', 'like', "%$search%"));
-                $q->orWhereHas('satuan', fn($sub) => $sub->where('nama_satuan', 'like', "%$search%"));
+                $q->orWhereHas('kategori', fn ($sub) => $sub->where('nama_kategori', 'like', "%$search%"));
+                $q->orWhereHas('supplier', fn ($sub) => $sub->where('nama_supplier', 'like', "%$search%"));
+                $q->orWhereHas('satuan', fn ($sub) => $sub->where('nama_satuan', 'like', "%$search%"));
 
                 $q->orWhere(function ($sub) use ($searchLower) {
                     if (stripos($searchLower, 'terse') !== false || $searchLower === 'tersedia') {
-                        $sub->whereHas('batch', fn($b) => $b->havingRaw('SUM(stok) > 10'));
+                        $sub->whereHas('batch', fn ($b) => $b->havingRaw('SUM(stok) > 10'));
                     } elseif (stripos($searchLower, 'menip') !== false || $searchLower === 'menipis') {
-                        $sub->whereHas('batch', fn($b) => $b->havingRaw('SUM(stok) > 0 AND SUM(stok) <= 10'));
+                        $sub->whereHas('batch', fn ($b) => $b->havingRaw('SUM(stok) > 0 AND SUM(stok) <= 10'));
                     } elseif (stripos($searchLower, 'hab') !== false || $searchLower === 'habis') {
                         $sub->whereDoesntHave('batch')
-                            ->orWhereHas('batch', fn($b) => $b->havingRaw('SUM(stok) = 0'));
+                            ->orWhereHas('batch', fn ($b) => $b->havingRaw('SUM(stok) = 0'));
                     }
                 });
             });
@@ -124,10 +123,10 @@ class ProdukController extends Controller
 
         return view('Staff_Produk.dataProduk', [
             'produkAll' => $produkAll,
-            'produk'    => $produkPaginated,
-            'kategori'  => Kategori::all(),
-            'supplier'  => Supplier::all(),
-            'satuan'    => Satuan::all(),
+            'produk' => $produkPaginated,
+            'kategori' => Kategori::all(),
+            'supplier' => Supplier::all(),
+            'satuan' => Satuan::all(),
         ]);
     }
 
@@ -135,7 +134,7 @@ class ProdukController extends Controller
     {
         return view('Staff_Produk.tambahProduk', [
             'kategori' => Kategori::all(),
-            'satuan'   => Satuan::all(),
+            'satuan' => Satuan::all(),
             'supplier' => Supplier::all(),
         ]);
     }
@@ -143,15 +142,15 @@ class ProdukController extends Controller
     public function storeProduk(Request $request)
     {
         $request->validate([
-            'nama_produk'              => 'required|string|max:255',
-            'id_kategori'              => 'required|exists:kategoris,id',
-            'id_satuan'                => 'required|exists:satuans,id',
-            'id_supplier'              => 'required|exists:suppliers,id',
-            'jumlah_satuan'            => 'required|numeric|min:1',
-            'estimasi_kadaluwarsa_hari'=> 'nullable|integer|min:0',
-            'status_tampil'            => 'required|in:Ditampilkan,Diarsipkan',
-            'deskripsi'                => 'nullable|string',
-            'gambar'                   => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'nama_produk' => 'required|string|max:255',
+            'id_kategori' => 'required|exists:kategoris,id',
+            'id_satuan' => 'required|exists:satuans,id',
+            'id_supplier' => 'required|exists:suppliers,id',
+            'jumlah_satuan' => 'required|numeric|min:1',
+            'estimasi_kadaluwarsa_hari' => 'required|integer|min:1',
+            'status_tampil' => 'required|in:Ditampilkan,Diarsipkan',
+            'deskripsi' => 'required|string',
+            'gambar' => 'required|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
         $gambarPath = null;
@@ -160,22 +159,20 @@ class ProdukController extends Controller
         }
 
         $produk = Produk::create([
-            'nama_produk'               => $request->nama_produk,
-            'id_kategori'               => $request->id_kategori,
-            'id_satuan'                 => $request->id_satuan,
-            'id_supplier'               => $request->id_supplier,
-            'jumlah_satuan'             => $request->jumlah_satuan,
+            'nama_produk' => $request->nama_produk,
+            'id_kategori' => $request->id_kategori,
+            'id_satuan' => $request->id_satuan,
+            'id_supplier' => $request->id_supplier,
+            'jumlah_satuan' => $request->jumlah_satuan,
             'estimasi_kadaluwarsa_hari' => $request->estimasi_kadaluwarsa_hari ?? 0,
-            'deskripsi'                 => $request->deskripsi,
-            'status_tampil'             => $request->status_tampil,
-            'gambar'                    => $gambarPath,
+            'deskripsi' => $request->deskripsi,
+            'status_tampil' => $request->status_tampil,
+            'gambar' => $gambarPath,
         ]);
 
-        // Generate Kode Produk: PRD-001, PRD-002, dst.
-        $kode = 'PRD-' . str_pad($produk->id, 3, '0', STR_PAD_LEFT);
+        $kode = 'PRD-'.str_pad($produk->id, 3, '0', STR_PAD_LEFT);
         $produk->update(['kode_produk' => $kode]);
 
-        // LANGSUNG KE DATA PRODUK + TOAST MUNCUL DI SANA
         return redirect()->route('produk.data')->with('success', 'Produk berhasil ditambahkan!');
     }
 
@@ -184,10 +181,10 @@ class ProdukController extends Controller
         $produk = Produk::findOrFail($id);
 
         return view('Staff_Produk.editProduk', [
-            'produk'   => $produk,
+            'produk' => $produk,
             'kategori' => Kategori::all(),
             'supplier' => Supplier::all(),
-            'satuan'   => Satuan::all(),
+            'satuan' => Satuan::all(),
         ]);
     }
 
@@ -196,15 +193,15 @@ class ProdukController extends Controller
         $produk = Produk::findOrFail($id);
 
         $request->validate([
-            'nama_produk'              => 'required|string|max:255',
-            'id_kategori'              => 'required|exists:kategoris,id',
-            'id_satuan'                => 'required|exists:satuans,id',
-            'id_supplier'              => 'required|exists:suppliers,id',
-            'jumlah_satuan'            => 'required|numeric|min:1',
-            'estimasi_kadaluwarsa_hari'=> 'nullable|integer|min:0',
-            'status_tampil'            => 'required|in:Ditampilkan,Diarsipkan',
-            'deskripsi'                => 'nullable|string',
-            'gambar'                   => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'nama_produk' => 'required|string|max:255',
+            'id_kategori' => 'required|exists:kategoris,id',
+            'id_satuan' => 'required|exists:satuans,id',
+            'id_supplier' => 'required|exists:suppliers,id',
+            'jumlah_satuan' => 'required|numeric|min:1',
+            'estimasi_kadaluwarsa_hari' => 'nullable|integer|min:1',
+            'status_tampil' => 'required|in:Ditampilkan,Diarsipkan',
+            'deskripsi' => 'nullable|string',
+            'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
         $gambarPath = $produk->gambar;
@@ -216,18 +213,17 @@ class ProdukController extends Controller
         }
 
         $produk->update([
-            'nama_produk'               => $request->nama_produk,
-            'id_kategori'               => $request->id_kategori,
-            'id_satuan'                 => $request->id_satuan,
-            'id_supplier'               => $request->id_supplier,
-            'jumlah_satuan'             => $request->jumlah_satuan,
+            'nama_produk' => $request->nama_produk,
+            'id_kategori' => $request->id_kategori,
+            'id_satuan' => $request->id_satuan,
+            'id_supplier' => $request->id_supplier,
+            'jumlah_satuan' => $request->jumlah_satuan,
             'estimasi_kadaluwarsa_hari' => $request->estimasi_kadaluwarsa_hari ?? 0,
-            'deskripsi'                 => $request->deskripsi,
-            'status_tampil'             => $request->status_tampil,
-            'gambar'                    => $gambarPath,
+            'deskripsi' => $request->deskripsi,
+            'status_tampil' => $request->status_tampil,
+            'gambar' => $gambarPath,
         ]);
 
-        // LANGSUNG KE DATA PRODUK + TOAST MUNCUL DI SANA
         return redirect()->route('produk.data')->with('success', 'Produk berhasil diupdate!');
     }
 
@@ -239,7 +235,7 @@ class ProdukController extends Controller
             if ($produk->batch_count > 0) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Tidak dapat menghapus produk karena masih memiliki batch.'
+                    'message' => 'Tidak dapat menghapus produk karena masih memiliki batch.',
                 ], 422);
             }
 
@@ -251,28 +247,25 @@ class ProdukController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Produk berhasil dihapus.'
-            ], 200); // penting: status code eksplisit
+                'message' => 'Produk berhasil dihapus.',
+            ], 200);
         } catch (\Exception $e) {
-            \Log::error('Delete produk error: ' . $e->getMessage());
+            \Log::error('Delete produk error: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan server.'
+                'message' => 'Terjadi kesalahan server.',
             ], 500);
         }
     }
 
-    /**
-     * Check if product name exists (for soft warning)
-     */
     public function checkProductName(Request $request)
     {
         $name = $request->query('name');
         $excludeId = $request->query('exclude_id');
 
         $query = Produk::where('nama_produk', $name);
-        
+
         if ($excludeId) {
             $query->where('id', '!=', $excludeId);
         }
@@ -282,3 +275,4 @@ class ProdukController extends Controller
         return response()->json(['exists' => $exists]);
     }
 }
+

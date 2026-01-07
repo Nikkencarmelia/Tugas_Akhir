@@ -30,8 +30,7 @@
         .order-product-details { flex-grow: 1; }
         .produk-lain { font-size: 12px; color: #6c757d; font-style: italic; }
 
-        /* Badge Supplier Styles */
-        .img-container { position: relative; width: 80px; height: 80px; }
+.img-container { position: relative; width: 80px; height: 80px; }
         .img-container img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 1px solid #f1f3f4; }
         .badge-supplier {
         position: absolute; top: 5px; right: 5px;
@@ -50,8 +49,7 @@
         .status-menunggu-cari-kurir{background:#fff3cd;color:#856404;border:1px solid #ffeaa7;}
         @media(max-width:768px){.orders-header{flex-direction:column;gap:1rem;text-align:center}.order-header{flex-direction:column;gap:.5rem;align-items:flex-start}.order-product{flex-direction:column;text-align:center}.order-actions{justify-content:center}.select-controls{flex-wrap:wrap;gap:0.5rem;justify-content:flex-start;}.select-controls .input-group{max-width:200px !important;}.select-controls .form-select{max-width:140px !important;}}
 
-        /* Modern Modal Styles - Synced with User/profil.blade.php */
-        .modal-content {
+.modal-content {
             border-radius: 12px;
             border: none;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
@@ -136,8 +134,7 @@
             border-radius: 0 0 12px 12px;
         }
 
-        /* Custom Tab Buttons Style */
-        .orders-tabs{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;}
+.orders-tabs{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;}
         .orders-tab{padding:8px 16px;border-radius:20px;background:#ffffff;text-decoration:none;color:#6c757d;font-weight:500;border:1px solid #e9ecef;transition:all .3s ease;}
         .orders-tab.active{background:#198754;color:white;border-color:#198754;}
         .orders-tab.active .badge { color: white !important; }
@@ -168,7 +165,7 @@
         .alert {
             border-radius: 10px;
         }
-        /* Update Modal Header for Delete */
+
         .modal-header-danger {
             background: #dc3545;
             color: white;
@@ -188,8 +185,7 @@
             <small class="text-muted">Kelola data wilayah dan ongkos kirim</small>
         </div>
 
-        <!-- Custom Tab Buttons -->
-        <div class="orders-tabs mb-4">
+<div class="orders-tabs mb-4">
             <a href="{{ route('staff_purchasing.ongkir.index', ['tab' => 'kecamatan']) }}" class="orders-tab {{ $activeTab == 'kecamatan' ? 'active' : '' }}" data-tab="kecamatan">Kecamatan</a>
             <a href="{{ route('staff_purchasing.ongkir.index', ['tab' => 'kelurahan']) }}" class="orders-tab {{ $activeTab == 'kelurahan' ? 'active' : '' }}" data-tab="kelurahan">Kelurahan</a>
             <a href="{{ route('staff_purchasing.ongkir.index', ['tab' => 'kodepos']) }}" class="orders-tab {{ $activeTab == 'kodepos' ? 'active' : '' }}" data-tab="kodepos">Kode Pos</a>
@@ -197,10 +193,7 @@
 
         <div class="tab-content">
 
-            <!-- ============================
-                 TAB 1 — KECAMATAN
-            =============================-->
-            <div class="tab-panel {{ $activeTab == 'kecamatan' ? 'active' : '' }}" id="kecamatan">
+<div class="tab-panel {{ $activeTab == 'kecamatan' ? 'active' : '' }}" id="kecamatan">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-semibold">Data Kecamatan</h5>
                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalKecamatan">
@@ -241,8 +234,8 @@
                                         <button class="btn btn-warning btn-sm btn-edit-kec" data-bs-toggle="modal" data-bs-target="#modalKecamatan" data-id="{{ $item->id }}" data-nama="{{ $item->nama_kecamatan }}" data-ongkir-mobil="{{ $item->ongkir_minimal_mobil }}" data-ongkir-motor="{{ $item->ongkir_minimal_motor }}">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button class="btn btn-danger btn-sm btn-delete-kec" 
-                                            data-url="{{ route('staff_purchasing.kecamatan.destroy', $item->id) }}" 
+                                        <button class="btn btn-danger btn-sm btn-delete-kec"
+                                            data-url="{{ route('staff_purchasing.kecamatan.destroy', $item->id) }}"
                                             data-nama="{{ $item->nama_kecamatan }}">
                                             <i class="bi bi-trash"></i>
                                         </button>
@@ -258,10 +251,7 @@
                 </div>
             </div>
 
-            <!-- ============================
-                 TAB 2 — KELURAHAN
-            =============================-->
-            <div class="tab-panel {{ $activeTab == 'kelurahan' ? 'active' : '' }}" id="kelurahan">
+<div class="tab-panel {{ $activeTab == 'kelurahan' ? 'active' : '' }}" id="kelurahan">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-semibold">Data Kelurahan</h5>
                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalKelurahan">
@@ -312,8 +302,8 @@
                                         <button class="btn btn-warning btn-sm btn-edit-kel" data-bs-toggle="modal" data-bs-target="#modalKelurahan" data-id="{{ $item->id }}" data-nama="{{ $item->nama_kelurahan }}" data-kec="{{ $item->id_kecamatan }}">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button class="btn btn-danger btn-sm btn-delete-kel" 
-                                            data-url="{{ route('staff_purchasing.kelurahan.destroy', $item->id) }}" 
+                                        <button class="btn btn-danger btn-sm btn-delete-kel"
+                                            data-url="{{ route('staff_purchasing.kelurahan.destroy', $item->id) }}"
                                             data-nama="{{ $item->nama_kelurahan }}">
                                             <i class="bi bi-trash"></i>
                                         </button>
@@ -329,10 +319,7 @@
                 </div>
             </div>
 
-            <!-- ============================
-                 TAB 3 — KODE POS
-            =============================-->
-            <div class="tab-panel {{ $activeTab == 'kodepos' ? 'active' : '' }}" id="kodepos">
+<div class="tab-panel {{ $activeTab == 'kodepos' ? 'active' : '' }}" id="kodepos">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-semibold">Data Kode Pos</h5>
                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalKodePos">
@@ -392,8 +379,8 @@
                                         <button class="btn btn-warning btn-sm btn-edit-kp" data-bs-toggle="modal" data-bs-target="#modalKodePos" data-id="{{ $item->id }}" data-kode="{{ $item->kode_pos }}" data-kel="{{ $item->id_kelurahan }}">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button class="btn btn-danger btn-sm btn-delete-kp" 
-                                            data-url="{{ route('staff_purchasing.kodepos.destroy', $item->id) }}" 
+                                        <button class="btn btn-danger btn-sm btn-delete-kp"
+                                            data-url="{{ route('staff_purchasing.kodepos.destroy', $item->id) }}"
                                             data-nama="{{ $item->kode_pos }}">
                                             <i class="bi bi-trash"></i>
                                         </button>
@@ -412,8 +399,7 @@
         </div>
     </div>
 
-    {{-- Modal Kecamatan --}}
-    <div class="modal fade" id="modalKecamatan" tabindex="-1">
+<div class="modal fade" id="modalKecamatan" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -431,11 +417,11 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Ongkir Minimal Mobil (Rp)</label>
-                            <input type="number" class="form-control" id="ongkirMobilKecamatan" name="ongkir_minimal_mobil" min="0" step="1000" required>
+                            <input type="number" class="form-control" id="ongkirMobilKecamatan" name="ongkir_minimal_mobil" min="1" step="1000" required oninput="if(this.value === '0') this.value = '';">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Ongkir Minimal Motor (Rp)</label>
-                            <input type="number" class="form-control" id="ongkirMotorKecamatan" name="ongkir_minimal_motor" min="0" step="1000" required>
+                            <input type="number" class="form-control" id="ongkirMotorKecamatan" name="ongkir_minimal_motor" min="1" step="1000" required oninput="if(this.value === '0') this.value = '';">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -447,8 +433,7 @@
         </div>
     </div>
 
-    {{-- Modal Kelurahan --}}
-    <div class="modal fade" id="modalKelurahan" tabindex="-1">
+<div class="modal fade" id="modalKelurahan" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -483,8 +468,7 @@
         </div>
     </div>
 
-    {{-- Modal Kode Pos --}}
-    <div class="modal fade" id="modalKodePos" tabindex="-1">
+<div class="modal fade" id="modalKodePos" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -519,8 +503,7 @@
         </div>
     </div>
 
-    {{-- Modal Konfirmasi Hapus --}}
-    <div class="modal fade" id="modalDeleteConfirm" tabindex="-1">
+<div class="modal fade" id="modalDeleteConfirm" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header modal-header-danger">
@@ -539,8 +522,7 @@
         </div>
     </div>
 
-    <!-- Toast Container -->
-    <div class="toast-container">
+<div class="toast-container">
         <div id="toastSuccess" class="toast align-items-center text-white bg-success border-0" role="alert" data-bs-autohide="true" data-bs-delay="5000">
             <div class="d-flex">
                 <div class="toast-body">
@@ -581,7 +563,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Toast handling
+
             @if(session('success'))
                 const successToast = new bootstrap.Toast(document.getElementById('toastSuccess'));
                 successToast.show();
@@ -592,8 +574,7 @@
                 errorToast.show();
             @endif
 
-            // Optional: Fungsi helper buat show toast custom (misal dari AJAX)
-            window.showToast = function(type, message, delay = 5000) {
+window.showToast = function(type, message, delay = 5000) {
                 const toastId = type === 'success' ? 'toastSuccess' : 'toastError';
                 const toastEl = document.getElementById(toastId);
                 const messageEl = document.getElementById(type === 'success' ? 'successMessage' : 'errorMessage');
@@ -621,10 +602,9 @@
             document.getElementById('formKecamatan').dataset.defaultAction = `{{ route('staff_purchasing.kecamatan.store') }}`;
             document.getElementById('formKelurahan').dataset.defaultAction = `{{ route('staff_purchasing.kelurahan.store') }}`;
             document.getElementById('formKodePos').dataset.defaultAction = `{{ route('staff_purchasing.kodepos.store') }}`;
-            
-            // Delete Logic
-            let deleteUrl = '';
-            
+
+let deleteUrl = '';
+
             function setupDeleteListener(selector) {
                 document.querySelectorAll(selector).forEach(btn => {
                     btn.addEventListener('click', function() {
@@ -645,13 +625,13 @@
                     const form = document.createElement('form');
                     form.method = 'POST';
                     form.action = deleteUrl;
-                    const csrfToken = document.querySelector('meta[name="csrf-token"]').content; // Note: Ensure meta tag exists or use @csrf blade equivalent in JS injection
-                    
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
                     const inputs = [
                         {name: '_token', value: '{{ csrf_token() }}', type: 'hidden'},
                         {name: '_method', value: 'DELETE', type: 'hidden'}
                     ];
-                    
+
                     inputs.forEach(i => {
                         const input = document.createElement('input');
                         input.type = i.type;
@@ -659,7 +639,7 @@
                         input.value = i.value;
                         form.appendChild(input);
                     });
-                    
+
                     document.body.appendChild(form);
                     form.submit();
                 }
@@ -674,7 +654,8 @@
                 const ongkirMobil = btn.dataset.ongkirMobil;
                 const ongkirMotor = btn.dataset.ongkirMotor;
                 const form = document.getElementById('formKecamatan');
-                form.action = `/purchasing/kecamatan/${id}`;
+                let updateUrl = `{{ route('staff_purchasing.kecamatan.update', ':id') }}`;
+                form.action = updateUrl.replace(':id', id);
                 form.querySelector('input[name="_method"]').value = 'PUT';
                 document.getElementById('namaKecamatan').value = nama;
                 document.getElementById('ongkirMobilKecamatan').value = ongkirMobil;
@@ -689,7 +670,8 @@
                 const nama = btn.dataset.nama;
                 const kec = btn.dataset.kec;
                 const form = document.getElementById('formKelurahan');
-                form.action = `/purchasing/kelurahan/${id}`;
+                let updateUrl = `{{ route('staff_purchasing.kelurahan.update', ':id') }}`;
+                form.action = updateUrl.replace(':id', id);
                 form.querySelector('input[name="_method"]').value = 'PUT';
                 document.getElementById('namaKelurahan').value = nama;
                 document.getElementById('kecamatanKelurahan').value = kec;
@@ -703,7 +685,8 @@
                 const kode = btn.dataset.kode;
                 const kel = btn.dataset.kel;
                 const form = document.getElementById('formKodePos');
-                form.action = `/purchasing/kode-pos/${id}`;
+                let updateUrl = `{{ route('staff_purchasing.kodepos.update', ':id') }}`;
+                form.action = updateUrl.replace(':id', id);
                 form.querySelector('input[name="_method"]').value = 'PUT';
                 document.getElementById('kodePos').value = kode;
                 document.getElementById('idKodePos').value = id;

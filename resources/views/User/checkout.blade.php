@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* (Semua style kamu tetap sama seperti sebelumnya) */
+
         .checkout-container { position: relative; min-height: 100vh; display: flex; flex-direction: row; justify-content: space-between; gap: 1.5rem; margin-top: 0.5rem; padding: 0 1.5rem 1.5rem; box-sizing: border-box; }
         .card { border-radius: 1rem; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08); overflow: hidden; }
         .form-control:focus, .form-select:focus { border-color: #198754 !important; box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25) !important; }
@@ -29,11 +29,11 @@
         .ongkir-notes { font-size: 0.875rem; color: #198754; margin-top: 0.25rem; font-style: italic; font-weight: 500; background-color: #d1e7dd; padding: 0.25rem 0.5rem; border-radius: 0.25rem; border-left: 3px solid #198754; }
         .page-header { display: flex; align-items: center; margin-bottom: 1rem; }
         .back-btn { display:flex; align-items:center; justify-content:center; width:40px; height:40px; margin-right:.75rem; color:#6c757d; background:transparent; font-size:1.5rem; text-decoration:none; border:none; border-radius:.5rem; transition:color .2s ease, transform .2s ease; }
-        
-        .price-original { 
-            text-decoration: line-through; 
-            color: #adb5bd; 
-            font-size: 0.85rem; 
+
+        .price-original {
+            text-decoration: line-through;
+            color: #adb5bd;
+            font-size: 0.85rem;
             margin-right: 0.5rem;
         }
     </style>
@@ -44,12 +44,22 @@
 
     <div class="container checkout-container">
 
-        <!-- KIRI: Alamat Pengiriman -->
-        <div class="col-12 col-lg-7 left-card">
+<div class="col-12 col-lg-7 left-card">
             <div class="card p-3">
                 <div class="card-body">
                     <div class="page-header">
-                        <a href="{{ route('keranjang.index') }}" class="back-btn" title="Kembali ke Keranjang">
+                        @php
+                            $backUrl = route('keranjang.index');
+                            if (request()->get('from') === 'detail') {
+                                $productId = request()->get('product_id');
+                                if ($productId) {
+                                    $backUrl = route('produk.detail', $productId);
+                                } else {
+                                    $backUrl = route('produk');
+                                }
+                            }
+                        @endphp
+                        <a href="{{ $backUrl }}" class="back-btn" title="Kembali">
                             <i class="bi bi-chevron-left"></i>
                         </a>
                         <h5 class="fw-bold mb-0">Alamat Pengiriman</h5>
@@ -83,8 +93,7 @@
                                 <input type="text" id="teleponInput" class="form-control form-control-sm" placeholder="08xxxxxxxxxx" required>
                             </div>
 
-                            <!-- Section Diantar -->
-                            <div id="deliverySection">
+<div id="deliverySection">
                                 @if($alamat->isNotEmpty())
                                 <div class="mb-2">
                                     <label class="form-label">Pilih Alamat Tersimpan (Opsional)</label>
@@ -149,7 +158,7 @@
                                 <div class="ongkir-section">
                                     <div class="mb-2">
                                         <label class="form-label">Penawaran Ongkir</label>
-                                        <input type="number" class="form-control form-control-sm" placeholder="Rp 0" step="1000" min="0" id="ongkirInput" required>
+                                        <input type="number" class="form-control form-control-sm" placeholder="Rp 0" step="1000" min="1" id="ongkirInput" required oninput="if(this.value === '0') this.value = '';">
                                         <div id="ongkirHelp" class="ongkir-help" style="display: none;">Minimal ongkir sesuai ketentuan.</div>
                                         <div id="ongkirNotes" class="ongkir-notes" style="display: none;"></div>
                                         <div id="ongkirError" class="ongkir-error" style="display: none;">Penawaran ongkir harus minimal Rp <span id="minimalDisplay">0</span></div>
@@ -157,8 +166,7 @@
                                 </div>
                             </div>
 
-                            <!-- Section Pick Up -->
-                            <div id="pickupSection">
+<div id="pickupSection">
                                 <div class="alert alert-info mb-2">
                                     <i class="fa fa-map-marker-alt"></i> <strong>Alamat Pickup:</strong><br>
                                     Jl. Contoh No. 123, RT 01/RW 01, Kelurahan Pickup, Kecamatan Pickup, Kota Contoh, 12345.
@@ -170,8 +178,7 @@
             </div>
         </div>
 
-        <!-- KANAN: Rincian Harga -->
-        <div class="col-12 col-lg-5 right-card">
+<div class="col-12 col-lg-5 right-card">
             <div class="card p-3 bg-light shadow-sm">
                 <div class="card-body">
                     <h5 class="fw-bold mb-2">Rincian Harga</h5>
@@ -189,7 +196,7 @@
                                     <div class="flex-grow-1 ms-2">
                                         <div class="item-name">{{ $item['nama_produk'] }}</div>
                                         <div class="item-detail">
-                                            {{ $item['quantity'] }} x 
+                                            {{ $item['quantity'] }} x
                                             @if(!empty($item['harga_awal']))
                                                 <span class="price-original">Rp {{ number_format($item['harga_awal'], 0, ',', '.') }}</span>
                                             @endif
@@ -263,7 +270,7 @@
             let minimalOngkir = 0;
 
             const alamatData = @json($alamat->keyBy('id')->toArray());
-            const itemsCheckout = @json($itemsCheckout); // AMAN! dari controller
+            const itemsCheckout = @json($itemsCheckout);
 
             function updateTotal() {
                 const total = subtotal + ongkir;
@@ -276,7 +283,7 @@
                 if (!kecId) return;
                 console.log('Loading kelurahan for kecamatan:', kecId);
                 $('#kelurahanInput').html('<option value="">Loading...</option>');
-                
+
                 $.get(`{{ url('/user/kelurahan') }}/${kecId}`)
                     .done(function(data) {
                         console.log('Kelurahan data:', data);
@@ -304,7 +311,7 @@
                         console.log('KodePos data:', data);
                         $('#kodeposInput').html('<option value="">Pilih kode pos</option>');
                          if (data.length === 0) {
-                             // Jangan alert dulu, mungkin user belum input
+
                          }
                         data.forEach(k => $('#kodeposInput').append(`<option value="${k.id}">${k.kode_pos}</option>`));
                         if (callback) callback();
@@ -367,10 +374,9 @@
                 buatPesananBtn.textContent = valid ? 'Buat Pesanan' : 'Lengkapi Form Terlebih Dahulu';
             }
 
-            // Event listeners
-            namaInput.addEventListener('input', checkValidity);
+namaInput.addEventListener('input', checkValidity);
             teleponInput.addEventListener('input', checkValidity);
-            
+
             opsiPengiriman.addEventListener('change', function() {
                 const val = this.value;
                 deliverySection.style.display = val === 'diantar' ? 'block' : 'none';
@@ -404,8 +410,7 @@
                 checkValidity();
             });
 
-            // Alamat tersimpan
-            if (alamatTersimpan) {
+if (alamatTersimpan) {
                 alamatTersimpan.addEventListener('change', function() {
                     const id = this.value;
                     if (id && alamatData[id]) {
@@ -436,8 +441,7 @@
                 });
             }
 
-            // Submit pesanan
-            buatPesananBtn.addEventListener('click', function() {
+buatPesananBtn.addEventListener('click', function() {
                 if (this.disabled) return;
                 this.disabled = true;
                 this.textContent = 'Memproses...';

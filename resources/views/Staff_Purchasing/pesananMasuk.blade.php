@@ -11,7 +11,7 @@
         .orders-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; background: white; padding: 1.5rem 2rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         .orders-header h3 { color: #2a522a; font-weight: 700; margin: 0; display: flex; align-items: center; gap: .5rem; }
         .orders-header h3 i { color: #198754; }
-        
+
         .order-card { background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.06); transition: .3s; border: 1px solid #f1f3f4; position: relative;}
         .order-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
         .order-card.hidden { display: none !important; }
@@ -21,9 +21,8 @@
         .order-meta { display: flex; flex-direction: column; font-size: 14px; color: #6c757d; gap: 4px; }
         .order-meta .alamat { background: #e8f5e9; color: #1b5e20; padding: 3px 8px; border-radius: 6px; font-size: 13px; display: inline-block; }
         .order-meta .metode { background: #e3f2fd; color: #0d47a1; padding: 3px 8px; border-radius: 6px; font-size: 13px; display: inline-block; }
-        
-        /* Unified Delivery & Method Badges */
-        .badge-metode { background: #e3f2fd; color: #0d47a1; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
+
+.badge-metode { background: #e3f2fd; color: #0d47a1; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
         .badge-alamat { background: #e8f5e9; color: #1b5e20; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
         .badge-kendaraan { background: #fef9c3; color: #854d0e; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #fde68a; }
         .order-number { font-weight: 600; color: #495057; }
@@ -32,27 +31,26 @@
         .img-container { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
         .img-container img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; border: 1px solid #dee2e6; }
         .badge-supplier { position: absolute; top: 5px; right: 5px; font-size: .7rem; font-weight: 600; padding: .3rem .55rem; border-radius: .4rem; line-height: 1; z-index: 2; }
-        
+
         .order-product-details h6 { margin-bottom: 0.25rem; font-weight: 600; color: #212529; }
         .produk-lain { font-size: 12px; color: #6c757d; font-style: italic; margin-top: 0.5rem; }
 
         .order-actions { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
         .select-controls { margin-bottom: 1.5rem; background: #fff; padding: 1rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
 
-        .order-status { 
-            display: flex; 
-            align-items: center; 
-            gap: .5rem; 
-            padding: 6px 12px; 
-            border-radius: 20px; 
-            font-size: 13px; 
-            font-weight: 500; 
-            width: fit-content; 
-            margin-bottom: 1rem; 
+        .order-status {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            width: fit-content;
+            margin-bottom: 1rem;
         }
 
-        /* Status Colors - Synchronized with User History */
-        .status-menunggu_konfirmasi { background: #f1f3f5; color: #495057; }
+.status-menunggu_konfirmasi { background: #f1f3f5; color: #495057; }
         .status-menunggu_pembayaran { background: #fff4e6; color: #d9480f; }
         .status-diproses { background: #fef9c3; color: #854d0e; }
         .status-dikirim { background: #e0f2fe; color: #0369a1; }
@@ -81,18 +79,16 @@
 @section('content')
 <div class="container py-5">
 
-    <!-- Header -->
-    <div class="orders-header">
+<div class="orders-header">
         <h3><i class="bi bi-bag-check"></i>Pesanan Masuk <span class="badge bg-success ms-2" id="countBadge">{{ count($pengiriman_masuk) }}</span></h3>
         <small class="text-muted">Daftar pesanan yang menunggu konfirmasi</small>
     </div>
 
-    <!-- Controls & Form -->
-    <form action="{{ route('staff_purchasing.terima_dipilih') }}" method="POST" id="bulkForm">
+<form action="{{ route('staff_purchasing.terima_dipilih') }}" method="POST" id="bulkForm">
         @csrf
-        
+
         <div class="select-controls d-flex flex-column gap-3">
-            <!-- Filter Tools -->
+
             <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
                 <div class="input-group" style="max-width: 400px; flex-grow: 1;">
                     <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
@@ -112,13 +108,12 @@
                 </div>
             </div>
 
-            <!-- Bulk Actions -->
-            <div class="d-flex justify-content-between align-items-center border-top pt-3">
+<div class="d-flex justify-content-between align-items-center border-top pt-3">
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="checkbox" id="selectAll">
                     <label class="form-check-label fw-bold" for="selectAll" style="cursor: pointer;">Pilih Semua</label>
                 </div>
-                
+
                 <div class="d-flex gap-2">
                 <button type="button" class="btn btn-primary d-flex align-items-center gap-2" id="btnTerimaDipilih" disabled>
                     <i class="fas fa-check-circle"></i> Terima Dipilih
@@ -129,19 +124,18 @@
             </div>
         </div>
 
-        <!-- Orders List -->
-        <div id="ordersContainer">
+<div id="ordersContainer">
             @forelse($pengiriman_masuk as $order)
             @php
                 $firstItem = $order->detailPesanan->first();
                 $supplier = $firstItem && $firstItem->produk && $firstItem->produk->supplier ? $firstItem->produk->supplier->nama_supplier : 'Non-Supplier';
                 $metode = $order->opsi_pengiriman;
-                
+
                 $imagePath = $firstItem->gambar ?? '';
                 if (str_starts_with($imagePath, 'images/')) {
-                    $src = asset($imagePath); // Public images
+                    $src = asset($imagePath);
                 } elseif (!str_contains($imagePath, 'http') && !str_starts_with($imagePath, 'storage/') && $imagePath) {
-                    $src = asset('storage/' . $imagePath); // Encoded/Storage images
+                    $src = asset('storage/' . $imagePath);
                 } else {
                     $src = $imagePath ? asset($imagePath) : asset('images/default-product.png');
                 }
@@ -153,7 +147,7 @@
                 data-product="{{ strtolower($firstItem->nama_produk ?? '') }}"
                 data-supplier="{{ strtolower($supplier) }}"
                 data-metode="{{ strtolower($metode) }}">
-                
+
                 <div class="order-header">
                     <div class="d-flex align-items-start gap-3">
                         <div class="form-check">
@@ -179,7 +173,7 @@
                                     $status = $order->status_pesanan;
                                     $statusClass = 'status-' . $status;
                                     $statusLabel = ucwords(str_replace('_', ' ', $status));
-                                    
+
                                     if(in_array($status, ['dibatalkan', 'ditolak_staff', 'ditolak_kurir'])) {
                                         $statusClass = 'status-dibatalkan';
                                         $statusLabel = 'Dibatalkan';
@@ -230,10 +224,10 @@
                     <div class="order-product-details flex-grow-1">
                         <h6>{{ $firstItem->nama_produk }}</h6>
                         <p class="mb-1 text-muted small">
-                            {{ $firstItem->quantity }} x Rp {{ number_format($firstItem->harga_satuan, 0, ',', '.') }} 
+                            {{ $firstItem->quantity }} x Rp {{ number_format($firstItem->harga_satuan, 0, ',', '.') }}
                             / {{ $firstItem->jumlah_satuan }} {{ $firstItem->satuan }}
                         </p>
-                        
+
                         @if($order->detailPesanan->count() > 1)
                         <div class="produk-lain mb-2">+ {{ $order->detailPesanan->count() - 1 }} produk lain</div>
                         @endif
@@ -257,12 +251,12 @@
                 @endif
 
                 <div class="order-actions">
-                    <button type="button" class="btn btn-success btn-sm btnTerimaSingle" 
+                    <button type="button" class="btn btn-success btn-sm btnTerimaSingle"
                         data-action="{{ route('staff_purchasing.terima_pesanan', $order->id) }}">
                         <i class="fa-solid fa-check me-1"></i>Terima
                     </button>
 
-                     <button type="button" class="btn btn-danger btn-sm btnTolakSingle" 
+                     <button type="button" class="btn btn-danger btn-sm btnTolakSingle"
                         data-action="{{ route('staff_purchasing.tolak_pesanan', $order->id) }}">
                         <i class="fa-solid fa-xmark me-1"></i>Tolak
                     </button>
@@ -280,9 +274,8 @@
             @endforelse
         </div>
     </form>
-    
-    <!-- Hidden Form for Single Actions -->
-    <form id="singleActionForm" method="POST" style="display:none;">
+
+<form id="singleActionForm" method="POST" style="display:none;">
         @csrf
     </form>
 </div>
@@ -302,8 +295,7 @@
         const btnTerimaDipilih = document.getElementById('btnTerimaDipilih');
         const btnTolakDipilih = document.getElementById('btnTolakDipilih');
 
-        // Colorize Badges
-        function colorizeBadges() {
+function colorizeBadges() {
             const badges = document.querySelectorAll('.badge-supplier');
             const colors = [
                 { bg: "#BAE6FD", text: "#0369A1" }, { bg: "#FEF9C3", text: "#A16207" },
@@ -332,23 +324,21 @@
         function updateSelectAllState() {
             const visibleCheckboxes = Array.from(checkboxes).filter(cb => !cb.closest('.order-card').classList.contains('hidden'));
             const checkedCount = visibleCheckboxes.filter(cb => cb.checked).length;
-            
+
             selectAll.checked = visibleCheckboxes.length > 0 && checkedCount === visibleCheckboxes.length;
             selectAll.indeterminate = checkedCount > 0 && checkedCount < visibleCheckboxes.length;
             updateActionButtons();
         }
 
-        // Filter & Search Logic
-        function filterOrders() {
+function filterOrders() {
             const search = searchInput.value.toLowerCase();
             const sort = sortSelect.value;
             const metodeFilter = metodeSelect.value;
 
             let visibleCount = 0;
             const cardsArray = Array.from(cards);
-            
-            // Sort
-            cardsArray.sort((a, b) => {
+
+cardsArray.sort((a, b) => {
                 const dateA = parseInt(a.dataset.date);
                 const dateB = parseInt(b.dataset.date);
                 return sort === 'newest' ? dateB - dateA : dateA - dateB;
@@ -356,11 +346,10 @@
 
             cardsArray.forEach(card => ordersContainer.appendChild(card));
 
-            // Filter
-            cardsArray.forEach(card => {
+cardsArray.forEach(card => {
                 const text = card.textContent.toLowerCase();
                 const metode = card.dataset.metode;
-                
+
                 let metodeMatch = true;
                 if(metodeFilter === 'pick-up') metodeMatch = (metode === 'dipick_up');
                 else if(metodeFilter === 'diantar') metodeMatch = (metode === 'diantar');
@@ -381,8 +370,7 @@
             updateSelectAllState();
         }
 
-        // Single Accept Login
-        document.querySelectorAll('.btnTerimaSingle').forEach(btn => {
+document.querySelectorAll('.btnTerimaSingle').forEach(btn => {
             btn.addEventListener('click', function() {
                 window.confirmAction('Apakah Anda yakin ingin menerima pesanan ini?', () => {
                     const form = document.getElementById('singleActionForm');
@@ -402,8 +390,7 @@
             });
         });
 
-        // Bulk Action Handlers
-        btnTerimaDipilih.addEventListener('click', () => {
+btnTerimaDipilih.addEventListener('click', () => {
             window.confirmAction('Apakah Anda yakin ingin menerima pesanan yang dipilih?', () => {
                 bulkForm.action = "{{ route('staff_purchasing.terima_dipilih') }}";
                 bulkForm.submit();
@@ -417,8 +404,7 @@
             });
         });
 
-        // Events
-        searchInput.addEventListener('input', filterOrders);
+searchInput.addEventListener('input', filterOrders);
         sortSelect.addEventListener('change', filterOrders);
         metodeSelect.addEventListener('change', filterOrders);
 
@@ -441,7 +427,7 @@
                 updateSelectAllState();
             });
         });
-        
+
         filterOrders();
     });
 </script>

@@ -111,13 +111,13 @@
         .search-controls .input-group {
             flex-grow: 1;
         }
-        /* Role Badges */
+
         .badge-role-super_admin { background-color: var(--bs-primary-bg-subtle) !important; color: var(--bs-primary-text-emphasis) !important; }
         .badge-role-staff_purchasing { background-color: var(--bs-success-bg-subtle) !important; color: var(--bs-success-text-emphasis) !important; }
         .badge-role-staff_produk { background-color: var(--bs-info-bg-subtle) !important; color: var(--bs-info-text-emphasis) !important; }
         .badge-role-kurir { background-color: var(--bs-warning-bg-subtle) !important; color: var(--bs-warning-text-emphasis) !important; }
         .badge-role-user { background-color: var(--bs-secondary-bg-subtle) !important; color: var(--bs-secondary-text-emphasis) !important; }
-        /* Status Badges */
+
         .badge-aktif-aktif { background-color: var(--bs-success-bg-subtle) !important; color: var(--bs-success-text-emphasis) !important; padding: 0.5em 0.75em; border-radius: 0.375rem; font-size: 0.75em; font-weight: 500; }
         .badge-aktif-tidak_aktif { background-color: var(--bs-danger-bg-subtle) !important; color: var(--bs-danger-text-emphasis) !important; padding: 0.5em 0.75em; border-radius: 0.375rem; font-size: 0.75em; font-weight: 500; }
     </style>
@@ -182,7 +182,6 @@
     </div>
 </div>
 
-{{-- Modal Edit User --}}
 <div class="modal fade" id="modalUser" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -237,7 +236,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // === TOAST SETUP (dari profil) ===
+
     function showToast(message, type = 'success') {
         const toastContainer = document.createElement('div');
         toastContainer.className = `toast align-items-center text-white bg-${type} border-0 position-fixed top-0 end-0 m-3`;
@@ -257,8 +256,7 @@ document.addEventListener('DOMContentLoaded', function() {
         toastContainer.addEventListener('hidden.bs.toast', () => toastContainer.remove());
     }
 
-    // === SEARCH FUNCTIONALITY ===
-    document.getElementById('searchUser').addEventListener('input', function() {
+document.getElementById('searchUser').addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase();
         const rows = document.querySelectorAll('#tableUser tbody tr');
         let index = 1;
@@ -275,8 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // === EVENT DELEGATION UNTUK EDIT USER (biar konsisten setiap klik) ===
-    document.addEventListener('click', function(e) {
+document.addEventListener('click', function(e) {
         if (e.target.closest('.btn-edit-user')) {
             const btn = e.target.closest('.btn-edit-user');
             const row = btn.closest('tr');
@@ -287,22 +284,19 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('role').value = row.dataset.role;
             document.getElementById('status_online').value = row.dataset.aktif === 'Aktif' ? 'aktif' : 'tidak_aktif';
 
-            // Buka modal manual & cleanup
-            setTimeout(() => {
+setTimeout(() => {
                 const modalEl = document.getElementById('modalUser');
                 const modal = new bootstrap.Modal(modalEl);
                 modal.show();
 
-                // Cleanup sebelum buka
-                document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
                 document.body.classList.remove('modal-open');
                 document.body.style.paddingRight = '';
             }, 50);
         }
     });
 
-    // === SUBMIT FORM - AJAX UPDATE ===
-    document.getElementById('formUser').addEventListener('submit', function(e) {
+document.getElementById('formUser').addEventListener('submit', function(e) {
         e.preventDefault();
         const id = document.getElementById('idUser').value;
         const formData = {
@@ -331,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             console.log('Response data:', data);
             if (data.success) {
-                // Update table row
+
                 const row = document.querySelector(`tr[data-id="${id}"]`);
                 if (row) {
                     row.dataset.role = formData.role;
@@ -342,22 +336,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
 
-                // Hide modal
-                const modalEl = document.getElementById('modalUser');
+const modalEl = document.getElementById('modalUser');
                 const modal = bootstrap.Modal.getInstance(modalEl);
                 if (modal) {
                     modal.hide();
                 }
 
-                // Cleanup dengan delay biar animasi selesai
-                setTimeout(() => {
+setTimeout(() => {
                     document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
                     document.body.classList.remove('modal-open');
                     document.body.style.paddingRight = '';
                 }, 500);
 
-                // Show toast setelah cleanup
-                setTimeout(() => {
+setTimeout(() => {
                     showToast(data.message || 'Role berhasil diubah!', 'success');
                 }, 550);
             } else {
@@ -370,14 +361,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // === RESET MODAL ON HIDDEN ===
-    const modalUser = document.getElementById('modalUser');
+const modalUser = document.getElementById('modalUser');
     modalUser.addEventListener('hidden.bs.modal', function() {
         document.getElementById('formUser').reset();
         document.getElementById('idUser').value = '';
 
-        // Cleanup tambahan di hidden event
-        setTimeout(() => {
+setTimeout(() => {
             document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
             document.body.classList.remove('modal-open');
             document.body.style.paddingRight = '';

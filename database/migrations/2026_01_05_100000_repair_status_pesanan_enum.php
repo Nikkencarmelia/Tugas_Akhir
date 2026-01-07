@@ -20,20 +20,16 @@ return new class extends Migration
             'menunggu_cari_kurir',
             'menunggu_konfirmasi_kurir',
             'ditolak_kurir',
-            'ditolak_staff',
-            'ditolak_staff_diambil',
             'menunggu_pembayaran',
             'menunggu_konfirmasi_pembayaran',
-            'menunggu_verifikasi_pembayaran',
-            'menyiapkan_pesanan',
             'diproses',
             'siap_diambil',
-            'siap_diambil_dikirim',
+            'pesanan_telah_diambil',
             'dikirim',
             'sedang_diantar',
-            'pesanan_telah_diambil',
             'selesai',
-            'dibatalkan'
+            'dibatalkan',
+            'ditolak_staff'
         ) DEFAULT 'menunggu_konfirmasi'");
     }
 

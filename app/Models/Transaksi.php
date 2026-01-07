@@ -12,7 +12,6 @@ class Transaksi extends Model
     protected $fillable = [
         'id_pemesanan',
         'bukti_pembayaran',
-        'status', // 'menunggu', 'valid', 'invalid'
     ];
 
     public function pemesanan()

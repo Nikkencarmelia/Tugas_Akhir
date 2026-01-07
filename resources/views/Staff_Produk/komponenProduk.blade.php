@@ -28,7 +28,7 @@
             .order-product img{width:80px;height:80px;object-fit:cover;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
             .order-product-details { flex-grow: 1; }
             .produk-lain { font-size: 12px; color: #6c757d; font-style: italic; }
-            /* Badge Supplier Styles */
+
             .img-container { position: relative; width: 80px; height: 80px; }
             .img-container img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 1px solid #f1f3f4; }
             .badge-supplier {
@@ -46,7 +46,7 @@
             .order-status{display:flex;align-items:center;gap:.5rem;padding:6px 12px;border-radius:20px;font-size:13px;font-weight:500;margin-bottom:1rem;}
             .status-menunggu-cari-kurir{background:#fff3cd;color:#856404;border:1px solid #ffeaa7;}
             @media(max-width:768px){.orders-header{flex-direction:column;gap:1rem;text-align:center}.order-header{flex-direction:column;gap:.5rem;align-items:flex-start}.order-product{flex-direction:column;text-align:center}.order-actions{justify-content:center}.select-controls{flex-wrap:wrap;gap:0.5rem;justify-content:flex-start;}.select-controls .input-group{max-width:200px !important;}.select-controls .form-select{max-width:140px !important;}}
-            /* Modern Modal Styles (Synced with Profil) */
+
             .modal-content {
                 border-radius: 12px;
                 border: none;
@@ -127,7 +127,7 @@
                 border-radius: 0 0 12px 12px;
                 background: #fff;
             }
-            /* Custom Tab Buttons Style */
+
             .orders-tabs{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;}
             .orders-tab{padding:8px 16px;border-radius:20px;background:#ffffff;text-decoration:none;color:#6c757d;font-weight:500;border:1px solid #e9ecef;transition:all .3s ease;}
             .orders-tab.active{background:#198754;color:white;border-color:#198754;}
@@ -162,7 +162,7 @@
             }
             .alert { border-radius: 10px; }
             .no-options { color: #dc3545; font-weight: 500; }
-            /* Danger Header for Delete Modal */
+
             .modal-header-danger {
                 background: #dc3545;
                 color: white;
@@ -180,23 +180,21 @@
         <h3><i class="bi bi-tag"></i>Kelola Kategori, Satuan & Supplier</h3>
         <small class="text-muted">Kelola data kategori, satuan, dan supplier produk</small>
     </div>
-    <!-- Flash Messages -->
+
     @if(session('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
-    <!-- Custom Tab Buttons -->
+
     <div class="orders-tabs mb-4">
         <a href="{{ route('produk.komponen.index', ['tab' => 'kategori']) }}" class="orders-tab {{ $activeTab == 'kategori' ? 'active' : '' }}" data-tab="kategori">Kategori</a>
         <a href="{{ route('produk.komponen.index', ['tab' => 'satuan']) }}" class="orders-tab {{ $activeTab == 'satuan' ? 'active' : '' }}" data-tab="satuan">Satuan</a>
         <a href="{{ route('produk.komponen.index', ['tab' => 'supplier']) }}" class="orders-tab {{ $activeTab == 'supplier' ? 'active' : '' }}" data-tab="supplier">Supplier</a>
     </div>
     <div class="tab-content">
-        <!-- ============================
-             TAB 1 — KATEGORI
-        =============================-->
+
         <div class="tab-panel {{ $activeTab == 'kategori' ? 'active' : '' }}" id="kategori">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-semibold">Data Kategori</h5>
@@ -249,9 +247,7 @@
                 {{ $kategori->links('pagination::bootstrap-5') }}
             </div>
         </div>
-        <!-- ============================
-             TAB 2 — SATUAN
-        =============================-->
+
         <div class="tab-panel {{ $activeTab == 'satuan' ? 'active' : '' }}" id="satuan">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-semibold">Data Satuan</h5>
@@ -304,9 +300,7 @@
                 {{ $satuan->links('pagination::bootstrap-5') }}
             </div>
         </div>
-        <!-- ============================
-             TAB 3 — SUPPLIER
-        =============================-->
+
         <div class="tab-panel {{ $activeTab == 'supplier' ? 'active' : '' }}" id="supplier">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-semibold">Data Supplier</h5>
@@ -361,7 +355,7 @@
         </div>
     </div>
 </div>
-{{-- Modal Tambah Kategori --}}
+
 <div class="modal fade" id="modalKategori" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -388,7 +382,7 @@
         </div>
     </div>
 </div>
-{{-- Modal Edit Kategori --}}
+
 <div class="modal fade" id="editModalKategori" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -420,7 +414,7 @@
         </div>
     </div>
 </div>
-{{-- Modal Move Kategori --}}
+
 <div class="modal fade" id="modalMoveKategori" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -453,7 +447,7 @@
         </div>
     </div>
 </div>
-{{-- Modal Tambah Satuan --}}
+
 <div class="modal fade" id="modalSatuan" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -480,7 +474,7 @@
         </div>
     </div>
 </div>
-{{-- Modal Edit Satuan --}}
+
 <div class="modal fade" id="editModalSatuan" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -512,7 +506,7 @@
         </div>
     </div>
 </div>
-{{-- Modal Move Satuan --}}
+
 <div class="modal fade" id="modalMoveSatuan" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -545,7 +539,7 @@
         </div>
     </div>
 </div>
-{{-- Modal Tambah Supplier --}}
+
 <div class="modal fade" id="modalSupplier" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -572,7 +566,7 @@
         </div>
     </div>
 </div>
-{{-- Modal Edit Supplier --}}
+
 <div class="modal fade" id="editModalSupplier" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -604,7 +598,7 @@
         </div>
     </div>
 </div>
-{{-- Modal Move Supplier --}}
+
 <div class="modal fade" id="modalMoveSupplier" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -637,7 +631,7 @@
         </div>
     </div>
 </div>
-{{-- Modal Konfirmasi Hapus --}}
+
 <div class="modal fade" id="modalDeleteConfirm" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -656,7 +650,7 @@
         </div>
     </div>
 </div>
-{{-- Toast Container --}}
+
 <div class="toast-container">
     <div id="toastSuccess" class="toast" role="alert" data-bs-delay="5000">
         <div class="toast-header">
@@ -677,10 +671,10 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // TAMBAHAN: Tab Switching
+
     const tabs = document.querySelectorAll('.orders-tab');
     const panels = document.querySelectorAll('.tab-panel');
-    
+
     function activateTab(tabName) {
         tabs.forEach(t => {
             t.classList.remove('active');
@@ -699,8 +693,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ================= KATEGORI =================
-    document.querySelectorAll('.btn-edit-kat').forEach(btn => {
+document.querySelectorAll('.btn-edit-kat').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = btn.dataset.id;
             const nama = btn.dataset.nama;
@@ -710,8 +703,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ================= SATUAN =================
-    document.querySelectorAll('.btn-edit-sat').forEach(btn => {
+document.querySelectorAll('.btn-edit-sat').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = btn.dataset.id;
             const nama = btn.dataset.nama;
@@ -721,8 +713,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ================= SUPPLIER =================
-    document.querySelectorAll('.btn-edit-sup').forEach(btn => {
+document.querySelectorAll('.btn-edit-sup').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = btn.dataset.id;
             const nama = btn.dataset.nama;
@@ -732,17 +723,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    /* Client-side search and listeners are removed or replaced by server-side query */
-
-    // Auto-show toast success
-    @if(session('success'))
+@if(session('success'))
         const toastEl = document.getElementById('toastSuccess');
         const toast = new bootstrap.Toast(toastEl);
         toast.show();
     @endif
 
-    // ================= DELETE & MOVE =================
-    function capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
+function capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
 
     function populateMoveSelect(capitalType, excludeId) {
         const select = document.getElementById(`moveSelect${capitalType}`);
@@ -751,11 +738,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const submitBtn = document.getElementById(`submitMove${capitalType}`);
         const batalBtn = document.getElementById(`batalMove${capitalType}`);
 
-        // Capture placeholder logic
-        const placeholderText = `Pilih ${capitalType} Lain`;
-        
-        // ROBUST RESET: Clear entirely and re-add placeholder
-        select.innerHTML = ''; 
+const placeholderText = `Pilih ${capitalType} Lain`;
+
+select.innerHTML = '';
         const placeholderOpt = document.createElement('option');
         placeholderOpt.value = "";
         placeholderOpt.textContent = placeholderText;
@@ -766,20 +751,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
         allRows.forEach(row => {
             const id = row.dataset.id;
-            // Only add if not excluded and not already added
+
             if (id != excludeId && !addedIds.has(id)) {
                 const opt = document.createElement('option');
                 opt.value = id;
                 opt.textContent = row.querySelector('td:nth-child(2)').textContent.trim();
                 select.appendChild(opt);
-                
+
                 addedIds.add(id);
                 hasOptions = true;
             }
         });
 
-        // Set default to placeholder
-        select.selectedIndex = 0;
+select.selectedIndex = 0;
 
         if (!hasOptions) {
             noOptionsDiv.style.display = 'block';
@@ -811,12 +795,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (count === 0) {
             document.getElementById('deleteName').textContent = nama;
-            // Simpan URL di tombol konfirmasi
+
             const confirmBtn = document.getElementById('confirmDeleteBtn');
-            confirmBtn.dataset.url = destroyUrl; 
-            
-            // Show Modal
-            new bootstrap.Modal(document.getElementById('modalDeleteConfirm')).show();
+            confirmBtn.dataset.url = destroyUrl;
+
+new bootstrap.Modal(document.getElementById('modalDeleteConfirm')).show();
         } else {
             document.getElementById(`moveSourceId${capitalType}`).value = id;
             populateMoveSelect(capitalType, id);
@@ -826,8 +809,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Event listeners for delete buttons
-    document.querySelectorAll('.btn-delete-kat').forEach(btn => {
+document.querySelectorAll('.btn-delete-kat').forEach(btn => {
         btn.addEventListener('click', () => handleDelete('kategori', btn));
     });
     document.querySelectorAll('.btn-delete-sat').forEach(btn => {
@@ -837,8 +819,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', () => handleDelete('supplier', btn));
     });
 
-    // Action listener for Confirm Delete Button
-    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
         const url = this.dataset.url;
         if(url) {
             const form = document.createElement('form');

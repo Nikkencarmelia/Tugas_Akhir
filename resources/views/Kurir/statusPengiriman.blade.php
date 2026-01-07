@@ -1,3 +1,9 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <title>Status Pengiriman</title>
+</head>
+<body>
 @extends('components.kurir')
 
 @section('content')
@@ -21,8 +27,7 @@
     .tab-panel{display:none;}
     .tab-panel.active{display:block;}
 
-    /* Badge Supplier Styles */
-    .img-container { position: relative; width: 80px; height: 80px; }
+.img-container { position: relative; width: 80px; height: 80px; }
     .img-container img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 1px solid #f1f3f4; }
     .badge-supplier {
       position: absolute; top: 5px; right: 5px;
@@ -33,7 +38,7 @@
     @media(max-width:768px){.orders-header{flex-direction:column;gap:1rem;text-align:center}.orders-tabs{justify-content:center;flex-wrap:wrap}.order-header{flex-direction:column;gap:.5rem;align-items:flex-start}.order-product{flex-direction:column;text-align:center}.order-actions{justify-content:center}}
 </style>
 <div class="container py-5">
-  <!-- Toast Container -->
+
   <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index:9999;">
     <div id="toastSuccess" class="toast align-items-center text-bg-success border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" style="min-width:380px;font-size:1rem;border-radius:0.75rem;">
       <div class="d-flex"><div class="toast-body fw-semibold"><i class="fa-solid fa-circle-check me-2"></i>{{ session('success') }}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>
@@ -52,14 +57,14 @@
   </div>
 
   <div class="tab-content">
-    <!-- MENUNGGU PENGIRIMAN -->
+
     <div id="menunggu" class="tab-panel active">
       @forelse($menunggu_pengiriman as $order)
         @php
             $firstItem = $order->detailPesanan->first();
             $productName = $firstItem ? ($firstItem->produk->nama_produk ?? $firstItem->nama_produk) : 'Produk';
             $supplierName = $firstItem && $firstItem->produk && $firstItem->produk->supplier ? $firstItem->produk->supplier->nama_supplier : 'Non-Supplier';
-            
+
             $imagePath = $firstItem->gambar ?? '';
             if (str_starts_with($imagePath, 'images/')) {
                 $src = asset($imagePath);
@@ -143,14 +148,13 @@
       @endforelse
     </div>
 
-    <!-- DIKIRIM -->
-    <div id="dikirim" class="tab-panel">
+<div id="dikirim" class="tab-panel">
       @forelse($dikirim as $order)
         @php
             $firstItem = $order->detailPesanan->first();
             $productName = $firstItem ? ($firstItem->produk->nama_produk ?? $firstItem->nama_produk) : 'Produk';
             $supplierName = $firstItem && $firstItem->produk && $firstItem->produk->supplier ? $firstItem->produk->supplier->nama_supplier : 'Non-Supplier';
-            
+
             $imagePath = $firstItem->gambar ?? '';
             if (str_starts_with($imagePath, 'images/')) {
                 $src = asset($imagePath);
@@ -172,7 +176,12 @@
             <div class="order-number mb-2">#{{ $order->kode_pesanan }}</div>
             <div class="mb-2 small text-muted"><i class="fa-regular fa-calendar me-1"></i>{{ $order->created_at->format('d M Y') }}</div>
             <div class="d-flex flex-wrap gap-1">
-                {{-- No vehicle badge in Dikirim tab per user request --}}
+                @if($metode == 'delivery')
+                <span class="vehicle-badge text-uppercase">
+                    <i class="fa-solid fa-{{ $kendaraan == 'motor' ? 'motorcycle' : 'truck-pickup' }}"></i>
+                    {{ $kendaraan }}
+                </span>
+                @endif
                 <span class="alamat-badge">
                     <i class="fa-solid fa-location-dot"></i>
                     {{ $kelurahan }} - {{ $order->alamat_lengkap }}
@@ -188,8 +197,8 @@
             </div>
           </div>
           <div class="text-end">
-             <div class="order-status status-dikirim">
-                <i class="fas fa-truck me-1"></i> Dikirim
+             <div class="order-status {{ $order->status_pesanan == 'sedang_diantar' ? 'status-dikirim' : 'status-dikirim' }}">
+                <i class="fas fa-truck me-1"></i> {{ $order->status_pesanan == 'sedang_diantar' ? 'Sedang Diantar' : 'Dikirim' }}
              </div>
              <div class="text-primary fw-bold small mt-2">
                 Rp {{ number_format($order->ongkir, 0, ',', '.') }}
@@ -238,7 +247,7 @@ document.addEventListener('DOMContentLoaded',()=>{
           if(p.id === tabId) p.classList.add('active');
           else p.classList.remove('active');
       });
-      // Update URL without reload
+
       const url = new URL(window.location);
       url.searchParams.set('tab', tabId);
       window.history.replaceState({}, '', url);
@@ -251,15 +260,13 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   });
 
-  // Handle URL tab parameter
-  const urlParams = new URLSearchParams(window.location.search);
+const urlParams = new URLSearchParams(window.location.search);
   const activeTab = urlParams.get('tab');
   if (activeTab && document.getElementById(activeTab)) {
       switchTab(activeTab);
   }
 
-  // Toasts init
-  const toastSuccessEl = document.getElementById('toastSuccess');
+const toastSuccessEl = document.getElementById('toastSuccess');
   const toastErrorEl = document.getElementById('toastError');
   const toastSuccess = new bootstrap.Toast(toastSuccessEl);
   const toastError = new bootstrap.Toast(toastErrorEl);
@@ -267,8 +274,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   @if(session('success')) toastSuccess.show(); @endif
   @if(session('error')) toastError.show(); @endif
 
-  // Colorize supplier badges
-  function colorizeBadges() {
+function colorizeBadges() {
     const badges = document.querySelectorAll('.badge-supplier');
     const colorPairs = [
       { bg: "#BAE6FD", text: "#0369A1" }, { bg: "#FEF9C3", text: "#A16207" },
@@ -291,3 +297,5 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 </script>
 @endsection
+</body>
+</html>

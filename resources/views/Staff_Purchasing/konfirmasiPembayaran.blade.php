@@ -11,7 +11,7 @@
         .orders-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; background: white; padding: 1.5rem 2rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         .orders-header h3 { color: #2a522a; font-weight: 700; margin: 0; display: flex; align-items: center; gap: .5rem; }
         .orders-header h3 i { color: #198754; }
-        
+
         .order-card { background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.06); transition: .3s; border: 1px solid #f1f3f4; position: relative;}
         .order-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
         .order-card.hidden { display: none !important; }
@@ -20,9 +20,8 @@
         .order-meta { display: flex; flex-direction: column; font-size: 14px; color: #6c757d; gap: 4px; }
         .order-meta .alamat { background: #e8f5e9; color: #1b5e20; padding: 3px 8px; border-radius: 6px; font-size: 13px; display: inline-block; }
         .order-meta .metode { background: #e3f2fd; color: #0d47a1; padding: 3px 8px; border-radius: 6px; font-size: 13px; display: inline-block; }
-        
-        /* Unified Delivery & Method Badges */
-        .badge-metode { background: #e3f2fd; color: #0d47a1; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
+
+.badge-metode { background: #e3f2fd; color: #0d47a1; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
         .badge-alamat { background: #e8f5e9; color: #1b5e20; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
         .badge-kendaraan { background: #fef9c3; color: #854d0e; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #fde68a; }
         .order-number { font-weight: 600; color: #495057; }
@@ -31,33 +30,32 @@
         .img-container { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
         .img-container img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; border: 1px solid #dee2e6; }
         .badge-supplier { position: absolute; top: 5px; right: 5px; font-size: .7rem; font-weight: 600; padding: .3rem .55rem; border-radius: .4rem; line-height: 1; z-index: 2; }
-        
+
         .order-product-details h6 { margin-bottom: 0.25rem; font-weight: 600; color: #212529; }
         .produk-lain { font-size: 12px; color: #6c757d; font-style: italic; margin-top: 0.5rem; }
 
         .order-actions { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
         .select-controls { margin-bottom: 1.5rem; background: #fff; padding: 1rem; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-        
-        .order-status { 
-            display: flex; 
-            align-items: center; 
-            gap: .5rem; 
-            padding: 6px 12px; 
-            border-radius: 20px; 
-            font-size: 13px; 
-            font-weight: 500; 
-            width: fit-content; 
-            margin-bottom: 1rem; 
+
+        .order-status {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            width: fit-content;
+            margin-bottom: 1rem;
         }
 
-        /* Status Colors - Synchronized with User History */
-        .status-menunggu_konfirmasi { background: #f1f3f5; color: #495057; }
+.status-menunggu_konfirmasi { background: #f1f3f5; color: #495057; }
         .status-menunggu_pembayaran { background: #fff4e6; color: #d9480f; }
         .status-diproses { background: #fef9c3; color: #854d0e; }
         .status-dikirim { background: #e0f2fe; color: #0369a1; }
         .status-selesai { background: #dcfce7; color: #166534; }
         .status-dibatalkan { background: #fee2e2; color: #991b1b; }
-        .status-verif { background: #fff7ed; color: #9a3412; }
+        .status-menunggu_konfirmasi_pembayaran { background: #fff7ed; color: #9a3412; }
         .status-siap_diambil { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .status-pesanan_telah_diambil { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
         .status-menunggu_konfirmasi_kurir { background: #fef9c3; color: #854d0e; }
@@ -79,16 +77,14 @@
 @section('content')
 <div class="container py-5">
 
-    <!-- Header -->
-    <div class="orders-header">
-        <h3><i class="fa-solid fa-file-invoice-dollar"></i> Konfirmasi Pembayaran 
+<div class="orders-header">
+        <h3><i class="fa-solid fa-file-invoice-dollar"></i> Konfirmasi Pembayaran
             <span class="badge bg-warning text-dark ms-2" id="countBadge">{{ count($pesanan) }}</span>
         </h3>
         <small class="text-muted">Daftar pembayaran yang menunggu konfirmasi</small>
     </div>
 
-    <!-- Controls -->
-    <div class="select-controls d-flex flex-column gap-3">
+<div class="select-controls d-flex flex-column gap-3">
          <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
             <div class="input-group" style="max-width: 400px; flex-grow: 1;">
                  <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
@@ -101,13 +97,12 @@
          </div>
     </div>
 
-    <!-- Orders List -->
-    <div id="ordersContainer">
+<div id="ordersContainer">
         @forelse($pesanan as $order)
         @php
             $firstItem = $order->detailPesanan->first();
-            $supplier = $firstItem && $firstItem->produk && $firstItem->produk->supplier 
-                ? $firstItem->produk->supplier->nama_supplier 
+            $supplier = $firstItem && $firstItem->produk && $firstItem->produk->supplier
+                ? $firstItem->produk->supplier->nama_supplier
                 : 'Non-Supplier';
             $metode = $order->opsi_pengiriman;
 
@@ -120,8 +115,8 @@
                 $src = $imagePath ? asset($imagePath) : asset('images/default-product.png');
             }
 
-            $buktiSrc = $order->bukti_pembayaran 
-                ? asset('storage/' . $order->bukti_pembayaran) 
+            $buktiSrc = $order->bukti_pembayaran
+                ? asset('storage/' . $order->bukti_pembayaran)
                 : asset('images/placeholder-bukti.jpg');
         @endphp
 
@@ -129,7 +124,7 @@
             data-date="{{ $order->updated_at->timestamp }}"
             data-product="{{ strtolower($firstItem->nama_produk ?? '') }}"
             data-supplier="{{ strtolower($supplier) }}">
-            
+
             <div class="order-header">
                 <div class="d-flex align-items-start gap-3">
                     <div class="order-meta">
@@ -149,8 +144,8 @@
                             @endif
                         </div>
                         <div class="mt-2">
-                            <span class="order-status status-verif py-1 px-2" style="font-size: 12px; margin: 0; display: inline-flex;">
-                                <i class="fas fa-clock"></i> Menunggu Verifikasi Pembayaran
+                            <span class="order-status status-menunggu_konfirmasi_pembayaran py-1 px-2" style="font-size: 12px; margin: 0; display: inline-flex;">
+                                <i class="fas fa-clock"></i> Menunggu Konfirmasi Pembayaran
                             </span>
                         </div>
                     </div>
@@ -166,10 +161,10 @@
                 <div class="order-product-details flex-grow-1">
                     <h6>{{ $firstItem->nama_produk }}</h6>
                     <p class="mb-1 text-muted small">
-                        {{ $firstItem->quantity }} x Rp {{ number_format($firstItem->harga_satuan, 0, ',', '.') }} 
+                        {{ $firstItem->quantity }} x Rp {{ number_format($firstItem->harga_satuan, 0, ',', '.') }}
                         / {{ $firstItem->jumlah_satuan }} {{ $firstItem->satuan }}
                     </p>
-                    
+
                     @if($order->detailPesanan->count() > 1)
                     <div class="produk-lain mb-2">+ {{ $order->detailPesanan->count() - 1 }} produk lain</div>
                     @endif
@@ -192,8 +187,7 @@
             </div>
             @endif
 
-            <!-- Action Buttons -->
-            <div class="order-actions">
+<div class="order-actions">
                 <form action="{{ route('staff_purchasing.terima_pembayaran', $order->id) }}" method="POST" class="formTerimaPembayaran" style="flex:1; min-width: 120px;">
                     @csrf
                     <button type="button" class="btn btn-success btn-sm w-100 btnTerimaPembayaran">
@@ -218,8 +212,7 @@
             </div>
         </div>
 
-        <!-- Modal Bukti Pembayaran -->
-        <div class="modal fade" id="buktiModal{{ $order->id }}" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="buktiModal{{ $order->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -252,7 +245,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Colorize supplier badges
+
         function colorizeBadges() {
             const badges = document.querySelectorAll('.badge-supplier');
             const colors = [
@@ -272,23 +265,22 @@
         }
         colorizeBadges();
 
-        // Search & Sort Same as others
-        const searchInput = document.getElementById('searchInput');
+const searchInput = document.getElementById('searchInput');
         const sortSelect = document.getElementById('sortSelect');
         const ordersContainer = document.getElementById('ordersContainer');
         const countBadge = document.getElementById('countBadge');
-        
+
         function filterOrders() {
              const search = searchInput.value.toLowerCase();
              const sort = sortSelect.value;
              const cards = Array.from(document.querySelectorAll('.order-card'));
-             
+
              cards.sort((a,b) => {
                  const dateA = parseInt(a.dataset.date);
                  const dateB = parseInt(b.dataset.date);
                  return sort === 'newest' ? dateB - dateA : dateA - dateB;
              });
-             
+
              let visibleCount = 0;
              cards.forEach(card => {
                   ordersContainer.appendChild(card);
@@ -306,8 +298,7 @@
         searchInput.addEventListener('input', filterOrders);
         sortSelect.addEventListener('change', filterOrders);
 
-        // Modal Listeners
-        document.addEventListener('click', function(e) {
+document.addEventListener('click', function(e) {
             if (e.target.closest('.btnTerimaPembayaran')) {
                 const form = e.target.closest('.formTerimaPembayaran');
                 window.confirmAction('Apakah Anda yakin ingin menerima pembayaran ini? Pesanan akan segera dilanjutkan ke tahap proses.', () => {

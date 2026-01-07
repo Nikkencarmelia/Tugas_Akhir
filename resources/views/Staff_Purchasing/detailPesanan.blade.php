@@ -24,22 +24,21 @@
         .badge-supplier { position: absolute; top: 5px; right: 5px; font-size: .7rem; font-weight: 600; padding: .3rem .55rem; border-radius: .4rem; line-height: 1; z-index: 2; }
         .product-details { flex-grow: 1; }
         .total-section { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e9ecef; }
-        
+
         .status-badge { padding: 0.5rem 1rem; border-radius: 50px; font-weight: 600; font-size: 0.9rem; }
-        
-        .order-status { 
-            display: flex; 
-            align-items: center; 
-            gap: .5rem; 
-            padding: 6px 12px; 
-            border-radius: 20px; 
-            font-size: 13px; 
-            font-weight: 500; 
-            width: fit-content; 
+
+        .order-status {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            width: fit-content;
         }
 
-        /* Status Colors - Synchronized */
-        .status-menunggu_konfirmasi { background: #f1f3f5; color: #495057; }
+.status-menunggu_konfirmasi { background: #f1f3f5; color: #495057; }
         .status-menunggu_pembayaran { background: #fff4e6; color: #d9480f; }
         .status-diproses { background: #fef9c3; color: #854d0e; }
         .status-dikirim { background: #e0f2fe; color: #0369a1; }
@@ -50,11 +49,10 @@
         .status-pesanan_telah_diambil { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
         .status-menunggu_konfirmasi_kurir { background: #fef9c3; color: #854d0e; }
 
-        /* Delivery & Method Badges */
-        .badge-metode { background: #e3f2fd; color: #0d47a1; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
+.badge-metode { background: #e3f2fd; color: #0d47a1; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
         .badge-alamat { background: #e8f5e9; color: #1b5e20; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
         .badge-kendaraan { background: #fef9c3; color: #854d0e; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #fde68a; }
-        
+
         @media (max-width: 768px) {
             .detail-header { flex-direction: column; gap: 1rem; text-align: center; }
             .detail-header-section { flex-direction: column; gap: .5rem; align-items: flex-start; }
@@ -69,10 +67,9 @@
     @section('content')
     <div class="container py-5">
 
-        <!-- HEADER -->
-        <div class="detail-header">
+<div class="detail-header">
             <div class="d-flex align-items-center">
-                <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('staff_purchasing.pesanan_masuk') }}" 
+                <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('staff_purchasing.pesanan_masuk') }}"
                    class="text-secondary me-3" style="text-decoration: none; font-size: 1.5rem; line-height: 1;">
                     <i class="bi bi-chevron-left"></i>
                 </a>
@@ -90,13 +87,12 @@
             </div>
         </div>
 
-        <!-- INFO UMUM & STATUS -->
-        <div class="detail-card">
+<div class="detail-card">
                 @php
                     $status = $pemesanan->status_pesanan;
                     $statusClass = 'status-' . $status;
                     $statusLabel = ucwords(str_replace('_', ' ', $status));
-                    
+
                     if(in_array($status, ['dibatalkan', 'ditolak_staff', 'ditolak_kurir'])) {
                         $statusClass = 'status-dibatalkan';
                         if($status == 'ditolak_staff') $statusLabel = 'Ditolak Staff';
@@ -162,20 +158,18 @@
             </div>
         </div>
 
-        <!-- PRODUK PESANAN -->
-        <div class="detail-card">
+<div class="detail-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-bold mb-0">Produk yang Dipesan ({{ $pemesanan->detailPesanan->count() }} item)</h5>
-                <!-- Search Removed as requested -->
+
             </div>
 
             <div id="productList">
             @foreach($pemesanan->detailPesanan as $item)
                 @php
                     $supplierName = $item->produk && $item->produk->supplier ? $item->produk->supplier->nama_supplier : 'Non-Supplier';
-                    
-                    // Logic to prioritize storage path if full URL not stored
-                    $imagePath = $item->gambar;
+
+$imagePath = $item->gambar;
                     if (!str_contains($imagePath, 'http') && !str_starts_with($imagePath, 'storage/')) {
                          $imagePath = 'storage/' . $imagePath;
                     }
@@ -189,7 +183,7 @@
 
                     <div class="product-details">
                         <h6 class="fw-semibold mb-1">{{ $item->nama_produk }}</h6>
-                        <!-- Quantity Format Update: 2 x 80.000/2 kg -->
+
                         <p class="small text-muted mb-1">
                             Jumlah: {{ $item->quantity }} x {{ number_format($item->harga_satuan, 0, ',', '.') }}/{{ $item->jumlah_satuan }} {{ $item->satuan }}
                         </p>
@@ -220,7 +214,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Colorize Supplier Badges
+
             function colorizeBadges() {
                 const badges = document.querySelectorAll('.badge-supplier');
                 const colors = [

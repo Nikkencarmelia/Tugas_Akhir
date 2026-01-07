@@ -1,3 +1,9 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <title>Detail Pengiriman</title>
+</head>
+<body>
 @extends('components.kurir')
 
 @section('content')
@@ -37,8 +43,7 @@
       margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e9ecef;
     }
 
-    /* Badge Supplier Styles */
-    .img-container { position: relative; width: 80px; height: 80px; }
+.img-container { position: relative; width: 80px; height: 80px; }
     .img-container img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 1px solid #dee2e6; }
     .badge-supplier {
       position: absolute; top: 5px; right: 5px;
@@ -56,7 +61,7 @@
 
 @php
     $tab = request('tab');
-    $backUrl = route('kurir.pengiriman'); // Default fallback
+    $backUrl = route('kurir.pengiriman');
 
     if (in_array($tab, ['menunggu', 'dikirim'])) {
         $backUrl = route('kurir.status_pengiriman', ['tab' => $tab]);
@@ -73,8 +78,7 @@
     </a>
   </div>
 
-  <!-- HEADER -->
-  <div class="detail-header">
+<div class="detail-header">
     <h3><i class="fa-solid fa-circle-info"></i> Detail Pengiriman</h3>
     <div class="text-end">
         <div class="detail-number">#{{ $pemesanan->kode_pesanan }}</div>
@@ -82,8 +86,7 @@
     </div>
   </div>
 
-  <!-- BAGIAN ALAMAT -->
-  <div class="detail-card">
+<div class="detail-card">
     <h5 class="mb-3 fw-bold text-success"><i class="fa-solid fa-location-dot me-2"></i>Alamat Pengiriman</h5>
     <div class="p-3 bg-light rounded-3 border-start border-success border-4">
         <p class="mb-1 fw-bold text-dark" style="font-size: 1.1rem;">{{ $pemesanan->nama_penerima }}</p>
@@ -95,8 +98,7 @@
     </div>
   </div>
 
-  <!-- BAGIAN PRODUK -->
-  <div class="detail-card">
+<div class="detail-card">
     <h5 class="fw-bold mb-3 text-success"><i class="fa-solid fa-box me-2"></i>Produk Dikirim</h5>
 
     @foreach($pemesanan->detailPesanan as $item)
@@ -157,3 +159,5 @@ document.addEventListener('DOMContentLoaded', colorizeBadges);
 </script>
 
 @endsection
+</body>
+</html>

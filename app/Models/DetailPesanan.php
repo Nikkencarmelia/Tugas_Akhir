@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class DetailPesanan extends Model
 {
@@ -19,7 +19,7 @@ class DetailPesanan extends Model
         'satuan',
         'jumlah_satuan',
         'harga_satuan',
-        'harga_total'
+        'harga_total',
     ];
 
     public function pemesanan()

@@ -108,18 +108,17 @@
         .search-controls .input-group {
             flex-grow: 1;
         }
-        /* Role Badges with Bootstrap Subtle Colors */
+
         .badge-role-super-admin { background-color: var(--bs-primary-bg-subtle) !important; color: var(--bs-primary-text-emphasis) !important; }
         .badge-role-staff-purchasing { background-color: var(--bs-success-bg-subtle) !important; color: var(--bs-success-text-emphasis) !important; }
         .badge-role-staff-produk { background-color: var(--bs-info-bg-subtle) !important; color: var(--bs-info-text-emphasis) !important; }
         .badge-role-kurir { background-color: var(--bs-warning-bg-subtle) !important; color: var(--bs-warning-text-emphasis) !important; }
         .badge-role-user { background-color: var(--bs-secondary-bg-subtle) !important; color: var(--bs-secondary-text-emphasis) !important; }
-        /* Online Status Badges */
+
         .badge-online-aktif { background-color: var(--bs-success-bg-subtle) !important; color: var(--bs-success-text-emphasis) !important; padding: 0.5em 0.75em; border-radius: 0.375rem; font-size: 0.75em; font-weight: 500; }
         .badge-online-tidak-aktif { background-color: var(--bs-danger-bg-subtle) !important; color: var(--bs-danger-text-emphasis) !important; padding: 0.5em 0.75em; border-radius: 0.375rem; font-size: 0.75em; font-weight: 500; }
-        /* Antar Status Badges */
-        /* Antar Status Badges - Prominent Solid Colors */
-        .badge-antar-siap { background-color: #198754 !important; color: white !important; padding: 0.5em 0.85em; border-radius: 50px; font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.badge-antar-siap { background-color: #198754 !important; color: white !important; padding: 0.5em 0.85em; border-radius: 50px; font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .badge-antar-sedang-antar { background-color: #f59e0b !important; color: white !important; padding: 0.5em 0.85em; border-radius: 50px; font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .badge-antar-- { background-color: #6c757d !important; color: white !important; padding: 0.5em 0.85em; border-radius: 50px; font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
     </style>
@@ -157,13 +156,13 @@
             </thead>
             <tbody>
                 @forelse($kurir ?? [] as $index => $kurir_item)
-                <tr data-id="{{ $kurir_item->id }}" 
-                    data-nama="{{ $kurir_item->nama_lengkap ?? '' }}" 
-                    data-email="{{ $kurir_item->email ?? '' }}" 
-                    data-telpon="{{ $kurir_item->no_telepon ?? '' }}" 
-                    data-role="{{ $kurir_item->role ?? 'Kurir' }}" 
-                    data-kendaraan="{{ $kurir_item->kendaraan ?? '' }}" 
-                    data-statusonline="{{ $kurir_item->status_online ?? 'Aktif' }}" 
+                <tr data-id="{{ $kurir_item->id }}"
+                    data-nama="{{ $kurir_item->nama_lengkap ?? '' }}"
+                    data-email="{{ $kurir_item->email ?? '' }}"
+                    data-telpon="{{ $kurir_item->no_telepon ?? '' }}"
+                    data-role="{{ $kurir_item->role ?? 'Kurir' }}"
+                    data-kendaraan="{{ $kurir_item->kendaraan ?? '' }}"
+                    data-statusonline="{{ $kurir_item->status_online ?? 'Aktif' }}"
                     data-statusantar="{{ $kurir_item->status_antar ?? 'Siap' }}">
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $kurir_item->nama_lengkap ?? '' }}</td>
@@ -198,7 +197,7 @@
         </table>
     </div>
 </div>
-{{-- Modal Edit Kurir --}}
+
 <div class="modal fade" id="modalKurir" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -266,14 +265,14 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // === SEARCH FUNCTIONALITY ===
+
     document.getElementById('searchKurir').addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase();
         const rows = document.querySelectorAll('#tableKurir tbody tr');
         let index = 1;
 
         rows.forEach(row => {
-            // Check if it's a data row (has data-nama)
+
             if (!row.dataset.nama) return;
 
             const nama = row.dataset.nama.toLowerCase();
@@ -288,10 +287,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Toggle "No results" row if all data rows are hidden
-        let noResultsRow = document.getElementById('noResultsRow');
+let noResultsRow = document.getElementById('noResultsRow');
         let visibleRows = Array.from(rows).filter(r => r.style.display !== 'none' && r.dataset.nama);
-        
+
         if (visibleRows.length === 0 && searchTerm !== '') {
             if (!noResultsRow) {
                 noResultsRow = document.createElement('tr');
@@ -307,8 +305,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // === EDIT KURIR ===
-    document.querySelectorAll('.btn-edit-kurir').forEach(btn => {
+document.querySelectorAll('.btn-edit-kurir').forEach(btn => {
         btn.addEventListener('click', function() {
             const row = this.closest('tr');
             document.getElementById('idKurir').value = row.dataset.id;
@@ -317,28 +314,21 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('noTelpon').value = row.dataset.telpon;
             document.getElementById('role').value = row.dataset.role;
             document.getElementById('kendaraan').value = row.dataset.kendaraan;
-            // Map badge status back to value
+
             document.getElementById('statusOnline').value = row.dataset.statusonline === 'Aktif' ? 'Aktif' : 'Tidak Aktif';
             document.getElementById('statusAntar').value = row.dataset.statusantar === 'Siap' ? 'Siap' : 'Sedang Antar';
         });
     });
 
-    // === SUBMIT KURIR (EDIT ROLE) ===
-    document.getElementById('formKurir').addEventListener('submit', function(e) {
+document.getElementById('formKurir').addEventListener('submit', function(e) {
         e.preventDefault();
         const id = document.getElementById('idKurir').value;
         const formData = {
             role: document.getElementById('role').value,
-            // Note: Kendaraan & Status Antar are disabled/readonly in UI for editing logic based on requirements "disable except role", 
-            // but if we want to allow editing them we need to handle it. 
-            // The Controller primarily updates Role. If we need to update other fields, we need to update Controller too.
-            // For now, based on requirements "all fields disabled except role" for edit:
-        };
 
-        // If user is editing Role, we send that.
-        
-        // Note: Using updated route prefix 'super_admin'
-        fetch(`/super_admin/manajemen_kurir/${id}`, {
+};
+
+fetch(`/super_admin/manajemen_kurir/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -353,16 +343,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert(data.message);
                 const row = document.querySelector(`tr[data-id="${id}"]`);
                 if (row) {
-                    // Update Role Badge
+
                     row.dataset.role = formData.role;
-                    // Simplify role class logic
+
                     const roleClass = formData.role.toLowerCase().replace(/ /g, '-').replace('_','-');
                     row.querySelector('td:nth-child(5) span').className = `badge badge-role-${roleClass}`;
                     row.querySelector('td:nth-child(5) span').textContent = formData.role;
                 }
                 const modal = bootstrap.Modal.getInstance(document.getElementById('modalKurir'));
                 modal.hide();
-                window.location.reload(); // Reload to reflect deletions if role changed from Kurir
+                window.location.reload();
             } else {
                 alert('Gagal update: ' + data.message);
             }
@@ -373,10 +363,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // === REMOVED DELETE KURIR ===
-
-    // Reset modal on close
-    document.getElementById('modalKurir').addEventListener('hidden.bs.modal', function() {
+document.getElementById('modalKurir').addEventListener('hidden.bs.modal', function() {
         document.getElementById('formKurir').reset();
         document.getElementById('idKurir').value = '';
     });

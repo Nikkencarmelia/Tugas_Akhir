@@ -7,8 +7,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
             body {
-                /* background: #f8f9fa;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; */
+
                 min-height: 100vh;
             }
 
@@ -271,7 +270,7 @@
         @section('content')
 
         <div class="container py-5">
-            <!-- TOAST -->
+
             <div class="position-fixed top-0 end-0 p-3" style="z-index: 1055;">
                 <div id="toastSuccess" class="toast align-items-center text-bg-success border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
                     <div class="d-flex">
@@ -296,8 +295,7 @@
                 </div>
             </div>
 
-            <!-- ===================== INFORMASI PRIBADI ===================== -->
-            <div id="info" class="profile-section {{ $activeTab == 'info' ? 'active' : '' }}">
+<div id="info" class="profile-section {{ $activeTab == 'info' ? 'active' : '' }}">
                 <h2 class="section-title"><i class="fas fa-user-circle me-2"></i>Informasi Pribadi</h2>
                 @if ($errors->any())
                     <div class="alert alert-danger">
@@ -338,8 +336,7 @@
                 </form>
             </div>
 
-            <!-- ===================== ALAMAT PENGIRIMAN ===================== -->
-            <div id="alamat" class="profile-section {{ $activeTab == 'alamat' ? 'active' : '' }}">
+<div id="alamat" class="profile-section {{ $activeTab == 'alamat' ? 'active' : '' }}">
                 <h2 class="section-title"><i class="fas fa-map-marker-alt me-2"></i>Alamat Pengiriman</h2>
 
                 @if ($errors->any())
@@ -352,15 +349,13 @@
                     </div>
                 @endif
 
-                <!-- Tombol Tambah Alamat -->
-                <div class="text-end mb-3">
+<div class="text-end mb-3">
                     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#tambahAlamatModal">
                         <i class="fas fa-plus me-1"></i> Tambah Alamat
                     </button>
                 </div>
 
-                <!-- Daftar Alamat -->
-                <div class="list-group">
+<div class="list-group">
                     @forelse($alamats as $alamat)
                         <div class="list-group-item d-flex justify-content-between align-items-start" data-id="{{ $alamat->id }}">
                             <div>
@@ -386,8 +381,7 @@
                 </div>
             </div>
 
-            <!-- ===================== MODAL TAMBAH ALAMAT ===================== -->
-            <div class="modal fade" id="tambahAlamatModal" tabindex="-1" aria-labelledby="tambahAlamatLabel" aria-hidden="true">
+<div class="modal fade" id="tambahAlamatModal" tabindex="-1" aria-labelledby="tambahAlamatLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -465,8 +459,7 @@
                 </div>
             </div>
 
-            <!-- ===================== MODAL EDIT ALAMAT ===================== -->
-            <div class="modal fade" id="editAlamatModal" tabindex="-1" aria-labelledby="editAlamatLabel" aria-hidden="true">
+<div class="modal fade" id="editAlamatModal" tabindex="-1" aria-labelledby="editAlamatLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -528,8 +521,7 @@
                 </div>
             </div>
 
-            <!-- ===================== MODAL KONFIRMASI HAPUS ALAMAT ===================== -->
-            <div class="modal fade" id="konfirmasiHapusModal" tabindex="-1" aria-labelledby="konfirmasiHapusLabel" aria-hidden="true">
+<div class="modal fade" id="konfirmasiHapusModal" tabindex="-1" aria-labelledby="konfirmasiHapusLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content border-danger">
                         <div class="modal-header bg-danger text-white">
@@ -553,8 +545,7 @@
                 </div>
             </div>
 
-            <!-- ===================== UBAH KATA SANDI ===================== -->
-            <div id="password" class="profile-section {{ $activeTab == 'password' ? 'active' : '' }}">
+<div id="password" class="profile-section {{ $activeTab == 'password' ? 'active' : '' }}">
                 <h2 class="section-title"><i class="fas fa-lock me-2"></i>Ubah Kata Sandi</h2>
                 @if ($errors->any())
                     <div class="alert alert-danger">
@@ -615,8 +606,7 @@
                 </form>
             </div>
 
-            <!-- ===================== MODAL KONFIRMASI UBAH PASSWORD ===================== -->
-            <div class="modal fade" id="konfirmasiPasswordModal" tabindex="-1" aria-labelledby="konfirmasiPasswordLabel" aria-hidden="true">
+<div class="modal fade" id="konfirmasiPasswordModal" tabindex="-1" aria-labelledby="konfirmasiPasswordLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content border-success">
                         <div class="modal-header bg-success text-white">
@@ -634,16 +624,14 @@
                 </div>
             </div>
 
-
-
-        </div>
+</div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                // === TOAST SETUP (global) ===
+
                 function showToast(message, type = 'success') {
                     const toastContainer = document.createElement('div');
                     toastContainer.className = `toast align-items-center text-white bg-${type} border-0 position-fixed top-0 end-0 m-3`;
@@ -660,24 +648,21 @@
                     toastContainer.addEventListener('hidden.bs.toast', () => toastContainer.remove());
                 }
 
-                // Show toast from session
-                @if(session('success'))
+@if(session('success'))
                     showToast('{{ session('success') }}');
                 @endif
 
-                // === TOMBOL SIMPAN & PASSWORD ===
-                document.querySelectorAll('.btn-save').forEach(btn => {
+document.querySelectorAll('.btn-save').forEach(btn => {
                     btn.addEventListener('click', () => {
                         if (btn.textContent.includes('Kata Sandi')) {
-                            // buka konfirmasi ubah password
+
                             const modalKonfirmasi = new bootstrap.Modal(document.getElementById('konfirmasiPasswordModal'));
                             modalKonfirmasi.show();
                         }
                     });
                 });
 
-                // === KONFIRMASI UBAH PASSWORD ===
-                const btnKonfirmasiUbahPassword = document.getElementById('btnKonfirmasiUbahPassword');
+const btnKonfirmasiUbahPassword = document.getElementById('btnKonfirmasiUbahPassword');
                 if (btnKonfirmasiUbahPassword) {
                     btnKonfirmasiUbahPassword.addEventListener('click', () => {
                         const modalEl = document.getElementById('konfirmasiPasswordModal');
@@ -693,17 +678,15 @@
                     });
                 }
 
-                // Fungsi helper untuk mengaktifkan select dengan force reflow (tanpa delay)
-                function enableSelect(selectId) {
+function enableSelect(selectId) {
                     const $select = $(`#${selectId}`);
                     $select.prop('disabled', false);
-                    // Force reflow untuk update visual segera
+
                     $select[0].offsetHeight;
                     $select.trigger('change');
                 }
 
-                // === AJAX DROPDOWN UNTUK TAMBAH ALAMAT ===
-                $('#kecamatan').change(function() {
+$('#kecamatan').change(function() {
                     const kecId = $(this).val();
                     if (kecId) {
                         $.get(`/user/kelurahan/${kecId}`, function(data) {
@@ -735,8 +718,7 @@
                     }
                 });
 
-                // === AJAX DROPDOWN UNTUK EDIT ALAMAT ===
-                $('#editKecamatan').change(function() {
+$('#editKecamatan').change(function() {
                     const kecId = $(this).val();
                     if (kecId) {
                         $.get(`/user/kelurahan/${kecId}`, function(data) {
@@ -768,8 +750,7 @@
                     }
                 });
 
-                // === EDIT ALAMAT ===
-                document.querySelectorAll('.edit-alamat').forEach(btn => {
+document.querySelectorAll('.edit-alamat').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const id = btn.dataset.id;
                         const nama = btn.dataset.nama;
@@ -785,9 +766,9 @@
                         document.getElementById('editKecamatan').value = kec;
                         document.getElementById('editAlamatLengkap').value = alamat;
 
-                        // Load kelurahan berdasarkan kecamatan
-                        if (kec) {
-                            $.get(`/user/kelurahan/${kec}`, function(data) {
+if (kec) {
+                            const urlKelurahan = `{{ route('user.ajax.kelurahan') }}?id_kecamatan=${kec}`;
+                            $.get(urlKelurahan, function(data) {
                                 $('#editKelurahan').html('<option disabled selected>Pilih Kelurahan</option>');
                                 data.forEach(function(kelData) {
                                     const selected = kelData.id == kel ? 'selected' : '';
@@ -795,9 +776,9 @@
                                 });
                                 enableSelect('editKelurahan');
 
-                                // Load kode pos berdasarkan kelurahan
-                                if (kel) {
-                                    $.get(`/user/kodepos/${kel}`, function(kpData) {
+if (kel) {
+                                    const urlKodepos = `{{ route('user.ajax.kodepos') }}?id_kelurahan=${kel}`;
+                                    $.get(urlKodepos, function(kpData) {
                                         $('#editKodePos').html('<option disabled selected>Pilih Kode Pos</option>');
                                         kpData.forEach(function(kpItem) {
                                             const selected = kpItem.id == kp ? 'selected' : '';
@@ -809,13 +790,11 @@
                             });
                         }
 
-                        // Set action form
-                        document.getElementById('formEditAlamat').action = `/user/alamat/${id}`;
+document.getElementById('formEditAlamat').action = `/user/alamat/${id}`;
                     });
                 });
 
-                // Reset modal edit saat close
-                const editModal = document.getElementById('editAlamatModal');
+const editModal = document.getElementById('editAlamatModal');
                 editModal.addEventListener('hidden.bs.modal', function() {
                     document.getElementById('formEditAlamat').action = '';
                     document.getElementById('formEditAlamat').reset();
@@ -823,8 +802,7 @@
                     $('#editKodePos').prop('disabled', true).html('<option disabled selected>Pilih Kode Pos</option>');
                 });
 
-                // === SIMPAN EDIT ALAMAT ===
-                const btnSimpanEdit = document.getElementById('btnSimpanEdit');
+const btnSimpanEdit = document.getElementById('btnSimpanEdit');
                 if (btnSimpanEdit) {
                     btnSimpanEdit.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -832,8 +810,7 @@
                     });
                 }
 
-                // === HAPUS ALAMAT DENGAN MODAL KONFIRMASI ===
-                let alamatIdToDelete = null;
+let alamatIdToDelete = null;
                 document.querySelectorAll('.delete-alamat').forEach(btn => {
                     btn.addEventListener('click', () => {
                         alamatIdToDelete = btn.dataset.id;
@@ -845,26 +822,23 @@
                     });
                 });
 
-                // === GANTI TAB PROFIL ===
-                document.querySelectorAll('.nav-link-profile').forEach(link => {
+document.querySelectorAll('.nav-link-profile').forEach(link => {
                     link.addEventListener('click', e => {
                         e.preventDefault();
                         const tab = link.dataset.section;
-                        // Update URL tanpa reload
+
                         const url = new URL(window.location);
                         url.searchParams.set('tab', tab);
                         window.history.pushState({}, '', url);
 
-                        // Switch class active
-                        document.querySelectorAll('.nav-link-profile').forEach(l => l.classList.remove('active'));
+document.querySelectorAll('.nav-link-profile').forEach(l => l.classList.remove('active'));
                         link.classList.add('active');
                         document.querySelectorAll('.profile-section').forEach(s => s.classList.remove('active'));
                         document.getElementById(tab).classList.add('active');
                     });
                 });
 
-                // Load initial tab dari URL/query param (override session kalau ada)
-                const urlParams = new URLSearchParams(window.location.search);
+const urlParams = new URLSearchParams(window.location.search);
                 const urlTab = urlParams.get('tab');
                 if (urlTab) {
                     document.querySelectorAll('.nav-link-profile').forEach(l => l.classList.remove('active'));
@@ -875,8 +849,7 @@
                     if (activeSection) activeSection.classList.add('active');
                 }
 
-                // === TOGGLE PASSWORD ===
-                document.querySelectorAll('.toggle-password').forEach(icon => {
+document.querySelectorAll('.toggle-password').forEach(icon => {
                     icon.addEventListener('click', () => {
                         const input = document.getElementById(icon.dataset.target);
                         if (input.type === 'password') {
@@ -889,8 +862,7 @@
                     });
                 });
 
-
-            });
+});
         </script>
 
         @endsection

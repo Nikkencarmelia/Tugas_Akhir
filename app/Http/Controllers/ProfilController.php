@@ -11,18 +11,18 @@ use Illuminate\Support\Facades\Log;
 
 class ProfilController extends Controller
 {
-    // ================= HALAMAN PROFIL USER =================
     public function userIndex(Request $request)
     {
         $user = Auth::user();
         $activeTab = $request->get('tab', 'info');
 
-        if (!$user || $user->role !== 'user') {
-            Log::error('Akses user profil ditolak: ' . ($user ? $user->email . ' (role: ' . $user->role . ')' : 'No user'));
+        if (! $user || $user->role !== 'user') {
+            Log::error('Akses user profil ditolak: '.($user ? $user->email.' (role: '.$user->role.')' : 'No user'));
+
             return redirect('/login')->with('error', 'Akses ditolak. Login sebagai user dulu.');
         }
 
-        Log::info('User Profil loaded: ' . $user->email);
+        Log::info('User Profil loaded: '.$user->email);
 
         return view('user.profil', [
             'user' => $user,
@@ -34,18 +34,17 @@ class ProfilController extends Controller
         ]);
     }
 
-    // ================= UPDATE PROFIL USER =================
     public function userUpdate(Request $request)
     {
         $user = Auth::user();
 
-        if (!$user || $user->role !== 'user') {
+        if (! $user || $user->role !== 'user') {
             return redirect('/login')->with('error', 'Akses ditolak.');
         }
 
         $rules = [
             'nama_lengkap' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'email' => 'required|email|unique:users,email,'.$user->id,
             'no_telepon' => 'nullable|string|max:20',
         ];
 
@@ -62,12 +61,11 @@ class ProfilController extends Controller
             ->with('success', 'Informasi profil berhasil diperbarui');
     }
 
-    // ================= UBAH PASSWORD USER =================
     public function userUpdatePassword(Request $request)
     {
         $user = Auth::user();
 
-        if (!$user || $user->role !== 'user') {
+        if (! $user || $user->role !== 'user') {
             return redirect('/login')->with('error', 'Akses ditolak.');
         }
 
@@ -76,7 +74,7 @@ class ProfilController extends Controller
             'password_baru' => 'required|min:6|confirmed',
         ]);
 
-        if (!Hash::check($request->password_lama, $user->password)) {
+        if (! Hash::check($request->password_lama, $user->password)) {
             return back()
                 ->withErrors(['password_lama' => 'Password lama tidak sesuai'])
                 ->with('tab', 'password');
@@ -91,46 +89,45 @@ class ProfilController extends Controller
             ->with('success', 'Password berhasil diperbarui');
     }
 
-    // ================= HALAMAN PROFIL KURIR =================
     public function kurirIndex(Request $request)
     {
         $user = Auth::user();
         $activeTab = $request->get('tab', 'info');
 
-        if (!$user || $user->role !== 'kurir') {
-            Log::error('Akses kurir profil ditolak: ' . ($user ? $user->email . ' (role: ' . $user->role . ')' : 'No user'));
+        if (! $user || $user->role !== 'kurir') {
+            Log::error('Akses kurir profil ditolak: '.($user ? $user->email.' (role: '.$user->role.')' : 'No user'));
+
             return redirect('/login')->with('error', 'Akses ditolak. Login sebagai kurir dulu.');
         }
 
-        Log::info('Kurir Profil loaded: ' . $user->email);
+        Log::info('Kurir Profil loaded: '.$user->email);
 
         $kurir = Kurir::where('id_user', $user->id)->first();
-        if (!$kurir) {
+        if (! $kurir) {
             $kurir = Kurir::create([
                 'id_user' => $user->id,
-                'jenis_kendaraan' => null, // Placeholder agar tidak terisi otomatis
+                'jenis_kendaraan' => null,
             ]);
             $kurir->syncStatus();
-            Log::info('Kurir auto-created for user ' . $user->id);
+            Log::info('Kurir auto-created for user '.$user->id);
         }
 
         return view('Kurir.profil', compact('user', 'kurir', 'activeTab'));
     }
 
-    // ================= UPDATE PROFIL KURIR =================
     public function kurirUpdate(Request $request)
     {
         $user = Auth::user();
 
-        if (!$user || $user->role !== 'kurir') {
+        if (! $user || $user->role !== 'kurir') {
             return redirect('/login')->with('error', 'Akses ditolak.');
         }
 
         $rules = [
             'nama_lengkap' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'email' => 'required|email|unique:users,email,'.$user->id,
             'no_telepon' => 'nullable|string|max:20',
-            'jenis_kendaraan' => 'required|in:motor,mobil',  // Khusus kurir
+            'jenis_kendaraan' => 'required|in:motor,mobil',
         ];
 
         $request->validate($rules);
@@ -154,12 +151,11 @@ class ProfilController extends Controller
             ->with('success', 'Informasi profil berhasil diperbarui');
     }
 
-    // ================= UBAH PASSWORD KURIR =================
     public function kurirUpdatePassword(Request $request)
     {
         $user = Auth::user();
 
-        if (!$user || $user->role !== 'kurir') {
+        if (! $user || $user->role !== 'kurir') {
             return redirect('/login')->with('error', 'Akses ditolak.');
         }
 
@@ -168,7 +164,7 @@ class ProfilController extends Controller
             'password_baru' => 'required|min:6|confirmed',
         ]);
 
-        if (!Hash::check($request->password_lama, $user->password)) {
+        if (! Hash::check($request->password_lama, $user->password)) {
             return back()
                 ->withErrors(['password_lama' => 'Password lama tidak sesuai'])
                 ->with('tab', 'password');

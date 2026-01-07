@@ -1,3 +1,9 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <title>Diskon Produk</title>
+</head>
+<body>
 @extends('Components.staff_produk')
 @section('content')
     <style>
@@ -53,8 +59,7 @@
             .filters-vertical .form-select, .filters-vertical .search-wrapper { width: auto !important; max-width: none; }
         }
 
-        /* Fix layout modal: Tambah spacing untuk label dan badge */
-        .modal .detail-label {
+.modal .detail-label {
             display: inline-block;
             margin-right: 0.5rem;
             min-width: 80px;
@@ -75,33 +80,30 @@
 <div class="dashboard-container">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <h1 class="dashboard-title"><i class="bi bi-percent"></i> Diskon Produk</h1>
-        
+
         <form action="{{ route('produk.diskon') }}" method="GET" id="search-form" class="d-flex gap-2 flex-wrap align-items-center filters-vertical">
-            <!-- Filter Status Tampil -->
+
             <select name="status_tampil" class="form-select" style="width: 150px;" onchange="this.form.submit()">
                 <option value="">Status Tampil</option>
                 <option value="Ditampilkan" {{ request('status_tampil') == 'Ditampilkan' ? 'selected' : '' }}>Ditampilkan</option>
                 <option value="Diarsipkan" {{ request('status_tampil') == 'Diarsipkan' ? 'selected' : '' }}>Diarsipkan</option>
             </select>
-            
-            <!-- Filter Kategori -->
-            <select name="kategori" class="form-select" style="width: 150px;" onchange="this.form.submit()">
+
+<select name="kategori" class="form-select" style="width: 150px;" onchange="this.form.submit()">
                 <option value="">Semua Kategori</option>
                 @foreach(\App\Models\Kategori::all() as $kat)
                     <option value="{{ $kat->nama_kategori }}" {{ request('kategori') == $kat->nama_kategori ? 'selected' : '' }}>{{ $kat->nama_kategori }}</option>
                 @endforeach
             </select>
-            
-            <!-- Filter Supplier -->
-            <select name="supplier" class="form-select" style="width: 150px;" onchange="this.form.submit()">
+
+<select name="supplier" class="form-select" style="width: 150px;" onchange="this.form.submit()">
                 <option value="">Semua Supplier</option>
                 @foreach(\App\Models\Supplier::all() as $sup)
                     <option value="{{ $sup->nama_supplier }}" {{ request('supplier') == $sup->nama_supplier ? 'selected' : '' }}>{{ $sup->nama_supplier }}</option>
                 @endforeach
             </select>
 
-            <!-- Search Input -->
-            <div class="input-group search-wrapper" style="width: 300px;">
+<div class="input-group search-wrapper" style="width: 300px;">
                 <input type="text" name="search" class="form-control" placeholder="Cari Kode Produk, nama, deskripsi..." value="{{ request('search') }}">
                 <button class="input-group-text border-start-0" type="submit">
                     <i class="bi bi-search text-muted"></i>
@@ -153,7 +155,7 @@
                                 <span class="badge-status badge-{{ strtolower(str_replace(' ', '_', $p->status_tampil)) }}">{{ $p->status_tampil }}</span>
                             </td>
                             <td>
-                                <button class="btn-action btn-detail" 
+                                <button class="btn-action btn-detail"
                                     data-gambar="{{ $p->gambar }}"
                                     data-nama="{{ $p->nama_produk }}"
                                     data-deskripsi="{{ $p->deskripsi }}"
@@ -185,7 +187,6 @@
     </nav>
 </div>
 
-<!-- Modal Detail -->
 <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -230,7 +231,7 @@
 </div>
 
 <script>
-// Logic Badge Colors
+
 function colorizeSingle(badgeEl, text) {
     if (!badgeEl || !text) return;
     const colors = [
@@ -262,12 +263,10 @@ function colorizeBadges() {
 document.addEventListener('DOMContentLoaded', () => {
     colorizeBadges();
 
-    // Modal Event Listener - Robust handling
-    const modalEl = document.getElementById('detailModal');
+const modalEl = document.getElementById('detailModal');
     if (!modalEl) return;
-    
-    // Use a single instance for everything
-    let detailModal = null;
+
+let detailModal = null;
 
     document.querySelectorAll('.btn-detail').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -280,28 +279,25 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('detailStok').textContent = d.stok;
             document.getElementById('detailKategori').textContent = d.kategori;
             document.getElementById('detailJumlahBatch').textContent = d.jumlahBatch;
-            
+
             const statusBadge = document.getElementById('detailStatusTampil');
             statusBadge.textContent = d.status;
             statusBadge.className = `badge-status badge-${d.status.toLowerCase().replace(/ /g,'_')}`;
 
-            // Lazy init modal to avoid conflicts
-            if (!detailModal) {
+if (!detailModal) {
                 detailModal = new bootstrap.Modal(modalEl);
             }
-            
+
             detailModal.show();
-            
-            // Re-colorize modal badges
-            setTimeout(() => {
+
+setTimeout(() => {
                 colorizeSingle(document.getElementById('detailSupplier'), d.supplier);
                 colorizeSingle(document.getElementById('detailKategori'), d.kategori);
             }, 50);
         });
     });
 
-    // Cleanup backdrop on hide if it gets stuck
-    modalEl.addEventListener('hidden.bs.modal', function () {
+modalEl.addEventListener('hidden.bs.modal', function () {
         document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
         document.body.classList.remove('modal-open');
         document.body.style.overflow = '';
@@ -310,3 +306,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 @endsection
+</body>
+</html>

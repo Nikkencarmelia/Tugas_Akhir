@@ -85,7 +85,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Diisi oleh JavaScript -->
+
                 </tbody>
             </table>
         </div>

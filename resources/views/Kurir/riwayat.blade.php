@@ -26,8 +26,7 @@
     .tab-panel{display:none;}
     .tab-panel.active{display:block;}
 
-    /* Badge Supplier Styles */
-    .img-container { position: relative; width: 80px; height: 80px; }
+.img-container { position: relative; width: 80px; height: 80px; }
     .img-container img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 1px solid #f1f3f4; }
     .badge-supplier {
       position: absolute; top: 5px; right: 5px;
@@ -49,9 +48,7 @@
 @section('content')
 <div class="container py-5">
 
-
-  <!-- Header & Tabs -->
-  <div class="orders-header">
+<div class="orders-header">
     <h3>Riwayat Pengiriman</h3>
     <div class="orders-tabs">
       <a href="#" class="orders-tab active" data-tab="selesai">Selesai</a>
@@ -61,14 +58,13 @@
 
   <div class="tab-content">
 
-    <!-- SELESAI -->
-    <div id="selesai" class="tab-panel active">
+<div id="selesai" class="tab-panel active">
       @forelse($selesai as $order)
       @php
           $firstItem = $order->detailPesanan->first();
           $productName = $firstItem ? ($firstItem->produk->nama_produk ?? $firstItem->nama_produk) : 'Produk';
           $supplierName = $firstItem && $firstItem->produk && $firstItem->produk->supplier ? $firstItem->produk->supplier->nama_supplier : 'Non-Supplier';
-          
+
           $imagePath = $firstItem->gambar ?? '';
           if (str_starts_with($imagePath, 'images/')) {
               $src = asset($imagePath);
@@ -135,8 +131,7 @@
       @endforelse
     </div>
 
-    <!-- DITOLAK / DIBATALKAN -->
-    <div id="ditolak" class="tab-panel">
+<div id="ditolak" class="tab-panel">
       @forelse($dibatalkan as $item)
       @php
           $isTugasKurir = $item instanceof \App\Models\TugasKurir;
@@ -146,17 +141,17 @@
           if ($isTugasKurir) {
               $statusLabel = 'Dibatalkan oleh Anda';
               $statusIcon = 'fa-person-circle-xmark';
-              $dateDisplay = $item->created_at; // Waktu saat kurir menolak
+              $dateDisplay = $item->created_at;
           } else {
               $statusLabel = ($order->status_pesanan == 'ditolak_staff') ? 'Pesanan Dibatalkan oleh Staff' : 'Pesanan Dibatalkan';
               $statusIcon = 'fa-times-circle';
-              $dateDisplay = $order->updated_at; // Waktu saat dibatalkan
+              $dateDisplay = $order->updated_at;
           }
 
           $firstItem = $order->detailPesanan->first();
           $productName = $firstItem ? ($firstItem->produk->nama_produk ?? $firstItem->nama_produk) : 'Produk';
           $supplierName = $firstItem && $firstItem->produk && $firstItem->produk->supplier ? $firstItem->produk->supplier->nama_supplier : 'Non-Supplier';
-          
+
           $imagePath = $firstItem->gambar ?? '';
           if (str_starts_with($imagePath, 'images/')) {
               $src = asset($imagePath);
@@ -227,7 +222,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded',()=>{
-  // Tab switching
+
   const tabs=document.querySelectorAll('.orders-tab');
   const panels=document.querySelectorAll('.tab-panel');
 
@@ -240,7 +235,7 @@ document.addEventListener('DOMContentLoaded',()=>{
           if(p.id === tabId) p.classList.add('active');
           else p.classList.remove('active');
       });
-      // Update URL without reload
+
       const url = new URL(window.location);
       url.searchParams.set('tab', tabId);
       window.history.replaceState({}, '', url);
@@ -253,16 +248,13 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   });
 
-  // Handle URL tab parameter
-  const urlParams = new URLSearchParams(window.location.search);
+const urlParams = new URLSearchParams(window.location.search);
   const activeTab = urlParams.get('tab');
   if (activeTab && document.getElementById(activeTab)) {
       switchTab(activeTab);
   }
 
-
-  // Colorize supplier badges
-  function colorizeBadges() {
+function colorizeBadges() {
     const badges = document.querySelectorAll('.badge-supplier');
     const colorPairs = [
       { bg: "#BAE6FD", text: "#0369A1" }, { bg: "#FEF9C3", text: "#A16207" },

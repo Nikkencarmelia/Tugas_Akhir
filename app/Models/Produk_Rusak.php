@@ -30,5 +30,4 @@ class Produk_Rusak extends Model
     {
         return $this->belongsTo(Batch::class, 'id_batch');
     }
-
 }

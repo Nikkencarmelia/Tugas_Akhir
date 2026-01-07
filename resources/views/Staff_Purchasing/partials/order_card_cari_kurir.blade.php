@@ -16,7 +16,7 @@
     data-date="{{ $order->updated_at->timestamp }}"
     data-product="{{ strtolower($firstItem->nama_produk ?? '') }}"
     data-supplier="{{ strtolower($supplier) }}">
-    
+
     <div class="order-header">
         <div class="d-flex align-items-start gap-3">
             <div class="order-meta">
@@ -35,12 +35,12 @@
                         </div>
                     @endif
                 </div>
-                <!-- Status Badge -->
+
                 @php
                     $status = $order->status_pesanan;
                     $statusClass = 'status-' . $status;
                     $statusLabel = ucwords(str_replace('_', ' ', $status));
-                    
+
                     if(in_array($status, ['dibatalkan', 'ditolak_staff', 'ditolak_kurir'])) {
                         $statusClass = 'status-dibatalkan';
                         if($status == 'ditolak_staff') $statusLabel = 'Ditolak Staff';
@@ -91,10 +91,10 @@
         <div class="order-product-details flex-grow-1">
             <h6>{{ $firstItem->nama_produk }}</h6>
             <p class="mb-1 text-muted small">
-                {{ $firstItem->quantity }} x Rp {{ number_format($firstItem->harga_satuan, 0, ',', '.') }} 
+                {{ $firstItem->quantity }} x Rp {{ number_format($firstItem->harga_satuan, 0, ',', '.') }}
                 / {{ $firstItem->jumlah_satuan }} {{ $firstItem->satuan }}
             </p>
-            
+
             @if($order->detailPesanan->count() > 1)
             <div class="produk-lain mb-2">+ {{ $order->detailPesanan->count() - 1 }} produk lain</div>
             @endif
@@ -119,10 +119,10 @@
 
     <div class="order-actions">
         @if($canAssign)
-            <button class="btn btn-success btn-sm btnCariKurir" 
-                    data-kode="{{ $order->kode_pesanan }}" 
+            <button class="btn btn-success btn-sm btnCariKurir"
+                    data-kode="{{ $order->kode_pesanan }}"
                     data-kendaraan="{{ $order->kendaraan }}"
-                    data-bs-toggle="modal" 
+                    data-bs-toggle="modal"
                     data-bs-target="#modalCariKurir">
                 <i class="fa-solid fa-truck me-1"></i>Cari Kurir
             </button>

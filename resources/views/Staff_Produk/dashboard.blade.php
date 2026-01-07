@@ -179,7 +179,7 @@
             .table tbody tr:hover {
                 background-color: #F3F4F6;
             }
-            /* Product Info */
+
             .img-container {
                 position: relative;
                 width: 75px;
@@ -223,7 +223,7 @@
                 display: block;
                 font-size: .8rem;
             }
-            /* Status Badges */
+
             .badge-status {
                 padding: .3rem .9rem;
                 border-radius: 1rem;
@@ -257,7 +257,7 @@
                 background: #DBEAFE;
                 color: #1E40AF;
             }
-            /* Action Buttons */
+
             .btn-action {
                 border: none;
                 border-radius: .4rem;
@@ -330,14 +330,13 @@
                 <h1 class="dashboard-title"><i class="bi bi-speedometer2"></i> Dashboard Produk</h1>
             </div>
 
-            {{-- STATISTIK PRODUK --}}
-            <div class="stats-grid">
+<div class="stats-grid">
                 <div class="stat-card total-icon">
                     <div class="stat-header">
                         <div class="stat-label">Total Produk</div>
                         <div class="stat-icon"><i class="bi bi-grid-3x3-gap"></i></div>
                     </div>
-                    {{-- Menggunakan variabel totalProduk dari Controller --}}
+
                     <div class="stat-value">{{ $totalProduk ?? 0 }}</div>
                 </div>
 
@@ -346,7 +345,7 @@
                         <div class="stat-label">Produk Ditampilkan</div>
                         <div class="stat-icon"><i class="bi bi-eye"></i></div>
                     </div>
-                    {{-- Menggunakan variabel totalTampil dari Controller --}}
+
                     <div class="stat-value">{{ $totalTampil ?? 0 }}</div>
                 </div>
 
@@ -355,12 +354,11 @@
                         <div class="stat-label">Produk Diarsipkan</div>
                         <div class="stat-icon"><i class="bi bi-archive"></i></div>
                     </div>
-                    {{-- Menggunakan variabel totalArsip dari Controller --}}
+
                     <div class="stat-value">{{ $totalArsip ?? 0 }}</div>
                 </div>
 
-                {{-- Menipis dan Habis (Sekarang dinamis dari Controller, berdasarkan total stok batch per produk) --}}
-                <div class="stat-card warning warning-icon">
+<div class="stat-card warning warning-icon">
                     <div class="stat-header">
                         <div class="stat-label">Produk Menipis</div>
                         <div class="stat-icon"><i class="bi bi-exclamation-triangle"></i></div>
@@ -377,8 +375,7 @@
                 </div>
             </div>
 
-            {{-- PRODUK BARU --}}
-            <div class="products-section mt-4">
+<div class="products-section mt-4">
                 <h2 class="section-title">
                     <i class="bi bi-bag-plus" style="color:#16a34a;"></i>
                     Produk yang Baru Ditambahkan
@@ -399,9 +396,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {{-- LANGSUNG GUNAKAN $produkBaru yang hanya berisi 5 data terbaru dari Controller --}}
 
-                                @if(isset($produkBaru) && $produkBaru->isEmpty())
+@if(isset($produkBaru) && $produkBaru->isEmpty())
                                     <tr>
                                         <td colspan="6" class="text-center py-4 text-muted">
                                             <i class="bi bi-box-seam" style="font-size:2rem;"></i>
@@ -411,7 +407,7 @@
                                 @else
                                     @foreach($produkBaru as $p)
                                         @php
-                                            // Compute status_stok dari batch
+
                                             $totalStok = $p->batch->sum('stok') ?? 0;
                                             if ($totalStok > 10) {
                                                 $statusStok = 'Tersedia';
@@ -535,8 +531,7 @@
                 });
             }
 
-            /* ================= DETAIL MODAL ================= */
-            const detailModal = document.getElementById('detailModal');
+const detailModal = document.getElementById('detailModal');
             detailModal.addEventListener('show.bs.modal', function(event) {
                 const button = event.relatedTarget;
                 const produkData = JSON.parse(button.getAttribute('data-produk'));
@@ -576,8 +571,7 @@
                     (produkData.status_tampil ?? '')
                     .toLowerCase().replace(/ /g, '_');
 
-                // Compute status_stok di JS juga, buat konsisten
-                const totalStok = produkData.batch ? produkData.batch.reduce((sum, b) => sum + (b.stok || 0), 0) : 0;
+const totalStok = produkData.batch ? produkData.batch.reduce((sum, b) => sum + (b.stok || 0), 0) : 0;
                 let statusStok = 'Habis';
                 let statusStokClass = 'habis';
                 if (totalStok > 10) {

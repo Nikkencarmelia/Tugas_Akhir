@@ -118,14 +118,13 @@
 </head>
 <body>
     <div class="email-container">
-        <!-- KIRI (Mirip Login Page) -->
+
         <div class="left-box">
             <h2>Food Center</h2>
             <p>Dinas Ketahanan Pangan Kabupaten Kutai Barat</p>
         </div>
 
-        <!-- KANAN (Konten Email) -->
-        <div class="right-box">
+<div class="right-box">
             <h2>Lupa Kata Sandi?</h2>
             <p>Hai {{ $user->nama_lengkap ?? 'Pengguna' }},</p>
 
@@ -145,8 +144,7 @@
 
         </div>
 
-        <!-- Footer -->
-        <div class="footer">
+<div class="footer">
             <p class="logo">Food Center - Dinas Ketahanan Pangan Kab. Kutai Barat</p>
             <p>&copy; 2026 Food Center. Semua hak dilindungi.</p>
         </div>

@@ -18,12 +18,11 @@
         <div class="container checkout-container py-5">
             <h4 class="mb-4 fw-bold text-center">Pembayaran Pesanan</h4>
             <div class="row g-4 justify-content-center">
-                
-                <!-- KIRI: Metode & Upload -->
-                <div class="col-12 col-lg-6">
+
+<div class="col-12 col-lg-6">
                     <div class="card p-4">
                         <h5 class="fw-bold mb-3">Instruksi Pembayaran</h5>
-                        
+
                         <div class="alert alert-light border mb-4">
                             <h6 class="fw-bold text-primary mb-2"><i class="fa-solid fa-building-columns me-2"></i>Transfer Bank (Manual)</h6>
                             <p class="mb-1 text-muted small">Silakan transfer sesuai total tagihan ke rekening di bawah ini:</p>
@@ -49,7 +48,7 @@
                                 <label class="form-label fw-bold">Upload Bukti Transfer</label>
                                 <input type="file" name="bukti_pembayaran" id="bukti_pembayaran" class="form-control" accept="image/*" required>
                                 <img id="imgPreview" class="img-preview mt-3 rounded border" style="max-width: 100%; max-height: 200px; display: none;" alt="Preview Bukti Pembayaran">
-                                <small class="text-muted">Format: JPG, PNG. Maks 2MB.</small>
+                                <small class="text-muted">Format: JPG, PNG. Maks 5MB.</small>
                             </div>
 
                             <button type="submit" class="btn btn-success w-100 rounded-3">
@@ -59,24 +58,57 @@
                     </div>
                 </div>
 
+                <!-- Toast Container for Notifications -->
+                <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                    <div id="validationToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body" id="toastBody">
+                                Pesan kesalahan akan muncul di sini.
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                </div>
+
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
                         const gambarInput = document.getElementById('bukti_pembayaran');
                         const imagePreview = document.getElementById('imgPreview');
+                        const toastEl = document.getElementById('validationToast');
+                        const toastBody = document.getElementById('toastBody');
+                        const toast = new bootstrap.Toast(toastEl);
+
+                        function showToast(message) {
+                            toastBody.textContent = message;
+                            toast.show();
+                        }
 
                         if (gambarInput && imagePreview) {
                             gambarInput.addEventListener('change', function(e) {
                                 const file = e.target.files[0];
-                                if (file && file.type.startsWith('image/')) {
+                                
+                                if (file) {
+                                    if (!file.type.startsWith('image/')) {
+                                        showToast('File yang dipilih bukan gambar!');
+                                        e.target.value = '';
+                                        imagePreview.style.display = 'none';
+                                        return;
+                                    }
+
+                                    const maxSize = 5 * 1024 * 1024; // 5MB
+                                    if (file.size > maxSize) {
+                                        showToast('Ukuran file terlalu besar! Maksimal 5MB.');
+                                        e.target.value = '';
+                                        imagePreview.style.display = 'none';
+                                        return;
+                                    }
+
                                     const reader = new FileReader();
                                     reader.onload = function(e) {
                                         imagePreview.src = e.target.result;
                                         imagePreview.style.display = 'block';
                                     };
                                     reader.readAsDataURL(file);
-                                } else if (file) {
-                                    alert('File yang dipilih bukan gambar!');
-                                    e.target.value = '';
                                 } else {
                                     imagePreview.style.display = 'none';
                                 }
@@ -85,8 +117,7 @@
                     });
                 </script>
 
-                <!-- KANAN: Rincian -->
-                <div class="col-12 col-lg-5">
+<div class="col-12 col-lg-5">
                     <div class="card p-4">
                         <h5 class="fw-bold mb-3">Rincian Pesanan</h5>
                         <div class="d-flex justify-content-between mb-2">
@@ -97,7 +128,7 @@
                         <div class="products-list mb-3">
                             @foreach($pemesanan->detailPesanan as $item)
                             <div class="d-flex align-items-center mb-3 border-bottom pb-2">
-                                <!-- Gambar (jika ada) -->
+
                                 @php
                                     $imgSrc = asset('images/default-produk.png');
                                     if ($item->gambar) {
@@ -120,7 +151,7 @@
                                             $hargaSekarang = $item->harga_satuan;
                                             $adaDiskon = $hargaNormal > $hargaSekarang;
                                         @endphp
-                                        {{ $item->quantity }} x 
+                                        {{ $item->quantity }} x
                                         @if($adaDiskon)
                                             <span class="text-decoration-line-through text-danger me-1">Rp {{ number_format($hargaNormal, 0, ',', '.') }}</span>
                                             <span class="fw-bold text-success">Rp {{ number_format($hargaSekarang, 0, ',', '.') }}</span>

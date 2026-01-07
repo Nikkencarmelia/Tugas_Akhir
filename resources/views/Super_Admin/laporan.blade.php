@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         body { background: #f5f7fa; }
         .orders-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;background:white;padding:1.5rem 2rem;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.08);}
@@ -57,32 +57,31 @@
         .search-controls .input-group {
             flex-grow: 1;
         }
-        /* Status Badge Styles - Enhanced for Table Display */
-        .order-status { 
-            display: inline-flex !important; 
-            align-items: center !important; 
-            gap: .5rem !important; 
-            padding: 6px 12px !important; 
-            border-radius: 20px !important; 
-            font-size: 13px !important; 
-            font-weight: 500 !important; 
+
+        .order-status {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: .5rem !important;
+            padding: 6px 12px !important;
+            border-radius: 20px !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
             width: fit-content !important;
             white-space: nowrap !important;
         }
-        
+
         .order-status i {
             font-size: 13px !important;
             margin-right: 4px !important;
         }
 
-        /* Status Colors - Matched with Staff Purchasing Pages */
-        .status-menunggu_konfirmasi { background: #f1f3f5 !important; color: #495057 !important; }
+.status-menunggu_konfirmasi { background: #f1f3f5 !important; color: #495057 !important; }
         .status-menunggu_pembayaran { background: #fff4e6 !important; color: #d9480f !important; }
         .status-diproses { background: #fef9c3 !important; color: #854d0e !important; }
         .status-dikirim { background: #e0f2fe !important; color: #0369a1 !important; }
         .status-selesai { background: #dcfce7 !important; color: #166534 !important; }
         .status-dibatalkan { background: #fee2e2 !important; color: #991b1b !important; }
-        .status-verif { background: #fff7ed !important; color: #9a3412 !important; }
+        .status-menunggu_konfirmasi_pembayaran { background: #fff7ed !important; color: #9a3412 !important; }
         .status-sedang_diantar { background: #e0f2fe !important; color: #0369a1 !important; }
         .status-siap_diambil { background: #d4edda !important; color: #155724 !important; border: 1px solid #c3e6cb !important; }
         .status-pesanan_telah_diambil { background: #e0f2fe !important; color: #0369a1 !important; border: 1px solid #bae6fd !important; }
@@ -91,7 +90,7 @@
         .status-ditolak_staff { background: #fee2e2 !important; color: #991b1b !important; }
         .status-ditolak_staff_diambil { background: #fee2e2 !important; color: #991b1b !important; }
         .extra-small { font-size: 0.75rem !important; }
-        /* Custom Tab Buttons Style */
+
         .orders-tabs{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;}
         .orders-tab{padding:8px 16px;border-radius:20px;background:#ffffff;text-decoration:none;color:#6c757d;font-weight:500;border:1px solid #e9ecef;transition:all .3s ease;}
         .orders-tab.active{background:#198754;color:white;border-color:#198754;}
@@ -132,8 +131,7 @@
         </div>
     </div>
 
-    <!-- Monthly Filter Section -->
-    <div class="card border-0 shadow-sm rounded-4 mb-4">
+<div class="card border-0 shadow-sm rounded-4 mb-4">
         <div class="card-body p-3">
             <form action="{{ route('super_admin.laporan') }}" method="GET" class="row g-3 align-items-end" id="filterForm">
                 <input type="hidden" name="tab" id="activeTabInput" value="penjualan">
@@ -173,7 +171,7 @@
     </div>
 
     <div class="tab-content">
-        <!-- Tab Laporan Penjualan -->
+
         <div id="penjualan" class="tab-panel active">
             <h5 class="section-title"><i class="bi bi-cart-check"></i>Laporan Penjualan</h5>
             <div class="table-responsive">
@@ -233,14 +231,13 @@
                     </tbody>
                 </table>
             </div>
-            <!-- Pagination -->
+
             <div class="d-flex justify-content-end mt-3">
                 {{ $penjualan->appends(request()->query())->links('pagination::bootstrap-5') }}
             </div>
         </div>
 
-        <!-- Tab Laporan Pesanan -->
-        <div id="pesanan" class="tab-panel">
+<div id="pesanan" class="tab-panel">
             <h5 class="section-title"><i class="bi bi-bag-check"></i>Laporan Pesanan</h5>
             <div class="table-responsive">
                 <table class="table table-bordered align-middle" id="tablePesanan">
@@ -279,10 +276,10 @@
                             <td>
                                 @php
                                     $status = $item['status_pesanan'] ?? 'selesai';
-                                    
+
                                     $statusClass = 'status-' . $status;
                                     if(in_array($status, ['dibatalkan', 'ditolak_staff', 'ditolak_kurir', 'ditolak_staff_diambil'])) $statusClass = 'status-dibatalkan';
-                                    elseif(in_array($status, ['menunggu_konfirmasi_pembayaran', 'menunggu_verifikasi_pembayaran'])) $statusClass = 'status-verif';
+                                    elseif($status == 'menunggu_konfirmasi_pembayaran') $statusClass = 'status-menunggu_konfirmasi_pembayaran';
                                     elseif(in_array($status, ['menunggu_cari_kurir', 'menunggu_konfirmasi_kurir'])) $statusClass = 'status-diproses';
                                     elseif(in_array($status, ['menunggu_konfirmasi'])) $statusClass = 'status-menunggu_konfirmasi';
                                     elseif(in_array($status, ['dikirim', 'sedang_diantar'])) $statusClass = 'status-dikirim';
@@ -290,19 +287,18 @@
                                     $statusLabel = ucwords(str_replace('_', ' ', $status));
                                     if($status == 'ditolak_staff') $statusLabel = 'Ditolak Staff';
                                     elseif($status == 'ditolak_kurir') $statusLabel = 'Ditolak Kurir';
-                                    elseif(in_array($status, ['menunggu_konfirmasi_pembayaran', 'menunggu_verifikasi_pembayaran'])) $statusLabel = 'Menunggu Verifikasi';
+                                    elseif($status == 'menunggu_konfirmasi_pembayaran') $statusLabel = 'Menunggu Konfirmasi Pembayaran';
                                     elseif(in_array($status, ['dikirim', 'sedang_diantar'])) $statusLabel = 'Dikirim';
                                     elseif(in_array($status, ['menunggu_konfirmasi'])) $statusLabel = 'Menunggu Konfirmasi';
                                     elseif(in_array($status, ['menunggu_cari_kurir', 'menunggu_konfirmasi_kurir'])) $statusLabel = 'Diproses';
                                     elseif($status == 'pesanan_telah_diambil') $statusLabel = 'Pesanan Telah Diambil';
-                                    
-                                    // Icon mapping - consistent with Staff Purchasing pages
-                                    $icon = 'fa-box';
+
+$icon = 'fa-box';
                                     if($status == 'selesai') $icon = 'fa-check-circle';
                                     elseif($statusClass == 'status-dibatalkan') $icon = 'fa-times-circle';
                                     elseif($statusClass == 'status-dikirim') $icon = 'fa-truck';
                                     elseif($statusClass == 'status-menunggu_konfirmasi' || $statusClass == 'status-diproses') $icon = 'fa-hourglass-half';
-                                    elseif($statusClass == 'status-verif') $icon = 'fa-clock';
+                                    elseif($statusClass == 'status-menunggu_konfirmasi_pembayaran') $icon = 'fa-clock';
                                     elseif($status == 'menunggu_pembayaran') $icon = 'fa-wallet';
                                     elseif($status == 'siap_diambil') $icon = 'fa-box-open';
                                     elseif($status == 'pesanan_telah_diambil') $icon = 'fa-check-double';
@@ -327,8 +323,7 @@
             </div>
         </div>
 
-        <!-- Tab Laporan Stok -->
-        <div id="stok" class="tab-panel">
+<div id="stok" class="tab-panel">
             <h5 class="section-title"><i class="bi bi-box-seam"></i>Laporan Stok</h5>
             <div class="table-responsive">
                 <table class="table table-bordered align-middle" id="tableStok">
@@ -399,8 +394,7 @@
             </div>
         </div>
 
-        <!-- Tab Produk Terlaris -->
-        <div id="terlaris" class="tab-panel">
+<div id="terlaris" class="tab-panel">
             <h5 class="section-title"><i class="bi bi-graph-up"></i>Produk Terlaris</h5>
             <div class="table-responsive">
                 <table class="table table-bordered align-middle" id="tableTerlaris">
@@ -472,8 +466,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
     let activeTab = urlParams.get('tab') || 'penjualan';
 
-    // Heuristics for pagination clicks if tab param is missing (fallback)
-    if (!urlParams.get('tab')) {
+if (!urlParams.get('tab')) {
         if (urlParams.has('pesanan_page')) activeTab = 'pesanan';
         else if (urlParams.has('stok_page')) activeTab = 'stok';
         else if (urlParams.has('terlaris_page')) activeTab = 'terlaris';
@@ -487,9 +480,8 @@ document.addEventListener('DOMContentLoaded', function() {
             tabLink.classList.add('active');
             document.getElementById(tabId).classList.add('active');
             if (activeTabInput) activeTabInput.value = tabId;
-            
-            // Update URL without reloading
-            const url = new URL(window.location);
+
+const url = new URL(window.location);
             url.searchParams.set('tab', tabId);
             window.history.replaceState({}, '', url);
         }
@@ -504,7 +496,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const rows = activePanel.querySelectorAll('tbody tr');
         rows.forEach(row => {
             if (row.cells.length === 1 && row.cells[0].getAttribute('colspan')) return;
-            
+
             let match = false;
             const cells = row.querySelectorAll('td');
             cells.forEach(cell => {
@@ -516,7 +508,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const pembeli = (row.dataset.pembeli || '').toLowerCase();
             const batch = (row.dataset.batch || '').toLowerCase();
             const status = (row.dataset.status || '').toLowerCase();
-            
+
             if (produk.includes(searchTerm) || pembeli.includes(searchTerm) || batch.includes(searchTerm) || status.includes(searchTerm)) {
                 match = true;
             }
@@ -566,7 +558,7 @@ function colorizeBadges() {
         }
     });
 }
-// Run colorize after any pagination or filter
+
 document.addEventListener('DOMContentLoaded', colorizeBadges);
 </script>
 @endsection

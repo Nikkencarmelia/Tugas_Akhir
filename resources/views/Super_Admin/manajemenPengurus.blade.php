@@ -352,17 +352,17 @@
                                         <div class="modal-body">
                                             <div class="mb-3">
                                                 <label class="form-label">Nama</label>
-                                                <input type="text" class="form-control" name="nama" value="{{ $item->nama }}" required>
+                                                <input type="text" class="form-control" name="nama" value="{{ $item->nama }}">
                                             </div>
 
                                             <div class="mb-3">
                                                 <label class="form-label">Jabatan</label>
-                                                <input type="text" class="form-control" name="jabatan" value="{{ $item->jabatan }}" required>
+                                                <input type="text" class="form-control" name="jabatan" value="{{ $item->jabatan }}">
                                             </div>
 
                                             <div class="mb-3">
                                                 <label class="form-label">Deskripsi</label>
-                                                <textarea class="form-control" name="deskripsi" rows="3" required>{{ $item->deskripsi }}</textarea>
+                                                <textarea class="form-control" name="deskripsi" rows="3">{{ $item->deskripsi }}</textarea>
                                             </div>
 
                                             <div class="mb-3">
@@ -376,6 +376,8 @@
                                                 @else
                                                     <img src="" class="img-preview" alt="Preview" style="display: none;">
                                                 @endif
+                                                <br>
+                                                <small class="text-muted">Format: JPG, JPEG, PNG. Maks 5MB.</small>
                                             </div>
                                         </div>
 
@@ -429,11 +431,11 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Gambar Profil</label>
-                                <input type="file" name="gambar" class="form-control" accept="image/*">
-                                <div class="mt-2">
+                                <input type="file" name="gambar" class="form-control" accept="image/*" required>
+                                <div class="mt-2 text-center">
                                     <img src="" class="img-preview" alt="Preview Gambar" style="display: none; max-width: 200px; border-radius: 10px;">
                                 </div>
-                                <small class="text-muted">Ukuran ideal: 60x60px, format JPG/PNG.</small>
+                                <small class="text-muted">Format: JPG, JPEG, PNG. Maks 5MB.</small>
                             </div>
                         </div>
 
@@ -478,11 +480,21 @@
                     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                 </div>
             </div>
-            <div id="toastError" class="toast align-items-center text-white bg-danger border-0" role="alert" data-bs-autohide="true" data-bs-delay="5000" style="display: none;">
+            <div id="toastError" class="toast align-items-center text-white bg-danger border-0" role="alert" data-bs-autohide="true" data-bs-delay="5000">
                 <div class="d-flex">
                     <div class="toast-body">
                         <i class="bi bi-exclamation-triangle me-2"></i>
-                        Terjadi kesalahan. Silakan coba lagi.
+                        @if($errors->any())
+                            <ul class="mb-0 ps-3">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        @elseif(session('error'))
+                            {{ session('error') }}
+                        @else
+                            Terjadi kesalahan. Silakan coba lagi.
+                        @endif
                     </div>
                     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                 </div>
@@ -526,18 +538,71 @@
                     });
                 }
 
+                // Setup Validation Toast
+                const toastId = 'validationToast';
+                let toastEl = document.getElementById(toastId);
+                if (!toastEl) {
+                    let toastContainer = document.querySelector('.toast-container');
+                    if (!toastContainer) {
+                        toastContainer = document.createElement('div');
+                        toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+                        toastContainer.style.zIndex = '2000';
+                        document.body.appendChild(toastContainer);
+                    }
+
+                    toastEl = document.createElement('div');
+                    toastEl.id = toastId;
+                    toastEl.className = 'toast align-items-center text-white bg-danger border-0';
+                    toastEl.setAttribute('role', 'alert');
+                    toastEl.setAttribute('aria-live', 'assertive');
+                    toastEl.setAttribute('aria-atomic', 'true');
+                    toastEl.innerHTML = `
+                        <div class="d-flex">
+                            <div class="toast-body" id="toastBody"></div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                        </div>
+                    `;
+                    toastContainer.appendChild(toastEl);
+                }
+                const toastBody = document.getElementById('toastBody');
+                const toast = new bootstrap.Toast(toastEl);
+
+                function showToast(message) {
+                    toastBody.textContent = message;
+                    toast.show();
+                }
+
                 document.querySelectorAll('input[name="gambar"]').forEach(fileInput => {
                     const preview = fileInput.closest('.modal').querySelector('.img-preview');
                     if (preview) {
                         fileInput.addEventListener('change', function(e) {
                             const file = e.target.files[0];
                             if (file) {
+                                if (!file.type.startsWith('image/')) {
+                                    showToast('File yang dipilih bukan gambar!');
+                                    this.value = '';
+                                    preview.src = '#';
+                                    preview.style.display = 'none';
+                                    return;
+                                }
+
+                                const maxSize = 5 * 1024 * 1024; // 5MB
+                                if (file.size > maxSize) {
+                                    showToast('Ukuran file terlalu besar! Maksimal 5MB.');
+                                    this.value = '';
+                                    preview.src = '#';
+                                    preview.style.display = 'none';
+                                    return;
+                                }
+
                                 const reader = new FileReader();
                                 reader.onload = (e) => {
                                     preview.src = e.target.result;
                                     preview.style.display = 'block';
                                 };
                                 reader.readAsDataURL(file);
+                            } else {
+                                preview.style.display = 'none';
                             }
                         });
                     }
@@ -546,6 +611,11 @@
                 @if(session('success'))
                     const successToast = new bootstrap.Toast(document.getElementById('toastSuccess'));
                     successToast.show();
+                @endif
+
+                @if($errors->any() || session('error'))
+                    const errorToast = new bootstrap.Toast(document.getElementById('toastError'));
+                    errorToast.show();
                 @endif
 
                 document.querySelectorAll('form[action*="update"]').forEach(form => {

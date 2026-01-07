@@ -28,10 +28,8 @@ class Batch extends Model
         'tgl_perubahan_harga' => 'datetime',
     ];
 
-
     public function produk()
     {
         return $this->belongsTo(Produk::class, 'id_produk');
     }
-
 }

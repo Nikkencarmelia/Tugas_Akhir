@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Landing Page</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,17 +17,51 @@
             min-height: 100vh;
             display: flex;
             align-items: center;
-            background-color: #E5ECCD;
+            background: linear-gradient(135deg, #E5ECCD 0%, #d4dbb8 100%);
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
         }
 
-        /* Container Carousel */
+        .full-screen-section::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            right: -10%;
+            width: 40%;
+            height: 40%;
+            background: radial-gradient(circle, rgba(25, 135, 84, 0.05) 0%, transparent 70%);
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-img-wrapper {
+            position: relative;
+            z-index: 1;
+            transition: all 0.5s ease;
+        }
+
+        .hero-img-wrapper img {
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15));
+        }
+
+
+        @media (max-width: 991px) {
+            .full-screen-section {
+                padding: 100px 0 50px;
+            }
+        }
+
         #kepengurusanCarousel {
             max-width: 1200px;
             margin: 0 auto;
             padding-bottom: 4rem;
         }
 
-        /* Card Styling (Clean & Compact) */
         .square-card {
             background-color: #fff;
             border-radius: 20px;
@@ -82,6 +117,10 @@
             font-weight: 500;
         }
 
+        .square-card .card-text {
+            text-align: justify;
+        }
+
         .card-text {
             font-size: 14px;
             color: #555;
@@ -93,7 +132,6 @@
             -webkit-box-orient: vertical;
         }
 
-        /* Indicators */
         .carousel-indicators {
             bottom: -2rem;
         }
@@ -112,7 +150,6 @@
             transform: scale(1.2);
         }
 
-        /* Arrows */
         .carousel-control-prev, .carousel-control-next {
             width: 8%;
             opacity: 0.5;
@@ -141,9 +178,9 @@
             border-radius: 1rem;
             padding: 1rem;
             box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.08);
-            transition: transform 0.2s ease;
+            transition: transform 0.3s ease;
             height: 100%;
-            position: relative; /* untuk badge diskon */
+            position: relative;
         }
 
         .produk-card:hover {
@@ -232,29 +269,31 @@
 
 @section('content_full')
 
-{{-- Hero Section --}}
 <div class="full-screen-section">
     <div class="container">
-        <div class="row align-items-center gy-4">
-            <div class="col-md-6">
+        <div class="row align-items-center gy-5 hero-content">
+            <div class="col-lg-6">
                 <h1 class="fw-bold mb-3">Food Center</h1>
                 <h4 class="mb-4">Dinas Ketahanan Pangan Kabupaten Kutai Barat</h4>
-                <p style="font-size: 1.1rem; line-height: 1.8;">
+                <p style="font-size: 1.1rem; line-height: 1.8; text-align: justify;">
                     Tempat terbaik untuk memenuhi kebutuhan pangan lokal dengan kualitas terbaik!
-                    <strong>Food Center</strong> hadir sebagai sarana pemasaran digital yang menghubungkan langsung produsen pangan lokal dengan masyarakat.
+                    <strong>Food Center</strong> hadir sebagai sarana pemasaran digital yang menghubungkan langsung produsen pangan lokal dengan masyarakat secara efisien dan transparan.
                 </p>
-                <a href="{{ route('user.produk') }}" class="btn bg-success text-white fw-bold px-5 py-3 mt-4 shadow-lg rounded-pill">
+                <!-- TOMBOl BELANJA SEKARANG PAKAI STYLE BOOTSTRAP SUCCESS DEFAULT SAJA -->
+                <a href="{{ route('produk') }}" class="btn btn-success fw-bold mt-4">
                     Belanja Sekarang!
                 </a>
             </div>
-            <div class="col-md-6 d-none d-md-block">
-                <img src="{{ asset('images/gambar_pembuka.png') }}" class="img-fluid" alt="Food Center">
+            <div class="col-lg-6">
+                <div class="hero-img-wrapper text-center">
+                    <img src="{{ asset('images/gambar_pembuka.png') }}" class="img-fluid" alt="Food Center Hero" style="max-height: 500px;">
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-{{-- Kepengurusan --}}
+<!-- Sisa kode tetap sama -->
 <div class="mt-5 mb-5">
     <h2 class="fw-bold text-center mb-3">Kepengurusan Food Center</h2>
     <h5 class="text-center mb-4 text-muted">Dinas Ketahanan Pangan Kabupaten Kutai Barat</h5>
@@ -304,17 +343,16 @@
     @endif
 </div>
 
-{{-- Produk Terbaru --}}
 <div class="container mt-5" id="produk-terbaru">
     <div class="row align-items-center mb-4">
         <div class="col">
             <h2 class="fw-bold text-start">Produk Terbaru</h2>
         </div>
         <div class="col text-end">
-            <a href="{{ route('user.produk') }}" class="btn btn-lihat-semua">Lihat Semua >></a>
+            <a href="{{ route('produk') }}" class="btn btn-lihat-semua">Lihat Semua >></a>
         </div>
     </div>
-    <div class="row g-4 mt-2 justify-content-center">
+    <div class="row g-4 mt-2 justify-content-start">
         @foreach ($produkTerbaru as $item)
             <div class="col-6 col-sm-4 col-md-3 col-lg-2">
                 <div class="produk-card text-center d-flex flex-column justify-content-between">
@@ -325,16 +363,21 @@
                     <h5 class="card-title">{{ $item['nama_produk'] }}</h5>
                     <p class="card-subtitle">{{ $item['satuan_berat'] }}</p>
                     @if($item['is_diskon'])
-                        <p class="card-text fw-bold text-success mb-0">{{ $item['harga_formatted'] }}</p>
-                        <p class="text-muted text-decoration-line-through small">{{ $item['harga_awal_formatted'] }}</p>
+                        <p class="card-text fw-bold text-success mb-0 text-center">{{ $item['harga_formatted'] }}</p>
+                        <p class="text-muted text-decoration-line-through small text-center">{{ $item['harga_awal_formatted'] }}</p>
                     @else
-                        <p class="card-text fw-bold text-success">{{ $item['harga_formatted'] }}</p>
+                        <p class="card-text fw-bold text-success text-center">{{ $item['harga_formatted'] }}</p>
                     @endif
                     <div class="mt-auto">
-                        <a href="{{ route('user.produk.detail', $item['id']) }}" class="btn btn-outline-success btn-sm w-100 mb-2">
+                        <a href="{{ route('produk.detail', $item['id']) }}" class="btn btn-outline-success btn-sm w-100 mb-2">
                             Lihat Detail
                         </a>
-                        <button class="btn btn-success btn-sm w-100 add-to-cart" data-id="{{ $item['id'] }}" data-batch-id="{{ $item['batch_id'] ?? '' }}" data-quantity="{{ $item['quantity'] ?? 1 }}">Masukkan Keranjang</button>
+                        <button class="btn btn-success btn-sm w-100 add-to-cart" 
+                                data-id="{{ $item['id'] }}" 
+                                data-batch-id="{{ $item['batch_id'] ?? '' }}" 
+                                data-quantity="{{ $item['quantity'] ?? 1 }}">
+                            Masukkan Keranjang
+                        </button>
                     </div>
                 </div>
             </div>
@@ -342,7 +385,6 @@
     </div>
 </div>
 
-{{-- Produk Terlaris --}}
 @if($produkTerlaris->isNotEmpty())
     <div class="container mt-5 mb-5">
         <div class="row align-items-center mb-4">
@@ -350,10 +392,10 @@
                 <h2 class="fw-bold text-start">Produk Terlaris</h2>
             </div>
             <div class="col text-end">
-                <a href="{{ route('user.produk') }}" class="btn btn-lihat-semua">Lihat Semua >></a>
+                <a href="{{ route('produk') }}" class="btn btn-lihat-semua">Lihat Semua >></a>
             </div>
         </div>
-        <div class="row g-4 mt-2 justify-content-center">
+        <div class="row g-4 mt-2 justify-content-start">
             @foreach ($produkTerlaris as $item)
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2">
                     <div class="produk-card text-center d-flex flex-column justify-content-between">
@@ -364,14 +406,19 @@
                         <h5 class="card-title">{{ $item['nama_produk'] }}</h5>
                         <p class="card-subtitle">{{ $item['satuan_berat'] }}</p>
                         @if($item['is_diskon'])
-                            <p class="card-text fw-bold text-success mb-0">{{ $item['harga_formatted'] }}</p>
-                            <p class="text-muted text-decoration-line-through small">{{ $item['harga_awal_formatted'] }}</p>
+                            <p class="card-text fw-bold text-success mb-0 text-center">{{ $item['harga_formatted'] }}</p>
+                            <p class="text-muted text-decoration-line-through small text-center">{{ $item['harga_awal_formatted'] }}</p>
                         @else
-                            <p class="card-text fw-bold text-success">{{ $item['harga_formatted'] }}</p>
+                            <p class="card-text fw-bold text-success text-center">{{ $item['harga_formatted'] }}</p>
                         @endif
                         <div class="mt-auto">
-                            <a href="{{ route('user.produk.detail', $item['id']) }}" class="btn btn-outline-success btn-sm w-100 mb-2">Lihat Detail</a>
-                            <button class="btn btn-success btn-sm w-100 add-to-cart" data-id="{{ $item['id'] }}" data-batch-id="{{ $item['batch_id'] ?? '' }}" data-quantity="{{ $item['quantity'] ?? 1 }}">Masukkan Keranjang</button>
+                            <a href="{{ route('produk.detail', $item['id']) }}" class="btn btn-outline-success btn-sm w-100 mb-2">Lihat Detail</a>
+                            <button class="btn btn-success btn-sm w-100 add-to-cart" 
+                                    data-id="{{ $item['id'] }}" 
+                                    data-batch-id="{{ $item['batch_id'] ?? '' }}" 
+                                    data-quantity="{{ $item['quantity'] ?? 1 }}">
+                                Masukkan Keranjang
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -380,8 +427,7 @@
     </div>
 @endif
 
-{{-- Toast Container --}}
-<div class="toast-container">
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
     <div id="addToCartToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
             <i class="fas fa-shopping-cart text-success me-2"></i>
@@ -392,51 +438,6 @@
             <span id="toastMessage"></span>
         </div>
     </div>
-
-    @auth
-        @php
-            $pendingCount = \App\Models\Pemesanan::where('id_user', Auth::id())
-                            ->where('status_pesanan', 'menunggu_pembayaran')
-                            ->count();
-        @endphp
-        @if($pendingCount > 0)
-        <!-- Toast Pembayaran -->
-        <div id="toastPayment" class="toast align-items-center text-bg-warning border-0 shadow-lg position-fixed top-0 start-50 translate-middle-x mt-4" role="alert" aria-live="assertive" aria-atomic="true" style="min-width: 420px; font-size: 1.1rem; border-radius: 0.75rem; z-index: 1060;">
-            <div class="d-flex">
-                <div class="toast-body fw-semibold text-dark">
-                    <i class="fa-solid fa-bell me-2"></i>
-                    Halo {{ Auth::user()->name }}, Anda memiliki {{ $pendingCount }} pesanan yang menunggu pembayaran.
-                    <a href="{{ route('pemesanan.index') }}" class="fw-bold text-dark text-decoration-underline ms-1">Lihat</a>
-                </div>
-                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        </div>
-        @endif
-
-        @php
-            // Check for recently cancelled orders (e.g., last 24 hours, or just latest one)
-            // Ideally we should track 'read' status, but for now we show latest cancelled.
-            $cancelledOrder = \App\Models\Pemesanan::where('id_user', Auth::id())
-                            ->where('status_pesanan', 'dibatalkan')
-                            ->where('updated_at', '>=', now()->subHours(24)) // Show if cancelled in last 24h
-                            ->latest()
-                            ->first();
-        @endphp
-
-        @if($cancelledOrder)
-        <!-- Toast Pembayaran Dibatalkan -->
-        <div id="toastCancelled" class="toast align-items-center text-bg-danger border-0 shadow-lg position-fixed top-0 start-50 translate-middle-x mt-4" role="alert" aria-live="assertive" aria-atomic="true" style="min-width: 420px; font-size: 1.1rem; border-radius: 0.75rem; z-index: 1060;">
-            <div class="d-flex">
-                <div class="toast-body fw-semibold text-white">
-                    <i class="fa-solid fa-circle-exclamation me-2"></i>
-                    Pesanan #{{ $cancelledOrder->kode_pesanan }} telah dibatalkan oleh Staff.
-                    <a href="{{ route('pemesanan.index') }}" class="fw-bold text-white text-decoration-underline ms-1">Cek Riwayat</a>
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        </div>
-        @endif
-    @endauth
 </div>
 
 @endsection
@@ -444,37 +445,16 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Cek CSRF token ada atau nggak
+
         const csrfToken = document.querySelector('meta[name="csrf-token"]');
         if (!csrfToken) {
-            console.error('CSRF TOKEN MISSING! Tambah <meta name="csrf-token" content="{{ csrf_token() }}"> di layout head.');
+            console.error('CSRF TOKEN MISSING!');
             return;
         }
 
-        // Init toast dengan autohide
         const toastEl = document.getElementById('addToCartToast');
-        const toast = new bootstrap.Toast(toastEl, {
-            autohide: true,  // Auto hide setelah delay
-            delay: 3000      // 3 detik
-        });
+        const toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 3000 });
 
-        // Toast Payment & Cancelled (Show once per visit)
-        const toastPaymentEl = document.getElementById('toastPayment');
-        const toastCancelledEl = document.getElementById('toastCancelled');
-
-        if (toastPaymentEl && !localStorage.getItem('toastPaymentShown')) {
-            const toastPayment = new bootstrap.Toast(toastPaymentEl, { delay: 10000 });
-            toastPayment.show();
-            localStorage.setItem('toastPaymentShown', 'true');
-        }
-
-        if (toastCancelledEl && !localStorage.getItem('toastCancelledShown')) {
-            const toastCancelled = new bootstrap.Toast(toastCancelledEl, { delay: 10000 });
-            toastCancelled.show();
-            localStorage.setItem('toastCancelledShown', 'true');
-        }
-
-        // Function to update cart badge
         function updateCartBadge(count) {
             const badge = document.getElementById('cartBadge');
             if (badge) {
@@ -487,22 +467,20 @@
             }
         }
 
-        // Fungsi helper buat show toast (success/error)
         function showToast(message, isSuccess = true) {
             const toastBody = document.getElementById('toastMessage');
             toastBody.textContent = message;
 
-            // Ganti icon/header berdasarkan status
             const toastHeader = toastEl.querySelector('.toast-header strong');
             const icon = toastEl.querySelector('.toast-header i');
             if (isSuccess) {
                 toastHeader.textContent = 'Keranjang';
                 icon.className = 'fas fa-shopping-cart text-success me-2';
-                toastEl.classList.remove('bg-danger', 'text-white');  // Reset kalau ada error class
+                toastEl.classList.remove('bg-danger', 'text-white');
             } else {
                 toastHeader.textContent = 'Error';
                 icon.className = 'fas fa-exclamation-triangle text-danger me-2';
-                toastEl.classList.add('bg-danger', 'text-white');  // Styling error
+                toastEl.classList.add('bg-danger', 'text-white');
             }
 
             toast.show();
@@ -510,15 +488,18 @@
 
         document.querySelectorAll('.add-to-cart').forEach(button => {
             button.addEventListener('click', function() {
+                const isAuthenticated = {{ Auth::check() ? 'true' : 'false' }};
+                if (!isAuthenticated) {
+                    window.location.href = "{{ route('login') }}";
+                    return;
+                }
+
                 const productId = this.dataset.id;
                 const batchId = this.dataset.batchId || null;
                 const quantity = parseInt(this.dataset.quantity) || 1;
 
-                // Optional: Ambil nama produk dari card title terdekat (buat message lebih bagus)
                 const cardTitle = this.closest('.produk-card').querySelector('.card-title');
                 const namaProduk = cardTitle ? cardTitle.textContent.trim() : 'item';
-
-                console.log('Sending to cart:', { product_id: productId, batch_id: batchId, quantity: quantity });
 
                 if (!productId || isNaN(productId)) {
                     showToast('Error: Product ID tidak valid!', false);
@@ -543,29 +524,15 @@
                     })
                 })
                 .then(response => {
-                    console.log('Response status:', response.status);
                     if (!response.ok) {
-                        return response.text().then(text => {
-                            console.error('Error response:', text);
-                            throw new Error(`HTTP ${response.status}: ${text}`);
-                        });
+                        return response.text().then(text => { throw new Error(`HTTP ${response.status}: ${text}`); });
                     }
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Response data:', data);
                     if (data.success) {
-                        // Message lebih personal dengan nama produk
                         showToast(`Berhasil! ${quantity} ${namaProduk} ditambahkan ke keranjang.`, true);
-
-                        // Update cart badge
                         updateCartBadge(data.cart_count || 0);
-
-                        // Optional: Redirect ke keranjang setelah toast selesai (uncomment kalau mau)
-                        // toastEl.addEventListener('hidden.bs.toast', () => {
-                        //     window.location.href = '{{ route("keranjang.index") }}';
-                        // }, { once: true });
-
                     } else {
                         showToast(`Gagal: ${data.message || 'Unknown error'}`, false);
                     }

@@ -112,7 +112,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Diisi oleh JavaScript -->
+
                 </tbody>
             </table>
         </div>
@@ -123,7 +123,6 @@
     </nav>
 </div>
 
-<!-- Toast Container -->
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
     @if (session('success'))
         <div class="toast align-items-center text-white bg-success border-0" role="alert">
@@ -143,7 +142,6 @@
     @endif
 </div>
 
-<!-- Modal Detail Produk -->
 <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -183,7 +181,6 @@
     </div>
 </div>
 
-<!-- Modal Konfirmasi Hapus -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -202,7 +199,6 @@
     </div>
 </div>
 
-<!-- Modal Peringatan Batch -->
 <div class="modal fade" id="batchWarningModal" tabindex="-1" aria-labelledby="batchWarningLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -363,10 +359,9 @@
             const satuanDisplay = `${p.jumlah_satuan || 1} ${getStringValue(p.satuan)}`;
             const batchCount = p.batch ? p.batch.length : 0;
 
-            // FIX: Dynamic href untuk batch dengan ?from= + query current
-            const baseBatchUrl = batchUrl.replace(':id', p.id);
-            let batchHref = baseBatchUrl + '?from=produk.data';  // Tambah from=route_name
-            const currentQuery = new URLSearchParams(window.location.search).toString();  // Ambil query current (page, search, dll.)
+const baseBatchUrl = batchUrl.replace(':id', p.id);
+            let batchHref = baseBatchUrl + '?from=produk.data';
+            const currentQuery = new URLSearchParams(window.location.search).toString();
             if (currentQuery) {
                 batchHref += '&' + currentQuery;
             }
@@ -398,7 +393,7 @@
                     <button class="btn-action btn-detail" data-id="${p.id}"><i class="bi bi-eye"></i></button>
                     <a href="${editUrl.replace(':id', p.id)}" class="btn-action btn-edit"><i class="bi bi-pencil"></i></a>
                     <button class="btn-action btn-delete" data-id="${p.id}" data-name="${p.nama_produk.replace(/"/g, '&quot;')}" data-batch="${batchCount}"><i class="bi bi-trash"></i></button>
-                    <a href="${batchHref}" class="btn-action btn-batch"><i class="bi bi-layers"></i></a>  <!-- Ganti href ke dynamic -->
+                    <a href="${batchHref}" class="btn-action btn-batch"><i class="bi bi-layers"></i></a>
                 </td>
             `;
             tableBody.appendChild(row);
@@ -441,8 +436,7 @@
         });
     }
 
-    // Event: Detail Modal
-    tableBody.addEventListener('click', e => {
+tableBody.addEventListener('click', e => {
         const btn = e.target.closest('.btn-detail');
         if (!btn) return;
 
@@ -478,8 +472,7 @@
         new bootstrap.Modal(document.getElementById('detailModal')).show();
     });
 
-    // Event: Tombol Delete
-    tableBody.addEventListener('click', e => {
+tableBody.addEventListener('click', e => {
         const btn = e.target.closest('.btn-delete');
         if (!btn) return;
 
@@ -501,8 +494,7 @@
         deleteModalInstance.show();
     });
 
-    // PERBAIKAN UTAMA: Konfirmasi Hapus
-    document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
         if (!currentDeleteId) return;
 
         const url = deleteUrl.replace(':id', currentDeleteId);
@@ -530,7 +522,7 @@
             }
 
             if (res.ok && json.success === true) {
-                // Hapus dari data lokal
+
                 produkData.splice(produkData.findIndex(p => p.id === currentDeleteId), 1);
                 filteredData = filteredData.filter(p => p.id !== currentDeleteId);
 
@@ -549,8 +541,7 @@
         }
     });
 
-    // Init
-    document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
         populateSupplierFilter();
 
         filterStatusTampil.addEventListener('change', applyFiltersAndSearch);
@@ -561,8 +552,7 @@
 
         applyFiltersAndSearch();
 
-        // Tampilkan toast session
-        document.querySelectorAll('.toast').forEach(toastEl => {
+document.querySelectorAll('.toast').forEach(toastEl => {
             new bootstrap.Toast(toastEl, { delay: 5000 }).show();
         });
     });

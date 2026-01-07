@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class ManajemenPenggunaController extends Controller
 {
@@ -13,7 +12,6 @@ class ManajemenPenggunaController extends Controller
         $this->middleware('auth');
     }
 
-    // ================= LIST USER =================
     public function index()
     {
         $users = User::select(
@@ -28,12 +26,11 @@ class ManajemenPenggunaController extends Controller
         return view('super_admin.manajemenPengguna', compact('users'));
     }
 
-    // ================= UPDATE ROLE & STATUS =================
     public function updateRole(Request $request, $id)
     {
         $request->validate([
             'role' => 'required|in:user,kurir,staff_produk,staff_purchasing,super_admin',
-            'status_online' => 'nullable|in:aktif,tidak_aktif', // Nullable karena opsional dari modal
+            'status_online' => 'nullable|in:aktif,tidak_aktif',
         ]);
 
         $user = User::findOrFail($id);
@@ -42,14 +39,12 @@ class ManajemenPenggunaController extends Controller
             'role' => $request->role,
         ];
 
-        // Update status_online kalau ada input (tetep nullable)
         if ($request->filled('status_online')) {
             $updateData['status_online'] = $request->status_online;
         }
 
         $user->update($updateData);
 
-        // SYNC STATUS ANTAR FOR COURIER
         if ($user->role === 'kurir') {
             $kurir = \App\Models\Kurir::firstOrCreate(
                 ['id_user' => $user->id],
@@ -60,7 +55,7 @@ class ManajemenPenggunaController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Role user berhasil diperbarui'
+            'message' => 'Role user berhasil diperbarui',
         ]);
     }
 }

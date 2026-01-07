@@ -2,34 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\Pengurus;
-use App\Models\Produk;
 use App\Models\DetailPesanan;
 use App\Models\Pemesanan;
+use App\Models\Pengurus;
+use App\Models\Produk;
 use App\Models\Produk_Rusak;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class LaporanController extends Controller
 {
-    /**
-     * Tampilkan Dashboard Super Admin
-     */
     public function dashboardSuperAdmin()
     {
-        // 1. Stats Cards
+
         $total_user = User::count();
         $total_kurir = User::where('role', 'kurir')->count();
         $total_pengurus = Pengurus::count();
         $total_produk = Produk::count();
 
-        // 2. Best Selling Products (by Quantity)
         $top_products = DetailPesanan::select('id_produk', DB::raw('sum(quantity) as total_sold'))
-            ->whereHas('pemesanan', function($q) {
+            ->whereHas('pemesanan', function ($q) {
                 $q->where('status_pesanan', 'selesai');
             })
-            ->with(['produk' => function($q) {
+            ->with(['produk' => function ($q) {
                 $q->with('kategori');
             }])
             ->groupBy('id_produk')
@@ -37,13 +33,12 @@ class LaporanController extends Controller
             ->take(5)
             ->get();
 
-        // 3. Real Monthly Sales (Current Year)
         $monthly_sales_data = Pemesanan::select(
-                DB::raw('MONTH(created_at) as month'),
-                DB::raw('count(*) as total_orders'),
-                DB::raw('sum(total) as total_revenue'),
-                DB::raw('sum(subtotal) as net_revenue')
-            )
+            DB::raw('MONTH(created_at) as month'),
+            DB::raw('count(*) as total_orders'),
+            DB::raw('sum(total) as total_revenue'),
+            DB::raw('sum(subtotal) as net_revenue')
+        )
             ->where('status_pesanan', 'selesai')
             ->whereYear('created_at', date('Y'))
             ->groupBy('month')
@@ -51,39 +46,35 @@ class LaporanController extends Controller
             ->get();
 
         $month_names = [
-            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 
-            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus', 
-            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
         ];
 
         $monthly_sales = [];
-        foreach($monthly_sales_data as $data) {
-             $monthly_sales[] = [
-                 'month' => $month_names[$data->month],
-                 'orders' => $data->total_orders,
-                 'total' => $data->total_revenue,
-                 'net' => $data->net_revenue
-             ];
+        foreach ($monthly_sales_data as $data) {
+            $monthly_sales[] = [
+                'month' => $month_names[$data->month],
+                'orders' => $data->total_orders,
+                'total' => $data->total_revenue,
+                'net' => $data->net_revenue,
+            ];
         }
 
         return view('Super_Admin.dashboard', compact('total_user', 'total_kurir', 'total_pengurus', 'total_produk', 'top_products', 'monthly_sales'));
     }
 
-    /**
-     * Halaman Laporan Super Admin
-     */
     public function laporan(Request $request)
     {
         $month = $request->query('month', date('m'));
         $year = $request->query('year', date('Y'));
-        $sort = $request->query('sort', 'desc'); // Default newest
+        $sort = $request->query('sort', 'desc');
 
-        // 1. Laporan Penjualan (DetailPesanan selesai)
-        $penjualan = DetailPesanan::whereHas('pemesanan', function($q) use ($month, $year) {
-                $q->where('status_pesanan', 'selesai')
-                  ->whereMonth('created_at', $month)
-                  ->whereYear('created_at', $year);
-            })
+        $penjualan = DetailPesanan::whereHas('pemesanan', function ($q) use ($month, $year) {
+            $q->where('status_pesanan', 'selesai')
+                ->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year);
+        })
             ->join('pemesanans', 'detail_pesanans.id_pemesanan', '=', 'pemesanans.id')
             ->join('batches', 'detail_pesanans.id_batch', '=', 'batches.id')
             ->join('produks', 'detail_pesanans.id_produk', '=', 'produks.id')
@@ -108,19 +99,19 @@ class LaporanController extends Controller
             ->orderBy('pemesanans.created_at', $sort)
             ->paginate(10, ['*'], 'penjualan_page');
 
-        // 2. Laporan Pesanan (All Pemesanan)
         $pesanan = Pemesanan::with(['user', 'detailPesanan.batch'])
             ->whereMonth('created_at', $month)
             ->whereYear('created_at', $year)
             ->orderBy('created_at', $sort)
             ->paginate(10, ['*'], 'pesanan_page')
-            ->through(function($p) {
-                // Calculate normal total to detect discounts
-                $normal_subtotal = $p->detailPesanan->sum(function($detail) {
+            ->through(function ($p) {
+
+                $normal_subtotal = $p->detailPesanan->sum(function ($detail) {
                     $harga_normal = $detail->batch ? $detail->batch->harga_normal : ($detail->harga_satuan ?? 0);
+
                     return $detail->quantity * $harga_normal;
                 });
-                
+
                 $total_normal = $normal_subtotal + $p->ongkir;
 
                 return [
@@ -132,29 +123,27 @@ class LaporanController extends Controller
                     'total_bayar' => $p->total,
                     'ongkir' => $p->ongkir,
                     'total_normal_bayar' => $total_normal,
-                    'status_pesanan' => ucwords(str_replace('_', ' ', $p->status_pesanan)),
-                    'metode_pengiriman' => $p->opsi_pengiriman
+                    'status_pesanan' => $p->status_pesanan,
+                    'metode_pengiriman' => $p->opsi_pengiriman,
                 ];
             });
 
-        // 3. Laporan Stok (Berdasarkan Produk, filter pergerakan di bulan tsb)
-        $stok = Produk::with(['batch', 'rusak' => fn($q) => $q->select('id_produk', 'jumlah_rusak'), 'supplier', 'satuan', 'kategori'])
+        $stok = Produk::with(['batch', 'rusak' => fn ($q) => $q->select('id_produk', 'jumlah_rusak'), 'supplier', 'satuan', 'kategori'])
             ->paginate(10, ['*'], 'stok_page')
-            ->through(function($p) use ($month, $year) {
+            ->through(function ($p) use ($month, $year) {
                 $all_batches = $p->batch;
                 $total_batch = $all_batches->count();
                 $sisa_batch = $all_batches->where('stok', '>', 0)->count();
-                
+
                 $batch_aktif_obj = $all_batches->where('stok', '>', 0)->sortBy('id')->first();
                 $kode_batch_aktif = $batch_aktif_obj ? $batch_aktif_obj->kode_batch : 'Batch Habis';
                 $is_batch_habis = $batch_aktif_obj ? false : true;
 
-                // Transaksi di bulan terpilih
                 $stok_dibeli = DetailPesanan::where('id_produk', $p->id)
-                    ->whereHas('pemesanan', function($q) use ($month, $year) {
+                    ->whereHas('pemesanan', function ($q) use ($month, $year) {
                         $q->where('status_pesanan', 'selesai')
-                          ->whereMonth('created_at', $month)
-                          ->whereYear('created_at', $year);
+                            ->whereMonth('created_at', $month)
+                            ->whereYear('created_at', $year);
                     })
                     ->sum('quantity');
 
@@ -165,19 +154,17 @@ class LaporanController extends Controller
 
                 $sisa_stok = $all_batches->sum('stok');
 
-                // Stok Masuk di bulan terpilih (dari tgl_masuk batch)
                 $stok_masuk_bulan_ini = $all_batches->whereNotNull('tgl_masuk')
-                    ->filter(function($b) use ($month, $year) {
+                    ->filter(function ($b) use ($month, $year) {
                         return $b->tgl_masuk->format('m') == $month && $b->tgl_masuk->format('Y') == $year;
                     })
-                    ->sum('stok'); // Initial stock of batches created this month (approximate if history missing)
-                
-                // User asked for "tanggal update harga/perubahan signifikan"
+                    ->sum('stok');
+
                 $last_update = $all_batches->max('tgl_perubahan_harga');
 
                 return [
                     'nama_produk' => $p->nama_produk,
-                    'gambar' => $p->gambar ? 'storage/' . $p->gambar : 'images/default-produk.png',
+                    'gambar' => $p->gambar ? 'storage/'.$p->gambar : 'images/default-produk.png',
                     'nama_supplier' => $p->supplier->nama_supplier ?? '-',
                     'nama_kategori' => $p->kategori->nama_kategori ?? '-',
                     'jumlah_satuan' => $p->jumlah_satuan,
@@ -190,39 +177,38 @@ class LaporanController extends Controller
                     'stok_keluar_dibeli' => $stok_dibeli,
                     'stok_keluar_rusak' => $stok_rusak,
                     'sisa_stok' => $sisa_stok,
-                    'tanggal_update' => $last_update ?: $p->updated_at
+                    'tanggal_update' => $last_update ?: $p->updated_at,
                 ];
             });
 
-        // 4. Produk Terlaris (Filter bulan)
-        $total_all_sales = DetailPesanan::whereHas('pemesanan', function($q) use ($month, $year) {
-                $q->where('status_pesanan', 'selesai')
-                  ->whereMonth('created_at', $month)
-                  ->whereYear('created_at', $year);
-            })->sum('harga_total');
-        
+        $total_all_sales = DetailPesanan::whereHas('pemesanan', function ($q) use ($month, $year) {
+            $q->where('status_pesanan', 'selesai')
+                ->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year);
+        })->sum('harga_total');
+
         $terlaris = DetailPesanan::select('id_produk', DB::raw('sum(quantity) as jumlah_terjual'), DB::raw('sum(harga_total) as total_pendapatan'))
-            ->whereHas('pemesanan', function($q) use ($month, $year) {
+            ->whereHas('pemesanan', function ($q) use ($month, $year) {
                 $q->where('status_pesanan', 'selesai')
-                  ->whereMonth('created_at', $month)
-                  ->whereYear('created_at', $year);
+                    ->whereMonth('created_at', $month)
+                    ->whereYear('created_at', $year);
             })
-            ->with(['produk' => function($q) {
+            ->with(['produk' => function ($q) {
                 $q->with(['supplier', 'satuan'])->orderBy('created_at', 'asc');
             }])
             ->groupBy('id_produk')
-            ->orderBy('jumlah_terjual', 'asc') // User asked all tabs ASC
+            ->orderBy('jumlah_terjual', 'asc')
             ->paginate(10, ['*'], 'terlaris_page')
-            ->through(function($item) use ($total_all_sales) {
+            ->through(function ($item) use ($total_all_sales) {
                 return [
                     'nama_produk' => $item->produk->nama_produk,
-                    'gambar' => $item->produk->gambar ? 'storage/' . $item->produk->gambar : 'images/default-produk.png',
+                    'gambar' => $item->produk->gambar ? 'storage/'.$item->produk->gambar : 'images/default-produk.png',
                     'nama_supplier' => $item->produk->supplier->nama_supplier ?? '-',
                     'jumlah_satuan' => $item->produk->jumlah_satuan,
                     'satuan' => $item->produk->satuan->nama_satuan ?? 'Pcs',
                     'jumlah_terjual' => $item->jumlah_terjual,
                     'total_pendapatan' => $item->total_pendapatan,
-                    'persentase_penjualan' => $total_all_sales > 0 ? round(($item->total_pendapatan / $total_all_sales) * 100, 1) : 0
+                    'persentase_penjualan' => $total_all_sales > 0 ? round(($item->total_pendapatan / $total_all_sales) * 100, 1) : 0,
                 ];
             });
 

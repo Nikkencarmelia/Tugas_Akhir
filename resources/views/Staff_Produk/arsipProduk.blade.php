@@ -104,7 +104,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Diisi oleh JavaScript -->
+
                 </tbody>
             </table>
         </div>
@@ -126,8 +126,7 @@
         <ul class="pagination justify-content-center mt-3"></ul>
     </nav>
 
-    <!-- Toast Container -->
-    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
         <div id="restoreToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
                 <div class="toast-body" id="restoreToastMessage">
@@ -148,7 +147,6 @@
     </div>
 </div>
 
-<!-- Modal Detail -->
 <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -188,7 +186,6 @@
     </div>
 </div>
 
-<!-- Modal Konfirmasi -->
 <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -346,9 +343,8 @@
             const kategoriStr = getStringValue(p.kategori);
             const satuanDisplay = `${p.jumlah_satuan || 1} ${getStringValue(p.satuan)}`;
 
-            // FIX: Dynamic href untuk batch dengan ?from= + query current
-            const baseBatchUrl = batchUrl.replace(':id', p.id);
-            let batchHref = baseBatchUrl + '?from=produk.arsip';  // Tambah from=route_name (sesuain 'produk.arsip')
+const baseBatchUrl = batchUrl.replace(':id', p.id);
+            let batchHref = baseBatchUrl + '?from=produk.arsip';
             const currentQuery = new URLSearchParams(window.location.search).toString();
             if (currentQuery) {
                 batchHref += '&' + currentQuery;
@@ -374,7 +370,7 @@
                 <td>${satuanDisplay}</td>
                 <td>
                     <button class="btn-action btn-detail" data-id="${p.id}"><i class="bi bi-eye"></i></button>
-                    <a href="${batchHref}" class="btn-action btn-batch"><i class="bi bi-layers"></i></a>  <!-- Ganti href ke dynamic -->
+                    <a href="${batchHref}" class="btn-action btn-batch"><i class="bi bi-layers"></i></a>
                     <button class="btn btn-sm btn-outline-success btn-pulihkan" data-id="${p.id}" data-name="${p.nama_produk.replace(/"/g, '&quot;')}">
                         <i class="bi bi-upload"></i> Tampilkan Arsip
                     </button>

@@ -49,6 +49,7 @@
                 <small class="text-muted">Upload gambar baru untuk mengganti.</small>
             @endif
             <input type="file" class="form-control" id="gambar" name="gambar" accept="image/*">
+            <small class="text-muted">Format: JPG, JPEG, PNG. Maks 5MB.</small>
             <img id="imgPreview" class="img-preview" alt="Preview Gambar Baru">
         </div>
 
@@ -96,7 +97,7 @@
 
         <div class="mb-3">
             <label>Estimasi Hari Kadaluarsa</label>
-            <input type="number" class="form-control" name="estimasi_kadaluwarsa_hari" min="0" value="{{ old('estimasi_kadaluwarsa_hari', $produk->estimasi_kadaluwarsa_hari) }}" required>
+            <input type="number" class="form-control" name="estimasi_kadaluwarsa_hari" min="1" value="{{ old('estimasi_kadaluwarsa_hari', $produk->estimasi_kadaluwarsa_hari) }}" oninput="if(this.value === '0') this.value = '';">
             <small class="text-muted">Masukkan estimasi hari kadaluarsa produk dari tanggal masuk (contoh: 30 hari)</small>
         </div>
 
@@ -124,28 +125,74 @@
     document.addEventListener('DOMContentLoaded', function() {
         const gambarInput = document.getElementById('gambar');
         const imagePreview = document.getElementById('imgPreview');
+        
+        // Setup Toast Container if not exists
+        let toastContainer = document.querySelector('.toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+            toastContainer.style.zIndex = '1060';
+            document.body.appendChild(toastContainer);
+        }
+
+        // Setup Validation Toast
+        const toastId = 'validationToast';
+        let toastEl = document.getElementById(toastId);
+        if (!toastEl) {
+            toastEl = document.createElement('div');
+            toastEl.id = toastId;
+            toastEl.className = 'toast align-items-center text-white bg-danger border-0';
+            toastEl.setAttribute('role', 'alert');
+            toastEl.setAttribute('aria-live', 'assertive');
+            toastEl.setAttribute('aria-atomic', 'true');
+            toastEl.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body" id="toastBody"></div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            toastContainer.appendChild(toastEl);
+        }
+        const toastBody = document.getElementById('toastBody');
+        const toast = new bootstrap.Toast(toastEl);
+
+        function showToast(message) {
+            toastBody.textContent = message;
+            toast.show();
+        }
 
         if (gambarInput && imagePreview) {
             gambarInput.addEventListener('change', function(e) {
                 const file = e.target.files[0];
-                if (file && file.type.startsWith('image/')) {
+                if (file) {
+                    if (!file.type.startsWith('image/')) {
+                        showToast('File yang dipilih bukan gambar!');
+                        e.target.value = '';
+                        imagePreview.style.display = 'none';
+                        return;
+                    }
+
+                    const maxSize = 5 * 1024 * 1024; // 5MB
+                    if (file.size > maxSize) {
+                        showToast('Ukuran file terlalu besar! Maksimal 5MB.');
+                        e.target.value = '';
+                        imagePreview.style.display = 'none';
+                        return;
+                    }
+
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         imagePreview.src = e.target.result;
                         imagePreview.style.display = 'block';
                     };
                     reader.readAsDataURL(file);
-                } else if (file) {
-                    alert('File yang dipilih bukan gambar!');
-                    e.target.value = '';
                 } else {
                     imagePreview.style.display = 'none';
                 }
             });
         }
 
-        // Product Name Check (Soft Warning)
-        const nameInput = document.getElementById('nama_produk');
+const nameInput = document.getElementById('nama_produk');
         const nameWarning = document.getElementById('nameWarning');
         let timeout = null;
 
@@ -153,7 +200,7 @@
             nameInput.addEventListener('input', function() {
                 clearTimeout(timeout);
                 const name = this.value.trim();
-                
+
                 if (name.length < 3) {
                     nameWarning.classList.add('d-none');
                     return;

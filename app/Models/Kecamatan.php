@@ -15,7 +15,8 @@ class Kecamatan extends Model
         'ongkir_minimal_motor',
     ];
 
-    public function kelurahan(){
-        return $this->hasMany(Kelurahan::class,'id_kecamatan');
+    public function kelurahan()
+    {
+        return $this->hasMany(Kelurahan::class, 'id_kecamatan');
     }
 }

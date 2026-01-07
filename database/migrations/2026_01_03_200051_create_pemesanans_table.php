@@ -35,16 +35,14 @@ return new class extends Migration
                 'ditolak_kurir',
                 'menunggu_pembayaran',
                 'menunggu_konfirmasi_pembayaran',
-                'menunggu_verifikasi_pembayaran',
-                'menyiapkan_pesanan',
                 'diproses',
                 'siap_diambil',
-                'siap_diambil_dikirim',
+                'pesanan_telah_diambil',
                 'dikirim',
                 'sedang_diantar',
-                'pesanan_telah_diambil',
                 'selesai',
-                'dibatalkan'
+                'dibatalkan',
+                'ditolak_staff'
             ])->default('menunggu_konfirmasi');
             $table->timestamps();
         });

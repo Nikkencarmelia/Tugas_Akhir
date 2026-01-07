@@ -2,43 +2,42 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Produk;
 use App\Models\Batch;
+use App\Models\Produk;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use Carbon\Carbon;
 
 class BatchController extends Controller
 {
     public function index($id_produk, Request $request)
     {
-        // SET REFERRER KE SESSION
+
         $referrerRoute = $request->query('from', 'produk.data');
         $queryParams = $request->except(['from', 'page', 'search']);
         Session::put('batch_referrer', [
             'route' => $referrerRoute,
-            'query' => $queryParams
+            'query' => $queryParams,
         ]);
 
-        $produk = Produk::with(['kategori','supplier','satuan'])->findOrFail($id_produk);
+        $produk = Produk::with(['kategori', 'supplier', 'satuan'])->findOrFail($id_produk);
 
         $query = Batch::where('id_produk', $id_produk);
 
-        // SEARCH
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
-                  ->orWhere('kode_batch', 'like', "%{$search}%")
-                  ->orWhere('harga_normal', 'like', "%{$search}%")
-                  ->orWhere('harga_saat_ini', 'like', "%{$search}%")
-                  ->orWhere('stok', 'like', "%{$search}%")
-                  ->orWhere('keterangan_harga', 'like', "%{$search}%")
-                  ->orWhere('tgl_masuk', 'like', "%{$search}%")
-                  ->orWhere('tgl_kadaluwarsa', 'like', "%{$search}%")
-                  ->orWhereHas('produk', function($sub) use ($search) {
-                      $sub->where('kode_produk', 'like', "%{$search}%");
-                  });
+                    ->orWhere('kode_batch', 'like', "%{$search}%")
+                    ->orWhere('harga_normal', 'like', "%{$search}%")
+                    ->orWhere('harga_saat_ini', 'like', "%{$search}%")
+                    ->orWhere('stok', 'like', "%{$search}%")
+                    ->orWhere('keterangan_harga', 'like', "%{$search}%")
+                    ->orWhere('tgl_masuk', 'like', "%{$search}%")
+                    ->orWhere('tgl_kadaluwarsa', 'like', "%{$search}%")
+                    ->orWhereHas('produk', function ($sub) use ($search) {
+                        $sub->where('kode_produk', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -46,12 +45,10 @@ class BatchController extends Controller
             ->paginate(10)
             ->through(function ($batch) {
 
-                // FORMAT TANGGAL
                 $batch->tgl_masuk_format = Carbon::parse($batch->tgl_masuk)->format('d/m/Y');
                 $batch->tgl_kadaluwarsa_format = Carbon::parse($batch->tgl_kadaluwarsa)->format('d/m/Y');
                 $batch->tgl_perubahan_format = $batch->tgl_perubahan_harga ? Carbon::parse($batch->tgl_perubahan_harga)->format('d/m/Y H:i') : '-';
 
-                // SISA HARI
                 $today = Carbon::today();
                 $exp = Carbon::parse($batch->tgl_kadaluwarsa)->startOfDay();
                 $diff = $today->diffInDays($exp, false);
@@ -70,11 +67,9 @@ class BatchController extends Controller
                     $batch->sisa_color = 'text-success';
                 }
 
-                // FORMAT HARGA
-                $batch->harga_normal_rp = 'Rp '.number_format($batch->harga_normal,0,',','.');
-                $batch->harga_saat_ini_rp = 'Rp '.number_format($batch->harga_saat_ini,0,',','.');
+                $batch->harga_normal_rp = 'Rp '.number_format($batch->harga_normal, 0, ',', '.');
+                $batch->harga_saat_ini_rp = 'Rp '.number_format($batch->harga_saat_ini, 0, ',', '.');
 
-                // KETERANGAN HARGA
                 if ($batch->harga_saat_ini < $batch->harga_normal) {
                     $pct = round((($batch->harga_normal - $batch->harga_saat_ini) / $batch->harga_normal) * 100);
                     $batch->keterangan = "Diskon {$pct}%";
@@ -85,7 +80,6 @@ class BatchController extends Controller
                     $batch->keterangan = 'Normal';
                 }
 
-                // STATUS STOK
                 if ($batch->stok <= 0) {
                     $batch->status_stok_text = 'Habis';
                     $batch->status_stok_badge = 'badge-habis';
@@ -100,15 +94,12 @@ class BatchController extends Controller
                 return $batch;
             });
 
-        // Hitung total stok (dari semua batch, bukan cuma yang di-paginate)
-        // Kita perlu query terpisah atau aggregat raw
         $total_stok = Batch::where('id_produk', $id_produk)->sum('stok');
         $status_stok = $total_stok <= 0 ? 'Habis' : ($total_stok <= 10 ? 'Menipis' : 'Tersedia');
 
-        // DEFAULT UNTUK FORM
         $default_kadaluarsa = $produk->estimasi_kadaluwarsa_hari
-            ? Carbon::today()->addDays($produk->estimasi_kadaluwarsa_hari)->format('Y-m-d')
-            : '';
+                    ? Carbon::today()->addDays($produk->estimasi_kadaluwarsa_hari)->format('Y-m-d')
+                    : '';
 
         return view('Staff_Produk.batchStok', compact(
             'produk',
@@ -124,35 +115,31 @@ class BatchController extends Controller
         $request->validate([
             'id_produk' => 'required|exists:produks,id',
             'stok' => 'required|integer|min:1',
-            'tgl_masuk' => 'nullable|date',
-            'tgl_kadaluwarsa' => 'nullable|date|after_or_equal:tgl_masuk',
+            'tgl_masuk' => 'required|date',
+            'tgl_kadaluwarsa' => 'required|date|after_or_equal:tgl_masuk',
             'harga_normal' => 'required|integer|min:0',
             'harga_saat_ini' => 'required|integer|min:0',
         ]);
 
         $produk = Produk::findOrFail($request->id_produk);
 
-        // ✅ tanggal masuk
         $tglMasuk = $request->tgl_masuk
-            ? Carbon::parse($request->tgl_masuk)
-            : Carbon::today();
+                    ? Carbon::parse($request->tgl_masuk)
+                    : Carbon::today();
 
-        // ✅ Gunakan input dari form jika ada, jika tidak hitung otomatis
         if ($request->filled('tgl_kadaluwarsa')) {
             $tglKadaluwarsa = Carbon::parse($request->tgl_kadaluwarsa);
         } else {
-            // Hitung otomatis jika tidak ada input
-            if (!$produk->estimasi_kadaluwarsa_hari || $produk->estimasi_kadaluwarsa_hari < 1) {
+
+            if (! $produk->estimasi_kadaluwarsa_hari || $produk->estimasi_kadaluwarsa_hari < 1) {
                 return back()->with('error', 'Produk belum punya estimasi kadaluarsa. Silakan isi tanggal kadaluarsa secara manual.');
             }
             $tglKadaluwarsa = $tglMasuk->copy()->addDays($produk->estimasi_kadaluwarsa_hari);
         }
 
-        // ✅ Generate kode_batch: BATCH-ddmmyyyy-kode_produk-xxx
         $todayStr = Carbon::today()->format('dmY');
         $prodCode = $produk->kode_produk;
-        
-        // Count batches for this product to get sequence
+
         $latestBatch = Batch::where('id_produk', $produk->id)->count();
         $sequence = str_pad($latestBatch + 1, 3, '0', STR_PAD_LEFT);
         $kodeBatch = "BATCH-{$todayStr}-{$prodCode}-{$sequence}";
@@ -173,7 +160,6 @@ class BatchController extends Controller
         return back()->with('success', 'Batch berhasil ditambahkan');
     }
 
-
     public function update(Request $request, $id)
     {
         $batch = Batch::findOrFail($id);
@@ -185,7 +171,7 @@ class BatchController extends Controller
             'harga_saat_ini' => 'required|integer|min:0',
         ]);
 
-        $priceChanged = ((float)$batch->harga_normal !== (float)$request->harga_normal || (float)$batch->harga_saat_ini !== (float)$request->harga_saat_ini);
+        $priceChanged = ((float) $batch->harga_normal !== (float) $request->harga_normal || (float) $batch->harga_saat_ini !== (float) $request->harga_saat_ini);
 
         $data = [
             'tgl_kadaluwarsa' => $request->tgl_kadaluwarsa,
@@ -197,7 +183,7 @@ class BatchController extends Controller
 
         if ($priceChanged) {
             $data['tgl_perubahan_harga'] = now();
-            
+
             if ($request->harga_saat_ini < $request->harga_normal) {
                 $data['keterangan_harga'] = 'diskon';
             } elseif ($request->harga_saat_ini > $request->harga_normal) {
@@ -215,6 +201,7 @@ class BatchController extends Controller
     public function destroy($id)
     {
         Batch::findOrFail($id)->delete();
+
         return back()->with('success', 'Batch berhasil dihapus');
     }
 
@@ -227,18 +214,16 @@ class BatchController extends Controller
         $batch = Batch::findOrFail($id);
         $diskonPercent = $request->diskon_percent;
 
-        // Hitung harga setelah diskon
         $hargaSetelahDiskon = $batch->harga_normal - ($batch->harga_normal * $diskonPercent / 100);
         $hargaSetelahDiskon = round($hargaSetelahDiskon);
 
-        // Update batch
         $batch->update([
             'harga_saat_ini' => $hargaSetelahDiskon,
             'tgl_perubahan_harga' => now(),
             'keterangan_harga' => 'diskon',
         ]);
 
-        return back()->with('success', "Diskon {$diskonPercent}% berhasil diterapkan. Harga baru: Rp " . number_format($hargaSetelahDiskon, 0, ',', '.'));
+        return back()->with('success', "Diskon {$diskonPercent}% berhasil diterapkan. Harga baru: Rp ".number_format($hargaSetelahDiskon, 0, ',', '.'));
     }
 
     public function increasePrice(Request $request, $id)
@@ -248,29 +233,31 @@ class BatchController extends Controller
         ]);
 
         $batch = Batch::findOrFail($id);
-        $hargaBaru = (int) $request->harga_saat_ini;  // Cast ke integer untuk konsistensi dengan schema int(11)
+        $hargaBaru = (int) $request->harga_saat_ini;
 
-        // Hitung persentase perubahan untuk display (dari harga normal, seperti logic di view)
         $pct = $batch->harga_normal > 0 ? round((($hargaBaru - $batch->harga_normal) / $batch->harga_normal * 100)) : 0;
-        $keteranganDisplay = $pct > 0 ? "Naik {$pct}%" : "Harga Diperbarui";
+        $keteranganDisplay = $pct > 0 ? "Naik {$pct}%" : 'Harga Diperbarui';
 
-        // Simpan code pendek ke DB (konsisten dengan ENUM-like: 'normal', 'diskon', 'naik')
         $keteranganHarga = $pct > 0 ? 'harga naik' : 'normal';
 
-        // Update batch
         $batch->update([
             'harga_saat_ini' => $hargaBaru,
             'tgl_perubahan_harga' => now(),
             'keterangan_harga' => $keteranganHarga,
         ]);
 
-        return back()->with('success', "Harga baru Rp " . number_format($hargaBaru, 0, ',', '.') . " berhasil diterapkan. Keterangan: {$keteranganDisplay}.");
+        return back()->with('success', 'Harga baru Rp '.number_format($hargaBaru, 0, ',', '.')." berhasil diterapkan. Keterangan: {$keteranganDisplay}.");
     }
 
     private function hitungStatusStok($stok)
     {
-        if ($stok <= 0) return 'habis';
-        if ($stok <= 10) return 'menipis';
+        if ($stok <= 0) {
+            return 'habis';
+        }
+        if ($stok <= 10) {
+            return 'menipis';
+        }
+
         return 'tersedia';
     }
 }

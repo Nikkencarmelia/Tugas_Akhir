@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -17,8 +16,8 @@ class KodePos extends Model
         'kode_pos',
     ];
 
-    public function kelurahan(){
-        return $this->belongsTo(Kelurahan::class,'id_kelurahan');
+    public function kelurahan()
+    {
+        return $this->belongsTo(Kelurahan::class, 'id_kelurahan');
     }
-
 }

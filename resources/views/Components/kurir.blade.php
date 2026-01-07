@@ -7,8 +7,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-        <!-- font -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
@@ -36,8 +35,7 @@
                 font-family: 'Montserrat', sans-serif;
             }
 
-            /* Desktop Sidebar */
-            .sidebar-desktop {
+.sidebar-desktop {
                 height: 100vh;
                 width: 250px;
                 position: fixed;
@@ -93,16 +91,14 @@
                 box-shadow: inset 3px 0 0 white;
             }
 
-            /* Main Content Desktop */
-            .main-content-desktop {
+.main-content-desktop {
                 margin-left: 250px;
                 padding: 1.5rem;
                 min-height: 100vh;
                 transition: var(--transition);
             }
 
-            /* Mobile: Offcanvas Sidebar */
-            .sidebar-mobile {
+.sidebar-mobile {
                 --bs-offcanvas-width: 280px;
                 --bs-offcanvas-bg: var(--sidebar-bg);
                 --bs-offcanvas-border-width: 0;
@@ -170,14 +166,12 @@
                 box-shadow: inset 3px 0 0 white;
             }
 
-            /* Mobile Main Content */
-            .main-content-mobile {
+.main-content-mobile {
                 padding: 1rem;
                 min-height: 100vh;
             }
 
-            /* Mobile Header */
-            .mobile-header {
+.mobile-header {
                 background: white;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.08);
                 padding: 0.75rem 1rem;
@@ -204,8 +198,7 @@
                 color: var(--sidebar-bg);
             }
 
-            /* Responsive */
-            @media (max-width: 991.98px) {
+@media (max-width: 991.98px) {
                 .sidebar-desktop,
                 .main-content-desktop {
                     display: none !important;
@@ -229,25 +222,22 @@
                 }
             }
 
-            /* Smooth Transitions for All */
-            .offcanvas.show {
+.offcanvas.show {
                 transform: none;
             }
 
-            /* Unified Status & Badge Styles */
-            .order-status { 
-                display: flex; 
-                align-items: center; 
-                gap: .5rem; 
-                padding: 6px 14px; 
-                border-radius: 50px; 
-                font-size: 13px; 
-                font-weight: 600; 
-                width: fit-content; 
+.order-status {
+                display: flex;
+                align-items: center;
+                gap: .5rem;
+                padding: 6px 14px;
+                border-radius: 50px;
+                font-size: 13px;
+                font-weight: 600;
+                width: fit-content;
             }
 
-            /* Status Colors - Sync with User/Staff */
-            .status-menunggu_konfirmasi { background: #f1f3f5; color: #495057; }
+.status-menunggu_konfirmasi { background: #f1f3f5; color: #495057; }
             .status-menunggu_pembayaran { background: #fff4e6; color: #d9480f; }
             .status-diproses { background: #fef9c3; color: #854d0e; }
             .status-dikirim, .status-sedang_diantar { background: #e0f2fe; color: #0369a1; }
@@ -257,12 +247,10 @@
             .status-siap_diambil { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
             .status-pesanan_telah_diambil { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
 
-            /* Courier Specific Overrides / Alignment */
-            .status-handover { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; } /* For Siap Diantar */
-            .status-preparing { background: #fef9c3; color: #854d0e; } /* For Disiapkan oleh Staff */
+.status-handover { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+            .status-preparing { background: #fef9c3; color: #854d0e; }
 
-            /* Badge Styles */
-            .vehicle-badge {
+.vehicle-badge {
                 background: #fff3ce;
                 color: #856404;
                 padding: 4px 12px;
@@ -301,7 +289,7 @@
         </style>
     </head>
     <body>
-    <!-- Mobile Header with Toggle -->
+
     <div class="mobile-header d-lg-none">
         <nav class="navbar navbar-expand-lg">
             <div class="container-fluid">
@@ -313,8 +301,7 @@
         </nav>
     </div>
 
-    <!-- Mobile Sidebar (Offcanvas) -->
-    <div class="sidebar-mobile d-lg-none offcanvas offcanvas-start" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
+<div class="sidebar-mobile d-lg-none offcanvas offcanvas-start" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title" id="sidebarOffcanvasLabel">Kurir</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -334,15 +321,13 @@
                 <i class="bi bi-person"></i> Profil
             </a>
 
-            <!-- TRIGGER MODAL LOGOUT -->
-            <button type="button" class="nav-link logout-trigger" data-bs-toggle="modal" data-bs-target="#logoutModal">
+<button type="button" class="nav-link logout-trigger" data-bs-toggle="modal" data-bs-target="#logoutModal">
                 <i class="bi bi-box-arrow-right"></i> Logout
             </button>
         </div>
     </div>
 
-    <!-- Desktop Sidebar -->
-    <div class="sidebar-desktop d-none d-lg-block">
+<div class="sidebar-desktop d-none d-lg-block">
         <h4>Kurir</h4>
         <a href="{{ route('kurir.pengiriman') }}" class="nav-link {{ request()->routeIs('kurir.pengiriman') ? 'active' : '' }}">
             <i class="bi bi-inbox"></i> Pengiriman Masuk
@@ -357,22 +342,19 @@
             <i class="bi bi-person"></i> Profil
         </a>
 
-        <!-- TRIGGER MODAL LOGOUT -->
-        <button type="button" class="nav-link logout-trigger" data-bs-toggle="modal" data-bs-target="#logoutModal">
+<button type="button" class="nav-link logout-trigger" data-bs-toggle="modal" data-bs-target="#logoutModal">
             <i class="bi bi-box-arrow-right"></i> Logout
         </button>
     </div>
 
-    <!-- Main Content -->
-    <div class="main-content-desktop d-none d-lg-block">
+<div class="main-content-desktop d-none d-lg-block">
         @yield('content')
     </div>
     <div class="main-content-mobile d-lg-none">
         @yield('content')
     </div>
 
-    <!-- Logout Confirmation Modal -->
-    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg">
                 <div class="modal-header bg-danger text-white border-0">
@@ -397,17 +379,16 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Logout function helper
+
         window.logout = function() {
             const modalLogout = new bootstrap.Modal(document.getElementById('logoutModal'));
             modalLogout.show();
         };
 
-        // Optional: JS untuk handle logout trigger (kalau butuh custom, misalnya close offcanvas dulu)
-        document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.logout-trigger').forEach(trigger => {
                 trigger.addEventListener('click', function() {
-                    // Kalau di mobile offcanvas, tutup offcanvas dulu sebelum modal
+
                     const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('sidebarOffcanvas'));
                     if (offcanvas) {
                         offcanvas.hide();

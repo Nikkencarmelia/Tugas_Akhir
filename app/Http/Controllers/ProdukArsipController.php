@@ -29,9 +29,9 @@ class ProdukArsipController extends Controller
             ->values();
 
         return view('Staff_Produk.arsipProduk', [
-            'produkAll'  => $produkAll,
-            'suppliers'  => $suppliers,
-            'kategoris'  => $kategoris,
+            'produkAll' => $produkAll,
+            'suppliers' => $suppliers,
+            'kategoris' => $kategoris,
         ]);
     }
 
@@ -45,7 +45,7 @@ class ProdukArsipController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Produk "' . $produk->nama_produk . '" berhasil ditampilkan kembali!'
+            'message' => 'Produk "'.$produk->nama_produk.'" berhasil ditampilkan kembali!',
         ]);
     }
 
@@ -56,7 +56,7 @@ class ProdukArsipController extends Controller
         if (empty($ids)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tidak ada produk yang dipilih'
+                'message' => 'Tidak ada produk yang dipilih',
             ]);
         }
 
@@ -66,7 +66,7 @@ class ProdukArsipController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "$updated produk berhasil ditampilkan kembali!"
+            'message' => "$updated produk berhasil ditampilkan kembali!",
         ]);
     }
 
@@ -77,7 +77,7 @@ class ProdukArsipController extends Controller
         if ($count === 0) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tidak ada produk di arsip'
+                'message' => 'Tidak ada produk di arsip',
             ]);
         }
 
@@ -86,7 +86,7 @@ class ProdukArsipController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "Semua $count produk arsip berhasil ditampilkan kembali!"
+            'message' => "Semua $count produk arsip berhasil ditampilkan kembali!",
         ]);
     }
 }

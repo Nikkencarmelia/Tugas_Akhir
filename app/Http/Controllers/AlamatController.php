@@ -21,9 +21,9 @@ class AlamatController extends Controller
             'kecamatans' => Kecamatan::all(),
             'alamats' => $user
                 ->alamats()
-                ->with(['kecamatan','kelurahan','kodePos'])
+                ->with(['kecamatan', 'kelurahan', 'kodePos'])
                 ->get(),
-            'activeTab' => $activeTab
+            'activeTab' => $activeTab,
         ]);
     }
 
@@ -31,10 +31,9 @@ class AlamatController extends Controller
     {
         $user = Auth::user();
 
-        // batas maksimal 10 alamat per user
         if ($user->alamats()->count() >= 10) {
             return back()->withErrors([
-                'alamat' => 'Maksimal 10 alamat pengiriman'
+                'alamat' => 'Maksimal 10 alamat pengiriman',
             ]);
         }
 
@@ -103,8 +102,6 @@ class AlamatController extends Controller
 
         return back()->with('success', 'Alamat berhasil dihapus');
     }
-
-    // ================= AJAX DROPDOWN =================
 
     public function kelurahanByKecamatan($id)
     {

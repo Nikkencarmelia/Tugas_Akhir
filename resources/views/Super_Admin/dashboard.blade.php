@@ -94,9 +94,8 @@
         background-color: var(--soft-gray);
         color: #374151;
     }
-    
-    /* Specific Colors */
-    .stat-card.user .stat-icon { background-color: #dbeafe; color: #1e40af; }
+
+.stat-card.user .stat-icon { background-color: #dbeafe; color: #1e40af; }
     .stat-card.user::before { background: #dbeafe; }
 
     .stat-card.kurir .stat-icon { background-color: #fef3c7; color: #92400e; }
@@ -104,12 +103,11 @@
 
     .stat-card.pengurus .stat-icon { background-color: #d1fae5; color: #065f46; }
     .stat-card.pengurus::before { background: #d1fae5; }
-    
+
     .stat-card.produk .stat-icon { background-color: #e0e7ff; color: #3730a3; }
     .stat-card.produk::before { background: #e0e7ff; }
 
-
-    .stat-label {
+.stat-label {
         font-size: 0.875rem; font-weight: 600; color: var(--text-muted);
         text-transform: uppercase; letter-spacing: 0.025em;
     }
@@ -154,15 +152,14 @@
 @extends('components.super_admin')
 @section('content')
 
-    <!-- Header -->
-    <div class="dashboard-header">
+<div class="dashboard-header">
         <h1 class="dashboard-title">
           <i class="bi bi-speedometer2"></i> Dashboard Super Admin
         </h1>
     </div>
 
     <div class="dashboard-container">
-        <!-- Stats Grid -->
+
         <div class="stats-grid">
             <div class="stat-card user">
                 <div class="stat-header">
@@ -197,9 +194,8 @@
             </div>
         </div>
 
-        <!-- Content Grid -->
-        <div class="content-grid">
-            <!-- Best Selling Products -->
+<div class="content-grid">
+
             <div class="content-card">
                 <h3 class="card-title"><i class="bi bi-trophy text-warning me-2"></i>Produk Terlaris (Berdasarkan Quantity)</h3>
                 <div class="table-responsive">
@@ -239,8 +235,7 @@
                 </div>
             </div>
 
-            <!-- Detailed Monthly Sales -->
-            <div class="content-card">
+<div class="content-card">
                 <h3 class="card-title"><i class="bi bi-graph-up-arrow text-success me-2"></i>Penjualan Bulanan</h3>
                 <div class="table-responsive">
                     <table class="simple-table">

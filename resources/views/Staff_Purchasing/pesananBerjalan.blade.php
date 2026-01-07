@@ -11,7 +11,7 @@
         .orders-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; background: white; padding: 1.5rem 2rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         .orders-header h3 { color: #2a522a; font-weight: 700; margin: 0; display: flex; align-items: center; gap: .5rem; }
         .orders-header h3 i { color: #198754; }
-        
+
         .order-card { background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.06); transition: .3s; border: 1px solid #f1f3f4; position: relative;}
         .order-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
         .order-card.hidden { display: none !important; }
@@ -20,9 +20,8 @@
         .order-meta { display: flex; flex-direction: column; font-size: 14px; color: #6c757d; gap: 4px; }
         .order-meta .alamat { background: #e8f5e9; color: #1b5e20; padding: 3px 8px; border-radius: 6px; font-size: 13px; display: inline-block; }
         .order-meta .metode { background: #e3f2fd; color: #0d47a1; padding: 3px 8px; border-radius: 6px; font-size: 13px; display: inline-block; }
-        
-        /* Unified Delivery & Method Badges */
-        .badge-metode { background: #e3f2fd; color: #0d47a1; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
+
+.badge-metode { background: #e3f2fd; color: #0d47a1; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
         .badge-alamat { background: #e8f5e9; color: #1b5e20; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
         .badge-kendaraan { background: #fef9c3; color: #854d0e; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #fde68a; }
         .order-number { font-weight: 600; color: #495057; }
@@ -31,7 +30,7 @@
         .img-container { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
         .img-container img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; border: 1px solid #dee2e6; }
         .badge-supplier { position: absolute; top: 5px; right: 5px; font-size: .7rem; font-weight: 600; padding: .3rem .55rem; border-radius: .4rem; line-height: 1; z-index: 2; }
-        
+
         .order-product-details h6 { margin-bottom: 0.25rem; font-weight: 600; color: #212529; }
         .produk-lain { font-size: 12px; color: #6c757d; font-style: italic; margin-top: 0.5rem; }
 
@@ -46,20 +45,19 @@
         .tab-panel{display:none;}
         .tab-panel.active{display:block;}
 
-        .order-status { 
-            display: flex; 
-            align-items: center; 
-            gap: .5rem; 
-            padding: 6px 12px; 
-            border-radius: 20px; 
-            font-size: 13px; 
-            font-weight: 500; 
-            width: fit-content; 
-            margin-bottom: 1rem; 
+        .order-status {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            width: fit-content;
+            margin-bottom: 1rem;
         }
 
-        /* Status Colors - Synchronized with User History */
-        .status-menunggu_konfirmasi { background: #f1f3f5; color: #495057; }
+.status-menunggu_konfirmasi { background: #f1f3f5; color: #495057; }
         .status-menunggu_pembayaran { background: #fff4e6; color: #d9480f; }
         .status-diproses { background: #fef9c3; color: #854d0e; }
         .status-dikirim { background: #e0f2fe; color: #0369a1; }
@@ -86,9 +84,8 @@
 @extends('components.staff_purchasing')
 @section('content')
 <div class="container py-5">
-    
-    <!-- Header -->
-    <div class="orders-header">
+
+<div class="orders-header">
         <h3><i class="fa-solid fa-person-running"></i> Pesanan Berjalan</h3>
         <div class="orders-tabs">
             <a href="#" class="orders-tab active" data-tab="menunggu-pembayaran">Menunggu Pembayaran <span class="badge bg-warning">{{ $menunggu_pembayaran->count() }}</span></a>
@@ -97,8 +94,7 @@
         </div>
     </div>
 
-    <!-- Controls -->
-    <div class="select-controls d-flex gap-3 align-items-center mb-3">
+<div class="select-controls d-flex gap-3 align-items-center mb-3">
         <div class="input-group" style="max-width: 400px; flex-grow: 1;">
              <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
              <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Cari pesanan...">
@@ -109,11 +105,9 @@
         </select>
     </div>
 
-    <!-- Tab Content -->
-    <div class="tab-content">
-        
-        <!-- Tab Menunggu Pembayaran -->
-        <div class="tab-panel active" id="menunggu-pembayaran">
+<div class="tab-content">
+
+<div class="tab-panel active" id="menunggu-pembayaran">
             @forelse($menunggu_pembayaran as $order)
                 @include('Staff_Purchasing.partials.order_card_berjalan', ['order' => $order])
             @empty
@@ -121,8 +115,7 @@
             @endforelse
         </div>
 
-        <!-- Tab Siapkan Pesanan -->
-        <div class="tab-panel" id="siapkan-pesanan">
+<div class="tab-panel" id="siapkan-pesanan">
             @forelse($siapkan_pesanan as $order)
                 @include('Staff_Purchasing.partials.order_card_berjalan', ['order' => $order])
             @empty
@@ -130,8 +123,7 @@
             @endforelse
         </div>
 
-        <!-- Tab Siap Diambil -->
-        <div class="tab-panel" id="siap-diambil">
+<div class="tab-panel" id="siap-diambil">
             @forelse($siap_diambil as $order)
                 @include('Staff_Purchasing.partials.order_card_berjalan', ['order' => $order])
             @empty
@@ -144,7 +136,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Tab Switching with Persistence
+
     document.querySelectorAll('.orders-tab').forEach(tab => {
         tab.addEventListener('click', e => {
             e.preventDefault();
@@ -154,18 +146,16 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
             tab.classList.add('active');
             document.getElementById(tabId).classList.add('active');
-            
-            filterOrders(); 
 
-            // URL Persistence
-            const url = new URL(window.location);
+            filterOrders();
+
+const url = new URL(window.location);
             url.searchParams.set('tab', tabId);
             window.history.pushState({}, '', url);
         });
     });
 
-    // Handle Page Load: Initial Tab
-    const urlParams = new URLSearchParams(window.location.search);
+const urlParams = new URLSearchParams(window.location.search);
     const initialTab = urlParams.get('tab');
     if (initialTab) {
         const targetTab = document.querySelector(`.orders-tab[data-tab="${initialTab}"]`);
@@ -174,8 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Colorize Badges
-    const badges = document.querySelectorAll('.badge-supplier');
+const badges = document.querySelectorAll('.badge-supplier');
     const colors = [
         { bg: "#BAE6FD", text: "#0369A1" }, { bg: "#FEF9C3", text: "#A16207" },
         { bg: "#FBCFE8", text: "#9D174D" }, { bg: "#A7F3D0", text: "#065F46" },
@@ -191,18 +180,17 @@ document.addEventListener('DOMContentLoaded', () => {
         badge.style.setProperty('color', color.text, 'important');
     });
 
-    // Filtering & Sorting
-    const searchInput = document.getElementById('searchInput');
+const searchInput = document.getElementById('searchInput');
     const sortSelect = document.getElementById('sortSelect');
-    
+
     function filterOrders() {
         const activePanel = document.querySelector('.tab-panel.active');
         if(!activePanel) return;
-        
+
         const search = searchInput.value.toLowerCase();
         const sort = sortSelect.value;
         const cards = Array.from(activePanel.querySelectorAll('.order-card'));
-        
+
         cards.sort((a,b) => {
             const dateA = parseInt(a.dataset.date);
             const dateB = parseInt(b.dataset.date);
@@ -220,23 +208,22 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput.addEventListener('input', filterOrders);
     sortSelect.addEventListener('change', filterOrders);
 
-    // Modal Listeners
-    document.addEventListener('click', function(e) {
-        // Tab: Siapkan Pesanan -> Action: Siap Diambil
+document.addEventListener('click', function(e) {
+
         if (e.target.closest('.btnSiapDiambil')) {
             const form = e.target.closest('.formSiapDiambil');
             window.confirmAction('Apakah pesanan ini sudah selesai disiapkan dan siap untuk diambil atau diantar?', () => {
                 form.submit();
             });
         }
-        // Tab: Siap Diambil -> Action: Sudah Diambil
+
         if (e.target.closest('.btnSudahDiambil')) {
             const form = e.target.closest('.formSudahDiambil');
             window.confirmAction('Konfirmasi bahwa pesanan ini telah diambil oleh kurir atau pelanggan.', () => {
                 form.submit();
             });
         }
-        // Tab: Menunggu Pembayaran -> Admin Actions (if any shared partial)
+
         if (e.target.closest('.btnTerimaPembayaran')) {
             const form = e.target.closest('.formTerimaPembayaran');
             window.confirmAction('Apakah Anda yakin ingin menerima pembayaran ini?', () => {

@@ -3,43 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kategori;
-use App\Models\Supplier;
+use App\Models\Produk;
 use App\Models\Satuan;
-use App\Models\Produk;  // Import Produk untuk fitur move
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 
 class KomponenProdukController extends Controller
 {
-    /**
-     * INDEX
-     * Halaman kelola Kategori, Supplier, Satuan
-     */
     public function index(Request $request)
     {
         $activeTab = $request->get('tab', 'kategori');
 
-        // Kategori
         $kategori = Kategori::withCount('produk')
             ->when($request->search_kategori, function ($q) use ($request) {
-                $q->where('nama_kategori', 'like', '%' . $request->search_kategori . '%');
+                $q->where('nama_kategori', 'like', '%'.$request->search_kategori.'%');
             })
             ->latest()
             ->paginate(10, ['*'], 'page_kategori')
             ->appends(['tab' => 'kategori', 'search_kategori' => $request->search_kategori]);
 
-        // Supplier
         $supplier = Supplier::withCount('produk')
             ->when($request->search_supplier, function ($q) use ($request) {
-                $q->where('nama_supplier', 'like', '%' . $request->search_supplier . '%');
+                $q->where('nama_supplier', 'like', '%'.$request->search_supplier.'%');
             })
             ->latest()
             ->paginate(10, ['*'], 'page_supplier')
             ->appends(['tab' => 'supplier', 'search_supplier' => $request->search_supplier]);
 
-        // Satuan
         $satuan = Satuan::withCount('produk')
             ->when($request->search_satuan, function ($q) use ($request) {
-                $q->where('nama_satuan', 'like', '%' . $request->search_satuan . '%');
+                $q->where('nama_satuan', 'like', '%'.$request->search_satuan.'%');
             })
             ->latest()
             ->paginate(10, ['*'], 'page_satuan')
@@ -48,12 +41,10 @@ class KomponenProdukController extends Controller
         return view('Staff_Produk.komponenProduk', [
             'kategori' => $kategori,
             'supplier' => $supplier,
-            'satuan'   => $satuan,
-            'activeTab' => $activeTab
+            'satuan' => $satuan,
+            'activeTab' => $activeTab,
         ]);
     }
-
-    // ================= KATEGORI =================
 
     public function storeKategori(Request $request)
     {
@@ -74,7 +65,7 @@ class KomponenProdukController extends Controller
         $kategori = Kategori::findOrFail($id);
 
         $request->validate([
-            'nama_kategori' => 'required|string|max:255|unique:kategoris,nama_kategori,' . $kategori->id,
+            'nama_kategori' => 'required|string|max:255|unique:kategoris,nama_kategori,'.$kategori->id,
         ]);
 
         $namaLama = $kategori->nama_kategori;
@@ -82,11 +73,6 @@ class KomponenProdukController extends Controller
         $kategori->update([
             'nama_kategori' => $namaBaru,
         ]);
-
-        // Update semua produk yang pakai nama lama ke nama baru (jika logika update nama mempengaruhi produk)
-        // Asumsi: Jika nama kategori disimpan di tabel produk (bukan FK), update di sana
-        // Jika pakai FK, skip ini
-        // Produk::where('nama_kategori', $namaLama)->update(['nama_kategori' => $namaBaru]);
 
         return redirect()->route('produk.komponen.index', ['tab' => 'kategori'])->with('success', "Kategori dengan nama \"{$namaBaru}\" telah diubah!");
     }
@@ -105,7 +91,6 @@ class KomponenProdukController extends Controller
         return redirect()->route('produk.komponen.index', ['tab' => 'kategori'])->with('success', "Kategori dengan nama \"{$nama}\" telah dihapus!");
     }
 
-    // TAMBAHAN: Move semua produk dari source kategori ke target
     public function moveKategori(Request $request)
     {
         $request->validate([
@@ -116,17 +101,12 @@ class KomponenProdukController extends Controller
         $source = Kategori::findOrFail($request->source_id);
         $target = Kategori::findOrFail($request->target_id);
 
-        // Sudah ganti sesuai DB: id_kategori
         $movedCount = Produk::where('id_kategori', $source->id)->update(['id_kategori' => $target->id]);
 
-        // Hapus source setelah move
         $source->delete();
 
         return redirect()->route('produk.komponen.index', ['tab' => 'kategori'])->with('success', "Berhasil memindahkan {$movedCount} produk dari \"{$source->nama_kategori}\" ke \"{$target->nama_kategori}\". Kategori \"{$source->nama_kategori}\" telah dihapus!");
     }
-
-    // ================= SUPPLIER =================
-    // HANYA NAMA SAJA, TANPA KONTAK/ALAMAT
 
     public function storeSupplier(Request $request)
     {
@@ -147,7 +127,7 @@ class KomponenProdukController extends Controller
         $supplier = Supplier::findOrFail($id);
 
         $request->validate([
-            'nama_supplier' => 'required|string|max:255|unique:suppliers,nama_supplier,' . $supplier->id,
+            'nama_supplier' => 'required|string|max:255|unique:suppliers,nama_supplier,'.$supplier->id,
         ]);
 
         $namaLama = $supplier->nama_supplier;
@@ -155,9 +135,6 @@ class KomponenProdukController extends Controller
         $supplier->update([
             'nama_supplier' => $namaBaru,
         ]);
-
-        // Update di produk jika nama disimpan di sana (asumsi FK, skip jika pure FK)
-        // Produk::where('nama_supplier', $namaLama)->update(['nama_supplier' => $namaBaru]);
 
         return redirect()->route('produk.komponen.index', ['tab' => 'supplier'])->with('success', "Supplier dengan nama \"{$namaBaru}\" telah diubah!");
     }
@@ -176,7 +153,6 @@ class KomponenProdukController extends Controller
         return redirect()->route('produk.komponen.index', ['tab' => 'supplier'])->with('success', "Supplier dengan nama \"{$nama}\" telah dihapus!");
     }
 
-    // TAMBAHAN: Move semua produk dari source supplier ke target
     public function moveSupplier(Request $request)
     {
         $request->validate([
@@ -187,16 +163,12 @@ class KomponenProdukController extends Controller
         $source = Supplier::findOrFail($request->source_id);
         $target = Supplier::findOrFail($request->target_id);
 
-        // Sudah ganti sesuai DB: id_supplier
         $movedCount = Produk::where('id_supplier', $source->id)->update(['id_supplier' => $target->id]);
 
-        // Hapus source setelah move
         $source->delete();
 
         return redirect()->route('produk.komponen.index', ['tab' => 'supplier'])->with('success', "Berhasil memindahkan {$movedCount} produk dari \"{$source->nama_supplier}\" ke \"{$target->nama_supplier}\". Supplier \"{$source->nama_supplier}\" telah dihapus!");
     }
-
-    // ================= SATUAN (NAMA SAJA) =================
 
     public function storeSatuan(Request $request)
     {
@@ -217,7 +189,7 @@ class KomponenProdukController extends Controller
         $satuan = Satuan::findOrFail($id);
 
         $request->validate([
-            'nama_satuan' => 'required|string|max:255|unique:satuans,nama_satuan,' . $satuan->id,
+            'nama_satuan' => 'required|string|max:255|unique:satuans,nama_satuan,'.$satuan->id,
         ]);
 
         $namaLama = $satuan->nama_satuan;
@@ -225,9 +197,6 @@ class KomponenProdukController extends Controller
         $satuan->update([
             'nama_satuan' => $namaBaru,
         ]);
-
-        // Update di produk jika nama disimpan di sana (asumsi FK, skip jika pure FK)
-        // Produk::where('nama_satuan', $namaLama)->update(['nama_satuan' => $namaBaru]);
 
         return redirect()->route('produk.komponen.index', ['tab' => 'satuan'])->with('success', "Satuan dengan nama \"{$namaBaru}\" telah diubah!");
     }
@@ -246,7 +215,6 @@ class KomponenProdukController extends Controller
         return redirect()->route('produk.komponen.index', ['tab' => 'satuan'])->with('success', "Satuan dengan nama \"{$nama}\" telah dihapus!");
     }
 
-    // TAMBAHAN: Move semua produk dari source satuan ke target
     public function moveSatuan(Request $request)
     {
         $request->validate([
@@ -257,15 +225,10 @@ class KomponenProdukController extends Controller
         $source = Satuan::findOrFail($request->source_id);
         $target = Satuan::findOrFail($request->target_id);
 
-        // Sudah ganti sesuai DB: id_satuan
         $movedCount = Produk::where('id_satuan', $source->id)->update(['id_satuan' => $target->id]);
 
-        // Hapus source setelah move
         $source->delete();
 
         return redirect()->route('produk.komponen.index', ['tab' => 'satuan'])->with('success', "Berhasil memindahkan {$movedCount} produk dari \"{$source->nama_satuan}\" ke \"{$target->nama_satuan}\". Satuan \"{$source->nama_satuan}\" telah dihapus!");
     }
 }
-
-
-

@@ -2,9 +2,9 @@
 @php
     $firstItem = $order->detailPesanan->first();
     $supplier = $firstItem && $firstItem->produk && $firstItem->produk->supplier ? $firstItem->produk->supplier->nama_supplier : 'Non-Supplier';
-    
+
     $imagePath = $firstItem->gambar ?? '';
-    // Handle specific logic for your image paths if needed
+
     if (!str_contains($imagePath, 'http') && !str_starts_with($imagePath, 'storage/') && $imagePath) {
         $imagePath = 'storage/' . $imagePath;
     }
@@ -16,7 +16,7 @@
      data-product="{{ strtolower($firstItem->nama_produk ?? '') }}"
      data-supplier="{{ strtolower($supplier) }}"
      data-metode="{{ strtolower($order->opsi_pengiriman) }}">
-    
+
     <div class="order-header">
         <div class="order-meta">
             <div><i class="fa-regular fa-calendar me-2"></i>{{ $order->created_at->format('d M Y, H:i') }}</div>
@@ -48,11 +48,11 @@
         <div class="order-product-details flex-grow-1">
             <h6>{{ $firstItem->nama_produk ?? 'Produk' }}</h6>
             <p class="mb-1 text-muted small">
-                {{ $firstItem->quantity }} x Rp {{ number_format($firstItem->harga_satuan, 0, ',', '.') }} 
+                {{ $firstItem->quantity }} x Rp {{ number_format($firstItem->harga_satuan, 0, ',', '.') }}
                 / {{ $firstItem->jumlah_satuan ?? '1' }} {{ $firstItem->satuan ?? 'Unit' }}
             </p>
             <div class="fw-bold text-success">Total: Rp {{ number_format($order->total, 0, ',', '.') }}</div>
-            
+
             @if($order->detailPesanan->count() > 1)
             <div class="produk-lain">+ {{ $order->detailPesanan->count() - 1 }} produk lain</div>
             @endif
@@ -69,7 +69,7 @@
                 </button>
             </form>
         @endif
-        
+
         <a href="{{ route('staff_purchasing.detail_pesanan', $order->id) }}" class="btn btn-outline-primary btn-sm">
             <i class="fa-solid fa-eye me-1"></i>Lihat Detail
         </a>

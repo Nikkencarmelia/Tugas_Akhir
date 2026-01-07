@@ -35,7 +35,7 @@
             }
 
             .search-wrapper {
-                border: 1px solid #ced4da; /* abu tipis bawaan Bootstrap */
+                border: 1px solid #ced4da;
                 border-radius: 0.375rem;
                 transition: all 0.2s ease;
                 flex: 1;
@@ -43,7 +43,7 @@
             }
 
             .search-wrapper:focus-within {
-                border-color: #198754; /* hijau pas fokus */
+                border-color: #198754;
                 box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, .25);
             }
 
@@ -223,11 +223,11 @@
                 background: linear-gradient(135deg, white 0%, #f8f9fa 100%);
                 border-radius: 16px;
                 padding: 2rem;
-                margin-top: 0; /* Hapus margin top biar nempel */
+                margin-top: 0;
                 box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
                 border: 1px solid #e9ecef;
                 position: sticky;
-                top: 120px; /* Adjust sesuai navbar */
+                top: 120px;
             }
 
             .checkout-box h5 {
@@ -240,7 +240,7 @@
             }
 
             .checkout-box h5::before {
-                content: "\f291"; /* FA icon tag */
+                content: "\f291";
                 font-family: "Font Awesome 6 Free";
                 font-weight: 900;
                 color: #198754;
@@ -299,7 +299,7 @@
                     flex-direction: column;
                     align-items: flex-start;
                     gap: 1rem;
-                    padding: 1.5rem;
+                    padding: 1.25rem;
                 }
 
                 .product-info {
@@ -310,13 +310,14 @@
                 .harga, .total {
                     width: 100%;
                     text-align: left;
-                    margin-top: 0.5rem;
+                    margin-top: 0.25rem;
+                    font-size: 0.9rem;
                 }
 
                 .qty-box {
-                    width: 100%;
+                    width: auto;
                     justify-content: flex-start;
-                    margin-top: 0.5rem;
+                    margin: 0.5rem 0;
                 }
 
                 .search-form {
@@ -332,40 +333,17 @@
 
                 .header-left {
                     width: 100%;
-                    justify-content: space-between;
+                    justify-content: flex-start;
                 }
 
                 .search-wrapper {
                     max-width: none;
-                    order: 2;
-                }
-
-                .selected-actions {
-                    flex-direction: column;
-                    gap: 0.5rem;
-                    align-items: flex-start;
-                    text-align: left;
+                    width: 100%;
                 }
 
                 .checkout-box {
                     margin-top: 2rem;
                     position: static;
-                }
-
-                .qty-box {
-                    gap: 4px;
-                }
-
-                .btn-minus, .btn-plus {
-                    width: 30px;
-                    height: 30px;
-                    font-size: 14px;
-                }
-
-                .qty-input {
-                    width: 50px;
-                    height: 30px;
-                    font-size: 14px;
                 }
             }
 
@@ -431,8 +409,7 @@
                         </form>
                     </div>
 
-
-                    <div class="selected-actions">
+<div class="selected-actions">
                         <span class="selected-count"></span>
                         <button id="deleteSelected" class="btn btn-outline-danger delete-selected">Hapus Terpilih</button>
                     </div>
@@ -452,7 +429,7 @@
                             <i class="fa fa-shopping-cart fa-3x text-muted mb-3"></i>
                             <h5 class="text-muted">Keranjang Anda kosong</h5>
                             <p class="text-muted">Tambahkan produk untuk melihat di sini.</p>
-                            <a href="{{ route('user.produk') }}" class="btn btn-success">Belanja Sekarang</a>
+                            <a href="{{ route('produk') }}" class="btn btn-success">Belanja Sekarang</a>
                         </div>
                     @else
                         @foreach ($keranjang as $cartKey => $item)
@@ -483,8 +460,7 @@
                     @endif
                 </div>
 
-                {{-- Checkout Box --}}
-                <div class="col-lg-4">
+<div class="col-lg-4">
                     <div class="checkout-box">
                         <h5>Keranjang Belanja</h5>
                         <div class="d-flex justify-content-between mb-2">
@@ -496,8 +472,8 @@
                         </div>
 
                         <div class="d-flex gap-2">
-                            <a href="/" class="btn btn-outline-success w-100">Batal</a>
-                            <a href="{{ route('keranjang.checkout') }}" class="btn btn-success w-100">Checkout</a>
+                            <a href="{{ route('beranda') }}" class="btn btn-outline-success w-100">Batal</a>
+                            <button type="button" id="checkoutBtn" class="btn btn-success w-100">Checkout</button>
                         </div>
                     </div>
                 </div>
@@ -505,16 +481,14 @@
         </div>
 
         <script>
-            // CSRF Token
+
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-            // Format angka jadi Rupiah
-            function formatRupiah(angka) {
+function formatRupiah(angka) {
                 return 'Rp ' + angka.toLocaleString('id-ID');
             }
 
-            // Update total harga dan jumlah produk (client-side)
-            function updateTotal() {
+function updateTotal() {
                 let subtotal = 0;
                 let totalProduk = 0;
 
@@ -536,8 +510,7 @@
                 document.getElementById('total-produk').textContent = totalProduk + ' Produk';
             }
 
-            // Update selected actions bar
-            function updateSelectedActions() {
+function updateSelectedActions() {
                 const checkboxes = document.querySelectorAll('.cart-item input[type="checkbox"]:checked');
                 const count = checkboxes.length;
                 const selectedActions = document.querySelector('.selected-actions');
@@ -551,15 +524,13 @@
                 }
             }
 
-            // AJAX Update Quantity
-            function updateQuantity(productId, batchId, quantity) {
+function updateQuantity(productId, batchId, quantity) {
                 const payload = {
                     product_id: parseInt(productId),
                     quantity: parseInt(quantity)
                 };
 
-                // Only add batch_id if it exists and is not empty
-                if (batchId && batchId !== '') {
+if (batchId && batchId !== '') {
                     payload.batch_id = parseInt(batchId);
                 }
 
@@ -574,7 +545,7 @@
                 .then(async response => {
                     const isJson = response.headers.get('content-type')?.includes('application/json');
                     const text = await response.text();
-                    
+
                     try {
                         const data = JSON.parse(text);
                         if (!response.ok || !data.success) {
@@ -582,23 +553,22 @@
                         }
                         return data;
                     } catch (e) {
-                         // If not JSON, it's likely a server error page (HTML)
+
                         console.error('Server Error:', text);
                         throw new Error('Terjadi kesalahan di server (Cek Console).');
                     }
                 })
                 .then(data => {
-                     // Success (update UI done by updateTotal listener mostly, or reload not needed)
+
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     alert(error.message);
-                    location.reload(); // Reload untuk sync dengan server
+                    location.reload();
                 });
             }
 
-            // Tombol tambah qty
-            document.querySelectorAll('.btn-plus').forEach(btn => {
+document.querySelectorAll('.btn-plus').forEach(btn => {
                 btn.addEventListener('click', function () {
                     const input = this.parentElement.querySelector('.qty-input');
                     const cartItem = this.closest('.cart-item');
@@ -611,8 +581,7 @@
                 });
             });
 
-            // Tombol kurang qty
-            document.querySelectorAll('.btn-minus').forEach(btn => {
+document.querySelectorAll('.btn-minus').forEach(btn => {
                 btn.addEventListener('click', function () {
                     const input = this.parentElement.querySelector('.qty-input');
                     const cartItem = this.closest('.cart-item');
@@ -627,8 +596,7 @@
                 });
             });
 
-            // Update qty manual
-            document.querySelectorAll('.qty-input').forEach(input => {
+document.querySelectorAll('.qty-input').forEach(input => {
                 input.addEventListener('change', function() {
                     const cartItem = this.closest('.cart-item');
                     const productId = cartItem.dataset.productId;
@@ -638,8 +606,7 @@
                 });
             });
 
-            // Select all header checkbox
-            const selectAllHeader = document.getElementById('selectAllHeader');
+const selectAllHeader = document.getElementById('selectAllHeader');
             selectAllHeader.addEventListener('change', function() {
                 const isChecked = this.checked;
                 document.querySelectorAll('.cart-item input[type="checkbox"]').forEach(chk => {
@@ -649,13 +616,11 @@
                 updateSelectedActions();
             });
 
-            // Update total saat checkbox dicentang / dihapus
-            document.querySelectorAll('input[type="checkbox"]').forEach(chk => {
+document.querySelectorAll('input[type="checkbox"]').forEach(chk => {
                 chk.addEventListener('change', function() {
                     updateTotal();
 
-                    // Update select all header state
-                    const allCheckboxes = document.querySelectorAll('.cart-item input[type="checkbox"]');
+const allCheckboxes = document.querySelectorAll('.cart-item input[type="checkbox"]');
                     const checkedCount = document.querySelectorAll('.cart-item input[type="checkbox"]:checked').length;
                     selectAllHeader.checked = checkedCount === allCheckboxes.length;
                     selectAllHeader.indeterminate = checkedCount > 0 && checkedCount < allCheckboxes.length;
@@ -664,8 +629,7 @@
                 });
             });
 
-            // Button Hapus Terpilih
-            document.getElementById('deleteSelected').addEventListener('click', function() {
+document.getElementById('deleteSelected').addEventListener('click', function() {
                 const selectedItems = document.querySelectorAll('.cart-item input[type="checkbox"]:checked');
                 if (selectedItems.length === 0) {
                     alert('Pilih item untuk dihapus');
@@ -689,7 +653,7 @@
                             const item = document.querySelector(`.cart-item[data-id="${id}"]`);
                             if (item) item.remove();
                         });
-                        // Reset select all header
+
                         selectAllHeader.checked = false;
                         selectAllHeader.indeterminate = false;
                         updateSelectedActions();
@@ -704,9 +668,23 @@
                 });
             });
 
-            // Inisialisasi subtotal awal dan actions
-            updateTotal();
+updateTotal();
             updateSelectedActions();
+
+document.getElementById('checkoutBtn').addEventListener('click', function() {
+                const selectedCheckboxes = document.querySelectorAll('.cart-item input[type="checkbox"]:checked');
+                if (selectedCheckboxes.length === 0) {
+                    alert('Pilih setidaknya satu produk untuk checkout.');
+                    return;
+                }
+
+                const ids = Array.from(selectedCheckboxes).map(chk => chk.closest('.cart-item').dataset.id);
+
+                const checkoutUrl = new URL('{{ route("pemesanan.checkout") }}', window.location.origin);
+                ids.forEach(id => checkoutUrl.searchParams.append('selected_items[]', id));
+
+                window.location.href = checkoutUrl.toString();
+            });
         </script>
 
         @endsection

@@ -19,8 +19,7 @@
     .order-product-details { flex-grow: 1; }
     .produk-lain { font-size: 12px; color: #6c757d; font-style: italic; }
 
-    /* Badge Supplier Styles */
-    .img-container { position: relative; width: 80px; height: 80px; }
+.img-container { position: relative; width: 80px; height: 80px; }
     .img-container img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 1px solid #f1f3f4; }
     .badge-supplier {
       position: absolute; top: 5px; right: 5px;
@@ -31,7 +30,7 @@
     .order-actions{display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap;}
     .btn-order{padding:6px 14px;border-radius:20px;font-size:13px;font-weight:500;transition:all .3s ease;}
     .select-controls{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem;}
-    
+
     @media(max-width:768px){.orders-header{flex-direction:column;gap:1rem;text-align:center}.order-header{flex-direction:column;gap:.5rem;align-items:flex-start}.order-product{flex-direction:column;text-align:center}.order-actions{justify-content:center}}
   </style>
 </head>
@@ -61,15 +60,14 @@
       <label class="form-check-label fw-semibold" for="selectAll">Pilih Semua</label>
     </div>
     <div class="d-flex gap-2">
-      <!-- Bulk Selected Actions -->
+
       <button class="btn btn-success btn-sm btn-bulk-selected d-none" id="btnTerimaDipilih"><i class="fa-solid fa-check me-1"></i>Terima Dipilih</button>
       <button class="btn btn-danger btn-sm btn-bulk-selected d-none" id="btnTolakDipilih"><i class="fa-solid fa-xmark me-1"></i>Tolak Dipilih</button>
-      <!-- Button Terima Semua Removed as per request -->
+
     </div>
   </div>
 
-  <!-- Form for Bulk Selected Actions -->
-  <form id="bulkActionForm" method="POST" action="">
+<form id="bulkActionForm" method="POST" action="">
       @csrf
   </form>
 
@@ -77,7 +75,7 @@
     @php
         $firstItem = $order->detailPesanan->first();
         $supplier = $firstItem && $firstItem->produk && $firstItem->produk->supplier ? $firstItem->produk->supplier->nama_supplier : 'Non-Supplier';
-        
+
         $imagePath = $firstItem->gambar ?? '';
         if (!str_contains($imagePath, 'http') && !str_starts_with($imagePath, 'storage/')) {
             $imagePath = 'storage/' . $imagePath;
@@ -90,11 +88,10 @@
         $metode = $order->opsi_pengiriman;
         $kendaraan = $order->kendaraan;
 
-        // Status Badge Logic (Mimicking cariKurir)
-        $status = $order->status_pesanan;
+$status = $order->status_pesanan;
         $statusClass = 'status-' . $status;
         $statusLabel = ucwords(str_replace('_', ' ', $status));
-        
+
         if(in_array($status, ['dibatalkan', 'ditolak_staff', 'ditolak_kurir'])) {
             $statusClass = 'status-dibatalkan';
             $statusLabel = 'Dibatalkan';
@@ -179,7 +176,7 @@
       @csrf
       <button type="submit" class="btn btn-success btn-sm"><i class="fa-solid fa-check me-1"></i>Terima</button>
     </form>
-    
+
     <form action="{{ route('kurir.tolak', $order->id) }}" method="POST" class="d-inline">
         @csrf
         <button type="submit" class="btn btn-danger-order btn-sm"><i class="fa-solid fa-xmark me-1"></i>Tolak</button>
@@ -195,7 +192,6 @@
 </div>
 @endforelse
 
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -206,12 +202,12 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   const selectAll=document.getElementById('selectAll');
   const checkboxes=document.querySelectorAll('.orderCheckbox');
-  
+
   const btnTerimaDipilih=document.getElementById('btnTerimaDipilih');
   const btnTolakDipilih=document.getElementById('btnTolakDipilih');
   const btnsBulkSelected = document.querySelectorAll('.btn-bulk-selected');
   const btnsBulkAll = document.querySelectorAll('.btn-bulk-all');
-  
+
   const bulkActionForm = document.getElementById('bulkActionForm');
 
   function updateButtons() {
@@ -233,26 +229,23 @@ document.addEventListener('DOMContentLoaded',()=>{
   checkboxes.forEach(cb => {
       cb.addEventListener('change', updateButtons);
   });
-  
-  // Handle Bulk Selected Submit
-  btnTerimaDipilih.addEventListener('click', (e) => {
+
+btnTerimaDipilih.addEventListener('click', (e) => {
       e.preventDefault();
       bulkActionForm.action = "{{ route('kurir.terima_dipilih') }}";
       if(confirm('Terima pesanan yang dipilih?')) bulkActionForm.submit();
   });
-  
+
   btnTolakDipilih.addEventListener('click', (e) => {
       e.preventDefault();
       bulkActionForm.action = "{{ route('kurir.tolak_dipilih') }}";
       if(confirm('Tolak pesanan yang dipilih?')) bulkActionForm.submit();
   });
 
-  // Success init
-  if({{ session('success') ? 'true' : 'false' }}) toastSuccess.show();
+if({{ session('success') ? 'true' : 'false' }}) toastSuccess.show();
   if({{ session('error') ? 'true' : 'false' }}) toastReject.show();
 
-  // Colorize supplier badges
-  function colorizeBadges() {
+function colorizeBadges() {
     const badges = document.querySelectorAll('.badge-supplier');
     const colorPairs = [
       { bg: "#BAE6FD", text: "#0369A1" }, { bg: "#FEF9C3", text: "#A16207" },

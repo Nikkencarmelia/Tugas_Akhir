@@ -1,4 +1,4 @@
-{{-- resources/views/Staff_Produk/detailDiskon.blade.php --}}
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -40,14 +40,12 @@
         .table td { vertical-align: middle; font-size: .9rem; }
         .table tbody tr:hover { background-color: #F3F4F6; }
 
-        /* Badge Status Stok */
-        .badge-status { padding: .35rem .85rem; font-size: .75rem; border-radius: 1rem; font-weight: 600; }
+.badge-status { padding: .35rem .85rem; font-size: .75rem; border-radius: 1rem; font-weight: 600; }
         .badge-tersedia { background: #DBEAFE; color: #1E40AF; }
         .badge-menipis { background: #FEF3C7; color: #92400E; }
         .badge-habis { background: #FEE2E2; color: #991B1B; }
 
-        /* Badge Supplier & Kategori (mirip halaman sebelumnya) */
-        .badge-supplier, .badge-kategori { font-size: .7rem; font-weight: 600; padding: .3rem .55rem; border-radius: .4rem; line-height: 1; display: inline-block; }
+.badge-supplier, .badge-kategori { font-size: .7rem; font-weight: 600; padding: .3rem .55rem; border-radius: .4rem; line-height: 1; display: inline-block; }
 
         .badge-diskon {
             background: linear-gradient(135deg, #F59E0B, #D97706);
@@ -77,8 +75,7 @@
 
 <div class="dashboard-container">
 
-    <!-- DETAIL PRODUK -->
-    <div class="product-detail-card">
+<div class="product-detail-card">
         <div class="product-detail-header">
             <div class="d-flex align-items-center gap-2">
                 <a href="{{ route('produk.diskon') }}" class="btn-back">
@@ -116,8 +113,7 @@
         </div>
     </div>
 
-    <!-- HEADER + SEARCH -->
-    <div class="batch-header">
+<div class="batch-header">
         <div>
             <h3> Daftar Batch Diskon <span class="badge bg-success ms-2">{{ $batches->count() }}</span></h3>
             <small class="text-muted">Batch yang sedang mendapatkan promo diskon</small>
@@ -128,8 +124,7 @@
         </form>
     </div>
 
-    <!-- TABEL BATCH DISKON -->
-    <div class="table-card">
+<div class="table-card">
         <div class="table-responsive">
             <table class="table align-middle mb-0">
                 <thead>
@@ -169,14 +164,14 @@
             </table>
         </div>
     </div>
-    
+
     <nav aria-label="Batch pagination" class="mt-4">
         {{ $batches->appends(['search' => request('search')])->links('pagination::bootstrap-5') }}
     </nav>
 </div>
 
 <script>
-// AJAX LIVE SEARCH
+
 const searchInput = document.getElementById('batchSearch');
 let timeout = null;
 
@@ -195,21 +190,21 @@ if (searchInput) {
                 .then(html => {
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
-                    
+
                     const newTable = doc.querySelector('#batchTableBody');
                     const currentTable = document.querySelector('#batchTableBody');
-                    
+
                     if (newTable && currentTable) {
                         currentTable.innerHTML = newTable.innerHTML;
                     }
 
                     const newNav = doc.querySelector('nav[aria-label="Batch pagination"]');
                     const currentNav = document.querySelector('nav[aria-label="Batch pagination"]');
-                    
+
                     if (newNav && currentNav) {
                         currentNav.innerHTML = newNav.innerHTML;
                     }
-                    
+
                     window.history.pushState({}, '', url);
                     colorizeBadges();
                 })
@@ -219,12 +214,10 @@ if (searchInput) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // REMOVED JS SEARCH - Handled by server-side
 
-    colorizeBadges();
+colorizeBadges();
 });
 
-// Colorize badges supplier & kategori (mirip halaman sebelumnya)
 function colorizeBadges() {
     const colorPairs = [
         { bg: "#BAE6FD", text: "#0369A1" }, { bg: "#FEF9C3", text: "#A16207" },

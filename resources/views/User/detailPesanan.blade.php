@@ -34,9 +34,8 @@
     }
     .detail-meta { display: flex; gap: 2rem; font-size: 14px; color: #6c757d; }
     .detail-number { font-weight: 600; color: #495057; }
-    
-    /* Badge Styles from Riwayat */
-    .metode-badge {
+
+.metode-badge {
         background: #e3f2fd;
         color: #0d47a1;
         padding: 4px 12px;
@@ -66,8 +65,7 @@
         border: 1px solid #ffeaa7;
     }
 
-    /* Status Colors - Synchronized with Riwayat & Staff Side */
-    .status-menunggu_konfirmasi { background: #f1f3f5; color: #495057; }
+.status-menunggu_konfirmasi { background: #f1f3f5; color: #495057; }
     .status-menunggu_pembayaran { background: #fff4e6; color: #d9480f; }
     .status-diproses { background: #fef9c3; color: #854d0e; }
     .status-dikirim { background: #e0f2fe; color: #0369a1; }
@@ -98,10 +96,9 @@
       margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e9ecef;
     }
 
-    /* Badge Supplier Styles */
-    .img-container { position: relative; width: 80px; height: 80px; }
+.img-container { position: relative; width: 80px; height: 80px; }
     .img-container img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 1px solid #f1f3f4; }
-    
+
     @media (max-width: 768px) {
       .detail-header { flex-direction: column; gap: 1rem; text-align: center; }
       .detail-header-section { flex-direction: column; gap: .5rem; align-items: flex-start; }
@@ -117,8 +114,7 @@
 
 <div class="container py-5">
 
-  <!-- HEADER -->
-  <div class="detail-header">
+<div class="detail-header">
     <div class="d-flex align-items-center gap-3">
         <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('pemesanan.index') }}" class="text-dark text-decoration-none">
             <i class="fa-solid fa-chevron-left fs-4"></i>
@@ -131,8 +127,7 @@
     </div>
   </div>
 
-  <!-- BAGIAN ALAMAT -->
-  <div class="detail-card">
+<div class="detail-card">
     <div class="detail-header-section">
       <div class="detail-meta align-items-center">
         <div><i class="fa-regular fa-calendar me-1"></i> {{ $pemesanan->created_at->format('d M Y') }}</div>
@@ -140,7 +135,7 @@
             <i class="{{ $pemesanan->opsi_pengiriman == 'dipick_up' ? 'bi bi-shop' : 'fa-solid fa-truck' }}"></i>
             {{ $pemesanan->opsi_pengiriman == 'dipick_up' ? 'Pick Up' : 'Diantar' }}
         </div>
-        
+
         @if($pemesanan->opsi_pengiriman != 'dipick_up' && $pemesanan->id_kurir && $pemesanan->kurir)
             <div class="vehicle-badge">
                 <i class="fa-solid {{ $pemesanan->kurir->kurir->jenis_kendaraan == 'Motor' ? 'fa-motorcycle' : 'fa-truck-pickup' }} me-1"></i>
@@ -200,8 +195,7 @@
     @endif
   </div>
 
-  <!-- BAGIAN PRODUK -->
-  <div class="detail-card">
+<div class="detail-card">
     <h5 class="fw-bold mb-3">Produk Dipesan</h5>
 
     @foreach($pemesanan->detailPesanan as $item)
@@ -213,14 +207,14 @@
       <div class="product-details">
         <h6 class="fw-semibold mb-1">{{ $item->nama_produk }}</h6>
         <p class="small text-muted mb-0">
-            {{ $item->quantity }} x 
+            {{ $item->quantity }} x
             @if($item->batch && $item->batch->harga_normal > $item->harga_satuan)
                 <span class="price-original">Rp {{ number_format($item->batch->harga_normal, 0, ',', '.') }}</span>
             @endif
             Rp {{ number_format($item->harga_satuan, 0, ',', '.') }}/{{ $item->jumlah_satuan }} {{ $item->satuan }}
         </p>
       </div>
-      
+
       <div class="text-end">
         @if($item->batch && $item->batch->harga_normal > $item->harga_satuan)
             <div class="price-original small">Rp {{ number_format($item->batch->harga_normal * $item->quantity, 0, ',', '.') }}</div>
@@ -236,7 +230,7 @@
       <p class="mb-0 fw-semibold">Subtotal</p>
       <p class="mb-0 fw-bold">Rp {{ number_format($pemesanan->subtotal, 0, ',', '.') }}</p>
     </div>
-    
+
     <div class="d-flex justify-content-between align-items-center mt-2">
       <p class="mb-0 fw-semibold">Ongkos Kirim</p>
       <p class="mb-0 fw-bold text-success">Rp {{ number_format($pemesanan->ongkir, 0, ',', '.') }}</p>
@@ -248,10 +242,9 @@
     </div>
 
   </div>
-  
 
 </div>
 @endsection
-    
+
 </body>
 </html>

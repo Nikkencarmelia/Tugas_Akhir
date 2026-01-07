@@ -7,8 +7,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-        <!-- font -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
@@ -38,8 +37,7 @@
                 font-family: 'Montserrat', sans-serif;
             }
 
-            /* Desktop Sidebar */
-            .sidebar-desktop {
+.sidebar-desktop {
                 height: 100vh;
                 width: 250px;
                 position: fixed;
@@ -94,16 +92,14 @@
                 box-shadow: inset 3px 0 0 white;
             }
 
-            /* Main Content Desktop */
-            .main-content-desktop {
+.main-content-desktop {
                 margin-left: 250px;
                 padding: 1.5rem;
                 min-height: 100vh;
                 transition: var(--transition);
             }
 
-            /* Mobile: Offcanvas Sidebar */
-            .sidebar-mobile {
+.sidebar-mobile {
                 --bs-offcanvas-width: 280px;
                 --bs-offcanvas-bg: var(--sidebar-bg);
                 --bs-offcanvas-border-width: 0;
@@ -172,14 +168,12 @@
                 box-shadow: inset 3px 0 0 white;
             }
 
-            /* Mobile Main Content */
-            .main-content-mobile {
+.main-content-mobile {
                 padding: 1rem;
                 min-height: 100vh;
             }
 
-            /* Mobile Header */
-            .mobile-header {
+.mobile-header {
                 background: white;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.08);
                 padding: 0.75rem 1rem;
@@ -206,8 +200,7 @@
                 color: var(--sidebar-bg);
             }
 
-            /* Responsive */
-            @media (max-width: 991.98px) {
+@media (max-width: 991.98px) {
                 .sidebar-desktop,
                 .main-content-desktop {
                     display: none !important;
@@ -231,8 +224,7 @@
                 }
             }
 
-            /* Smooth Transitions for All */
-            .offcanvas {
+.offcanvas {
                 transition: var(--transition);
             }
 
@@ -242,11 +234,11 @@
         </style>
     </head>
     <body>
-        <!-- Mobile Header with Toggle -->
+
         <div class="mobile-header d-lg-none">
             <nav class="navbar navbar-expand-lg">
                 <div class="container-fluid">
-                    <a class="navbar-brand" href="/dashboard_produk">Staff Produk</a>
+                    <a class="navbar-brand" href="{{ route('produk.dashboard') }}">Staff Produk</a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
                     <i class="bi bi-list"></i>
                     </button>
@@ -254,8 +246,7 @@
             </nav>
         </div>
 
-        <!-- Mobile Sidebar (Offcanvas) -->
-        <div class="sidebar-mobile d-lg-none offcanvas offcanvas-start" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
+<div class="sidebar-mobile d-lg-none offcanvas offcanvas-start" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
             <div class="offcanvas-header">
                 <h5 class="offcanvas-title" id="sidebarOffcanvasLabel">Staff Produk</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -290,15 +281,13 @@
                     <i class="bi bi-exclamation-triangle"></i> Produk Rusak/Cacat
                 </a>
 
-                <!-- TRIGGER MODAL LOGOUT -->
-                <button type="button" class="nav-link logout-trigger" data-bs-toggle="modal" data-bs-target="#logoutModal">
+<button type="button" class="nav-link logout-trigger" data-bs-toggle="modal" data-bs-target="#logoutModal">
                     <i class="bi bi-box-arrow-right"></i> Logout
                 </button>
             </div>
         </div>
 
-        <!-- Desktop Sidebar -->
-        <div class="sidebar-desktop d-none d-lg-block">
+<div class="sidebar-desktop d-none d-lg-block">
             <h4>Staff Produk</h4>
             <a href="{{ route('produk.dashboard') }}" class="nav-link {{ request()->is('staff_produk/dashboard') ? 'active' : '' }}">
                 <i class="bi bi-speedometer2"></i> Dashboard
@@ -312,8 +301,7 @@
                 <i class="bi bi-sliders"></i> Komponen Produk
             </a>
 
-
-            <a href="{{ route('produk.diskon') }}" class="nav-link {{ request()->is('staff_produk/diskon') ? 'active' : '' }}">
+<a href="{{ route('produk.diskon') }}" class="nav-link {{ request()->is('staff_produk/diskon') ? 'active' : '' }}">
                 <i class="bi bi-percent"></i> Diskon
             </a>
 
@@ -328,22 +316,19 @@
                 <i class="bi bi-exclamation-triangle"></i> Produk Rusak/Cacat
             </a>
 
-            <!-- TRIGGER MODAL LOGOUT -->
-            <button type="button" class="nav-link logout-trigger" data-bs-toggle="modal" data-bs-target="#logoutModal">
+<button type="button" class="nav-link logout-trigger" data-bs-toggle="modal" data-bs-target="#logoutModal">
                 <i class="bi bi-box-arrow-right"></i> Logout
             </button>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content-desktop d-none d-lg-block">
+<div class="main-content-desktop d-none d-lg-block">
             @yield('content')
         </div>
         <div class="main-content-mobile d-lg-none">
             @yield('content')
         </div>
 
-        <!-- Logout Confirmation Modal -->
-        <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg">
                     <div class="modal-header bg-danger text-white border-0">
@@ -368,17 +353,16 @@
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-            // Logout function helper
+
             window.logout = function() {
                 const modalLogout = new bootstrap.Modal(document.getElementById('logoutModal'));
                 modalLogout.show();
             };
 
-            // Optional: JS untuk handle logout trigger (kalau butuh custom, misalnya close offcanvas dulu)
-            document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
                 document.querySelectorAll('.logout-trigger').forEach(trigger => {
                     trigger.addEventListener('click', function() {
-                        // Kalau di mobile offcanvas, tutup offcanvas dulu sebelum modal
+
                         const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('sidebarOffcanvas'));
                         if (offcanvas) {
                             offcanvas.hide();

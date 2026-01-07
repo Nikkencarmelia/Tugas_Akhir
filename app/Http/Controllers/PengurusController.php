@@ -8,79 +8,65 @@ use Illuminate\Support\Facades\Storage;
 
 class PengurusController extends Controller
 {
-    /**
-     * Tampilkan daftar pengurus di halaman manajemen super admin
-     */
-
     public function index()
     {
         $kepengurusan = Pengurus::latest()->get();
+
         return view('super_admin.manajemenPengurus', compact('kepengurusan'));
     }
 
-    /**
-     * Simpan pengurus baru
-     */
     public function store(Request $request)
     {
         $request->validate([
-            'nama'      => 'required|string|max:255',
-            'jabatan'   => 'required|string|max:255',
+            'nama' => 'required|string|max:255',
+            'jabatan' => 'required|string|max:255',
             'deskripsi' => 'required|string',
-            'gambar'    => 'required|image|mimes:jpg,jpeg,png|max:2048'
+            'gambar' => 'required|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
         $gambar = $request->file('gambar')->store('pengurus', 'public');
 
         Pengurus::create([
-            'nama'      => $request->nama,
-            'jabatan'   => $request->jabatan,
+            'nama' => $request->nama,
+            'jabatan' => $request->jabatan,
             'deskripsi' => $request->deskripsi,
-            'gambar'    => $gambar,
+            'gambar' => $gambar,
         ]);
 
         return redirect()->back()->with('success', 'Pengurus berhasil ditambahkan');
     }
 
-    /**
-     * Update pengurus
-     */
     public function update(Request $request, $id)
     {
         $pengurus = Pengurus::findOrFail($id);
 
         $request->validate([
-            'nama'      => 'required|string|max:255',
-            'jabatan'   => 'required|string|max:255',
-            'deskripsi' => 'required|string',
-            'gambar'    => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+            'nama' => 'nullable|string|max:255',
+            'jabatan' => 'nullable|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
-        $gambar = $pengurus->gambar;
+        $data = [];
+        if ($request->filled('nama')) $data['nama'] = $request->nama;
+        if ($request->filled('jabatan')) $data['jabatan'] = $request->jabatan;
+        if ($request->filled('deskripsi')) $data['deskripsi'] = $request->deskripsi;
+
         if ($request->hasFile('gambar')) {
-            if ($gambar) {
-                Storage::disk('public')->delete($gambar);
+            if ($pengurus->gambar) {
+                Storage::disk('public')->delete($pengurus->gambar);
             }
-            $gambar = $request->file('gambar')->store('pengurus', 'public');
+            $data['gambar'] = $request->file('gambar')->store('pengurus', 'public');
         }
 
-        $pengurus->update([
-            'nama'      => $request->nama,
-            'jabatan'   => $request->jabatan,
-            'deskripsi' => $request->deskripsi,
-            'gambar'    => $gambar,
-        ]);
+        if (!empty($data)) {
+            $pengurus->update($data);
+            return redirect()->back()->with('success', 'Pengurus berhasil diperbarui');
+        }
 
-        return redirect()->back()->with('success', 'Pengurus berhasil diperbarui');
+        return redirect()->back()->with('info', 'Tidak ada data yang diubah');
     }
 
-    /**
-     * Halaman Laporan Super Admin
-     */
-
-    /**
-     * Hapus pengurus
-     */
     public function destroy($id)
     {
         $pengurus = Pengurus::findOrFail($id);

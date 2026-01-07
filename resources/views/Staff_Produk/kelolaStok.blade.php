@@ -77,7 +77,7 @@
             </select>
             <select id="filter-supplier" class="form-select" style="width: 150px;">
                 <option value="all">Semua Supplier</option>
-                <!-- Diisi JS -->
+
             </select>
             <div class="input-group search-wrapper" style="width: 300px;">
                 <input type="text" id="search-input" class="form-control" placeholder="Cari Kode Produk, nama, kategori, supplier, stok...">
@@ -104,7 +104,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Diisi oleh JavaScript -->
+
                 </tbody>
             </table>
         </div>
@@ -112,12 +112,11 @@
 
     <nav aria-label="Page navigation example">
         <ul class="pagination justify-content-center mt-3">
-            <!-- Diisi oleh JavaScript -->
+
         </ul>
     </nav>
 </div>
 
-<!-- Modal Detail -->
 <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -158,7 +157,7 @@
 </div>
 
 <script>
-    // Base URL untuk batch
+
     const batchUrl = "{{ route('produk.batch.index', ':id') }}";
 
     const produkData = @json($produkAll);
@@ -288,9 +287,8 @@
             const kategoriStr = getStringValue(p.kategori);
             const satuanDisplay = `${p.jumlah_satuan || 1} ${getStringValue(p.satuan)}`;
 
-            // FIX: Dynamic href untuk batch dengan ?from= + query current
-            const baseBatchUrl = batchUrl.replace(':id', p.id);
-            let batchHref = baseBatchUrl + '?from=produk.kelola_stok';  // Route name full dari prefix
+const baseBatchUrl = batchUrl.replace(':id', p.id);
+            let batchHref = baseBatchUrl + '?from=produk.kelola_stok';
             const currentQuery = new URLSearchParams(window.location.search).toString();
             if (currentQuery) {
                 batchHref += '&' + currentQuery;

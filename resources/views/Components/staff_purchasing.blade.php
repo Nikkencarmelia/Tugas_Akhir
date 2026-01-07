@@ -1,4 +1,4 @@
-<!-- Components/staff_purchasing.blade.php -->
+
 <!DOCTYPE html>
 <html lang="id">
     <head>
@@ -8,8 +8,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
@@ -33,8 +32,7 @@
                 font-family: 'Montserrat', sans-serif;
             }
 
-            /* Desktop Sidebar */
-            .sidebar-desktop {
+.sidebar-desktop {
                 height: 100vh;
                 width: 250px;
                 position: fixed;
@@ -84,15 +82,13 @@
                 box-shadow: inset 3px 0 0 white;
             }
 
-            /* Main Content Container */
-            .main-content {
+.main-content {
                 padding: 1.5rem;
                 min-height: 100vh;
                 transition: var(--transition);
             }
 
-            /* Mobile Sidebar */
-            .sidebar-mobile {
+.sidebar-mobile {
                 --bs-offcanvas-width: 280px;
                 --bs-offcanvas-bg: var(--sidebar-bg);
             }
@@ -110,8 +106,7 @@
                 box-shadow: inset 3px 0 0 white;
             }
 
-            /* Mobile Header */
-            .mobile-header {
+.mobile-header {
                 background: white;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.08);
                 padding: 0.75rem 1rem;
@@ -121,10 +116,9 @@
                 top: 0;
             }
 
-            /* Responsive Logic */
-            @media (min-width: 992px) {
+@media (min-width: 992px) {
                 .main-content {
-                    margin-left: 250px; /* Push content to right on desktop */
+                    margin-left: 250px;
                 }
                 .mobile-header {
                     display: none !important;
@@ -143,11 +137,11 @@
     </head>
 
     <body>
-        <!-- Mobile Header (Visible only on mobile) -->
+
         <div class="mobile-header d-lg-none">
             <nav class="navbar navbar-expand-lg">
                 <div class="container-fluid">
-                    <a class="navbar-brand" href="/purchasing/dashboard">Staff Purchasing</a>
+                    <a class="navbar-brand" href="{{ route('staff_purchasing.dashboard') }}">Staff Purchasing</a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">
                     <i class="bi bi-list"></i>
                     </button>
@@ -155,39 +149,38 @@
             </nav>
         </div>
 
-        <!-- Mobile Sidebar (Offcanvas) -->
-        <div class="sidebar-mobile offcanvas offcanvas-start" tabindex="-1" id="sidebarOffcanvas">
+<div class="sidebar-mobile offcanvas offcanvas-start" tabindex="-1" id="sidebarOffcanvas">
             <div class="offcanvas-header">
                 <h5 class="offcanvas-title text-white">Staff Purchasing</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
             </div>
 
             <div class="offcanvas-body">
-                <a href="/purchasing/dashboard" class="nav-link {{ request()->is('purchasing/dashboard') ? 'active' : '' }}">
+                <a href="{{ route('staff_purchasing.dashboard') }}" class="nav-link {{ request()->routeIs('staff_purchasing.dashboard') ? 'active' : '' }}">
                     <i class="bi bi-speedometer2"></i> Dashboard
                 </a>
 
-                <a href="/purchasing/pesanan_masuk" class="nav-link {{ request()->is('purchasing/pesanan_masuk') ? 'active' : '' }}">
+                <a href="{{ route('staff_purchasing.pesanan_masuk') }}" class="nav-link {{ request()->routeIs('staff_purchasing.pesanan_masuk') ? 'active' : '' }}">
                     <i class="bi bi-bag-check"></i> Pesanan Masuk
                 </a>
 
-                <a href="/purchasing/cari_kurir" class="nav-link {{ request()->is('purchasing/cari_kurir') ? 'active' : '' }}">
+                <a href="{{ route('staff_purchasing.cari_kurir') }}" class="nav-link {{ request()->routeIs('staff_purchasing.cari_kurir') ? 'active' : '' }}">
                     <i class="bi bi-truck"></i> Cari Kurir
                 </a>
 
-                <a href="/purchasing/konfirmasi_pembayaran" class="nav-link {{ request()->is('purchasing/konfirmasi_pembayaran') ? 'active' : '' }}">
+                <a href="{{ route('staff_purchasing.konfirmasi_pembayaran') }}" class="nav-link {{ request()->routeIs('staff_purchasing.konfirmasi_pembayaran') ? 'active' : '' }}">
                     <i class="bi bi-cash-coin"></i> Konfirmasi Pembayaran
                 </a>
 
-                <a href="/purchasing/pesanan_berjalan" class="nav-link {{ request()->is('purchasing/pesanan_berjalan') ? 'active' : '' }}">
+                <a href="{{ route('staff_purchasing.pesanan_berjalan') }}" class="nav-link {{ request()->routeIs('staff_purchasing.pesanan_berjalan') ? 'active' : '' }}">
                     <i class="bi bi-hourglass-split"></i> Pesanan Berjalan
                 </a>
 
-                <a href="/purchasing/kelola_ongkir" class="nav-link {{ request()->is('purchasing/kelola_ongkir') ? 'active' : '' }}">
+                <a href="{{ route('staff_purchasing.ongkir.index') }}" class="nav-link {{ request()->routeIs('staff_purchasing.ongkir.index') ? 'active' : '' }}">
                     <i class="bi bi-geo-alt"></i> Kelola Ongkir & Daerah
                 </a>
 
-                <a href="/purchasing/riwayat_pesanan" class="nav-link {{ request()->is('purchasing/riwayat_pesanan') ? 'active' : '' }}">
+                <a href="{{ route('staff_purchasing.riwayat') }}" class="nav-link {{ request()->routeIs('staff_purchasing.riwayat') ? 'active' : '' }}">
                     <i class="bi bi-clock-history"></i> Riwayat Pesanan
                 </a>
 
@@ -197,34 +190,33 @@
             </div>
         </div>
 
-        <!-- Desktop Sidebar (Fixed) -->
-        <div class="sidebar-desktop d-none d-lg-block">
+<div class="sidebar-desktop d-none d-lg-block">
             <h4>Staff Purchasing</h4>
-            <a href="/purchasing/dashboard" class="nav-link {{ request()->is('purchasing/dashboard') ? 'active' : '' }}">
+            <a href="{{ route('staff_purchasing.dashboard') }}" class="nav-link {{ request()->routeIs('staff_purchasing.dashboard') ? 'active' : '' }}">
                 <i class="bi bi-speedometer2"></i> Dashboard
             </a>
 
-            <a href="/purchasing/pesanan_masuk" class="nav-link {{ request()->is('purchasing/pesanan_masuk') ? 'active' : '' }}">
+            <a href="{{ route('staff_purchasing.pesanan_masuk') }}" class="nav-link {{ request()->routeIs('staff_purchasing.pesanan_masuk') ? 'active' : '' }}">
                 <i class="bi bi-bag-check"></i> Pesanan Masuk
             </a>
 
-            <a href="/purchasing/cari_kurir" class="nav-link {{ request()->is('purchasing/cari_kurir') ? 'active' : '' }}">
+            <a href="{{ route('staff_purchasing.cari_kurir') }}" class="nav-link {{ request()->routeIs('staff_purchasing.cari_kurir') ? 'active' : '' }}">
                 <i class="bi bi-truck"></i> Cari Kurir
             </a>
 
-            <a href="/purchasing/konfirmasi_pembayaran" class="nav-link {{ request()->is('purchasing/konfirmasi_pembayaran') ? 'active' : '' }}">
+            <a href="{{ route('staff_purchasing.konfirmasi_pembayaran') }}" class="nav-link {{ request()->routeIs('staff_purchasing.konfirmasi_pembayaran') ? 'active' : '' }}">
                 <i class="bi bi-cash-coin"></i> Konfirmasi Pembayaran
             </a>
 
-            <a href="/purchasing/pesanan_berjalan" class="nav-link {{ request()->is('purchasing/pesanan_berjalan') ? 'active' : '' }}">
+            <a href="{{ route('staff_purchasing.pesanan_berjalan') }}" class="nav-link {{ request()->routeIs('staff_purchasing.pesanan_berjalan') ? 'active' : '' }}">
                 <i class="bi bi-hourglass-split"></i> Pesanan Berjalan
             </a>
 
-            <a href="/purchasing/kelola_ongkir" class="nav-link {{ request()->is('purchasing/kelola_ongkir') ? 'active' : '' }}">
+            <a href="{{ route('staff_purchasing.ongkir.index') }}" class="nav-link {{ request()->routeIs('staff_purchasing.ongkir.index') ? 'active' : '' }}">
                 <i class="bi bi-geo-alt"></i> Kelola Ongkir & Daerah
             </a>
 
-            <a href="/purchasing/riwayat_pesanan" class="nav-link {{ request()->is('purchasing/riwayat_pesanan') ? 'active' : '' }}">
+            <a href="{{ route('staff_purchasing.riwayat') }}" class="nav-link {{ request()->routeIs('staff_purchasing.riwayat') ? 'active' : '' }}">
                 <i class="bi bi-clock-history"></i> Riwayat Pesanan
             </a>
 
@@ -233,25 +225,22 @@
             </button>
         </div>
 
-        <!-- Main Content (Single Source of Truth) -->
-        <div class="main-content">
+<div class="main-content">
             @yield('content')
         </div>
 
-        <!-- Toast Notifications -->
-        <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1060;">
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1060;">
             <div id="statusToast" class="toast align-items-center border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="d-flex">
                     <div class="toast-body fw-semibold">
-                        <!-- Message will be injected here -->
+
                     </div>
                     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
             </div>
         </div>
 
-        <!-- Universal Confirmation Modal -->
-        <div class="modal fade" id="universalConfirmModal" tabindex="-1" aria-labelledby="universalConfirmModalLabel" aria-hidden="true">
+<div class="modal fade" id="universalConfirmModal" tabindex="-1" aria-labelledby="universalConfirmModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg">
                     <div class="modal-header bg-success text-white border-0">
@@ -274,8 +263,7 @@
             </div>
         </div>
 
-        <!-- Logout Confirmation Modal -->
-        <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg">
                     <div class="modal-header bg-danger text-white border-0">
@@ -300,11 +288,7 @@
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-            /**
-             * Universal Confirmation Modal Handler
-             * @param {string} message - Message to display
-             * @param {function} onConfirm - Callback on confirmation
-             */
+
             window.confirmAction = function(message, onConfirm) {
                 const modalEl = document.getElementById('universalConfirmModal');
                 const modal = new bootstrap.Modal(modalEl);
@@ -312,9 +296,8 @@
                 const messageEl = document.getElementById('confirmMessage');
 
                 messageEl.textContent = message;
-                
-                // Clear previous listeners to avoid multiple triggers
-                const newConfirmBtn = confirmBtn.cloneNode(true);
+
+const newConfirmBtn = confirmBtn.cloneNode(true);
                 confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
 
                 newConfirmBtn.addEventListener('click', () => {
@@ -327,22 +310,20 @@
                 modal.show();
             };
 
-            // Logout function helper
-            window.logout = function() {
+window.logout = function() {
                 const modalLogout = new bootstrap.Modal(document.getElementById('logoutModal'));
                 modalLogout.show();
             };
 
-            // Auto-show Toast from Session
-            document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
                 const successMsg = "{{ session('success') }}";
                 const errorMsg = "{{ session('error') }}";
                 const toastEl = document.getElementById('statusToast');
-                
+
                 if (successMsg || errorMsg) {
                     const toastBody = toastEl.querySelector('.toast-body');
                     toastBody.textContent = successMsg || errorMsg;
-                    
+
                     if (successMsg) {
                         toastEl.classList.add('text-bg-success');
                         toastEl.classList.remove('text-bg-danger');
@@ -350,7 +331,7 @@
                         toastEl.classList.add('text-bg-danger');
                         toastEl.classList.remove('text-bg-success');
                     }
-                    
+
                     const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
                     toast.show();
                 }

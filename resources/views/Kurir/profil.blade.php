@@ -7,8 +7,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
             body {
-                /* background: #f8f9fa;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; */
+
                 min-height: 100vh;
             }
 
@@ -271,7 +270,7 @@
         @section('content')
 
         <div class="container py-5">
-            <!-- TOAST -->
+
             <div class="position-fixed top-0 end-0 p-3" style="z-index: 1055;">
                 <div id="toastSuccess" class="toast align-items-center text-bg-success border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
                     <div class="d-flex">
@@ -295,8 +294,7 @@
                 </div>
             </div>
 
-            <!-- ===================== INFORMASI PRIBADI ===================== -->
-            <div id="info" class="profile-section {{ ($activeTab ?? 'info') == 'info' ? 'active' : '' }}">
+<div id="info" class="profile-section {{ ($activeTab ?? 'info') == 'info' ? 'active' : '' }}">
                 <h2 class="section-title"><i class="fas fa-user-circle me-2"></i>Informasi Pribadi</h2>
                 <form method="POST" action="{{ route('kurir.profil.update') }}" class="form-section">
                     @csrf
@@ -339,8 +337,7 @@
                 </form>
             </div>
 
-            <!-- ===================== UBAH KATA SANDI ===================== -->
-            <div id="password" class="profile-section {{ ($activeTab ?? 'info') == 'password' ? 'active' : '' }}">
+<div id="password" class="profile-section {{ ($activeTab ?? 'info') == 'password' ? 'active' : '' }}">
                 <h2 class="section-title"><i class="fas fa-lock me-2"></i>Ubah Kata Sandi</h2>
                 <form id="passwordForm" method="POST" action="{{ route('kurir.profil.password') }}" class="form-section">
                     @csrf
@@ -392,8 +389,7 @@
                 </form>
             </div>
 
-            <!-- ===================== MODAL KONFIRMASI UBAH PASSWORD ===================== -->
-            <div class="modal fade" id="konfirmasiPasswordModal" tabindex="-1" aria-labelledby="konfirmasiPasswordLabel" aria-hidden="true">
+<div class="modal fade" id="konfirmasiPasswordModal" tabindex="-1" aria-labelledby="konfirmasiPasswordLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content border-success">
                         <div class="modal-header bg-success text-white">
@@ -411,9 +407,7 @@
                 </div>
             </div>
 
-
-
-        </div>
+</div>
 
         @if(session('success'))
             <script>
@@ -429,12 +423,11 @@
         <script>
             document.addEventListener('DOMContentLoaded', function() {
 
-                // === KONFIRMASI UBAH PASSWORD ===
-                const btnUbahPassword = document.getElementById('btnUbahPassword');
+const btnUbahPassword = document.getElementById('btnUbahPassword');
                 if (btnUbahPassword) {
                     btnUbahPassword.addEventListener('click', (e) => {
                         e.preventDefault();
-                        // buka konfirmasi ubah password
+
                         const modalKonfirmasi = new bootstrap.Modal(document.getElementById('konfirmasiPasswordModal'));
                         modalKonfirmasi.show();
                     });
@@ -455,8 +448,7 @@
                     });
                 }
 
-                // === GANTI TAB PROFIL ===
-                document.querySelectorAll('.nav-link-profile').forEach(link => {
+document.querySelectorAll('.nav-link-profile').forEach(link => {
                     link.addEventListener('click', e => {
                         e.preventDefault();
                         document.querySelectorAll('.nav-link-profile').forEach(l => l.classList.remove('active'));
@@ -466,8 +458,7 @@
                     });
                 });
 
-                // === TOGGLE PASSWORD ===
-                document.querySelectorAll('.toggle-password').forEach(icon => {
+document.querySelectorAll('.toggle-password').forEach(icon => {
                     icon.addEventListener('click', () => {
                         const input = document.getElementById(icon.dataset.target);
                         if (input.type === 'password') {
@@ -480,8 +471,7 @@
                     });
                 });
 
-
-            });
+});
         </script>
 
         @endsection

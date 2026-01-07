@@ -22,8 +22,7 @@
         .dashboard-container { padding: 1.5rem; max-width: 1200px; margin: auto; }
         .dashboard-title { font-size: 1.6rem; font-weight: 700; color: var(--green-primary); display: flex; align-items: center; gap: .5rem; }
 
-        /* Detail Produk */
-        .product-detail-card { background: var(--white); border-radius: .8rem; border: 1px solid var(--border-color); box-shadow: 0 2px 8px var(--shadow); overflow: hidden; margin-bottom: 2rem; }
+.product-detail-card { background: var(--white); border-radius: .8rem; border: 1px solid var(--border-color); box-shadow: 0 2px 8px var(--shadow); overflow: hidden; margin-bottom: 2rem; }
         .product-detail-header { background: var(--green-soft); padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
         .btn-back { background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; padding: 0; cursor: pointer; }
         .btn-back:hover { color: var(--text-dark); }
@@ -35,16 +34,14 @@
             font-size: .8rem; padding: .4rem .7rem; border-radius: .5rem; font-weight: 600;
         }
 
-        /* Batch Header */
-        .batch-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; background: var(--white); padding: 1.5rem 2rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+.batch-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; background: var(--white); padding: 1.5rem 2rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         .batch-header h3 { color: #2a522a; margin: 0; display: flex; align-items: center; gap: .5rem; }
         .batch-search {
             width: 500px !important;
             max-width: 500px !important;
         }
 
-        /* Table */
-        .table-card { background: var(--white); border-radius: .8rem; border: 1px solid var(--border-color); box-shadow: 0 2px 8px var(--shadow); overflow: hidden; }
+.table-card { background: var(--white); border-radius: .8rem; border: 1px solid var(--border-color); box-shadow: 0 2px 8px var(--shadow); overflow: hidden; }
         .table th { background: var(--green-soft); color: var(--green-text); font-weight: 600; font-size: .85rem; text-transform: uppercase; border-bottom: 2px solid var(--border-color); }
         .table td { vertical-align: middle; font-size: .9rem; border-top: 1px solid var(--border-color); color: var(--text-dark); }
         .table tbody tr:hover { background-color: #F3F4F6; }
@@ -65,8 +62,7 @@
             transform: scale(1.05);
         }
 
-        /* Status Badges for Tingkat Kerusakan - FIXED: Solid colors without opacity */
-        .badge-ringan {
+.badge-ringan {
             background-color: #6c757d !important;
             color: #ffffff !important;
             font-weight: 600;
@@ -115,10 +111,9 @@
 
     <div class="dashboard-container">
 
-        <!-- DETAIL PRODUK - FIXED: Akses sebagai model Eloquent -->
-        <div class="product-detail-card">
+<div class="product-detail-card">
             <div class="product-detail-header">
-                <!-- FIXED: Add back button -->
+
                 <div class="d-flex align-items-center gap-2">
                     <button class="btn-back" onclick="window.history.back()">
                         <i class="bi bi-chevron-left"></i>
@@ -150,8 +145,7 @@
             </div>
         </div>
 
-        <!-- LIST BATCH RUSAK -->
-        <div class="batch-header">
+<div class="batch-header">
             <div>
                 <h3><i class="bi bi-exclamation-triangle"></i> Daftar Batch Rusak <span class="badge bg-danger ms-2">{{ $totalDamaged }}</span></h3>
                 <small class="text-muted">Riwayat batch produk yang rusak/cacat</small>
@@ -186,7 +180,7 @@
                             <td class="harga-normal">{{ $batch['harga_normal'] }}</td>
                             <td>{{ $batch['jumlah_rusak'] ?? 0 }} unit</td>
                             <td>{{ $batch['keterangan'] }}</td>
-                            <td>{{ $batch['tanggal_ditemukan'] }}</td> <!-- FIXED: Fallback dari controller -->
+                            <td>{{ $batch['tanggal_ditemukan'] }}</td>
                             <td><span class="badge badge-{{ strtolower($batch['tingkat_kerusakan']) }}">{{ $batch['tingkat_kerusakan'] ?? 'Sedang' }}</span></td>
                             <td>
                                 <button class="btn-bukti" data-bs-toggle="modal" data-bs-target="#buktiModal{{ $batch['batch_id'] }}">
@@ -204,15 +198,14 @@
             </div>
         </div>
 
-        <!-- FIXED: Dynamic Pagination -->
-        <nav aria-label="Batch pagination" class="mt-4">
+<nav aria-label="Batch pagination" class="mt-4">
             {{ $damaged_batches->appends(request()->query())->links('pagination::bootstrap-5') }}
         </nav>
 
     </div>
 
     @forelse($damaged_batches as $batch)
-    <!-- Modal Bukti Gambar per Batch - FIXED: Image size not too big -->
+
     <div class="modal fade" id="buktiModal{{ $batch['batch_id'] }}">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -235,7 +228,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // FIXED: JS Search Fungsional
+
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('batchSearch');
             const tableRows = document.querySelectorAll('#batchTable tbody tr');
@@ -247,8 +240,7 @@
                 });
             });
 
-            // FIXED: Colorize badges for supplier & kategori (same as previous badges)
-            function colorizeSingle(badgeEl, text){
+function colorizeSingle(badgeEl, text){
                 if(!badgeEl || !text) return;
                 const colorPairs=[{bg:"#BAE6FD",text:"#0369A1"},{bg:"#FEF9C3",text:"#A16207"},{bg:"#FBCFE8",text:"#9D174D"},{bg:"#A7F3D0",text:"#065F46"},{bg:"#DDD6FE",text:"#5B21B6"},{bg:"#FECACA",text:"#991B1B"},{bg:"#FDE68A",text:"#B45309"},{bg:"#F5D0FE",text:"#86198F"}];
                 let hash=0;

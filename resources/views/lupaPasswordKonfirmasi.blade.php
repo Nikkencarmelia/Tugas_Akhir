@@ -42,8 +42,8 @@
                 font-size: 0.9rem;
             }
             .form-control:focus {
-                border-color: #198754 !important; /* warna border success */
-                box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, .25) !important; /* efek glow hijau */
+                border-color: #198754 !important;
+                box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, .25) !important;
             }
             .google-icon {
                 cursor: pointer;
@@ -57,19 +57,16 @@
         <div class="container d-flex align-items-center justify-content-center login-container">
             <div class="row w-100 shadow-lg" style="max-width:1000px;border-radius:20px;overflow:hidden">
 
-                <!-- KIRI -->
-                <div class="col-md-6 p-5 left-box d-flex flex-column justify-content-center">
+<div class="col-md-6 p-5 left-box d-flex flex-column justify-content-center">
                     <h2 class="fw-bold mb-2">Food Center</h2>
                     <p>Dinas Ketahanan Pangan Kabupaten Kutai Barat</p>
                 </div>
 
-                <!-- KANAN -->
-                <div class="col-md-6 p-5 right-box">
+<div class="col-md-6 p-5 right-box">
                     <h2 class="fw-bold mb-4">Reset Kata Sandi</h2>
                     <p class="text-muted mb-4">Masukkan Kata Sandi baru untuk akun Anda. Pastikan Kata Sandi kuat dan mudah diingat.</p>
 
-                    {{-- ERROR --}}
-                    @if ($errors->any())
+@if ($errors->any())
                         <div class="alert alert-danger">
                             <ul class="mb-0">
                                 @foreach ($errors->all() as $error)
@@ -79,22 +76,18 @@
                         </div>
                     @endif
 
-                    {{-- SUCCESS --}}
-                    @if (session('success'))
+@if (session('success'))
                         <div class="alert alert-success">{{ session('success') }}</div>
                     @endif
 
-                    {{-- ERROR SESSION --}}
-                    @if (session('error'))
+@if (session('error'))
                         <div class="alert alert-danger">{{ session('error') }}</div>
                     @endif
 
-                    {{-- FORM RESET PASSWORD --}}
-                    <form method="POST" action="{{ route('password.update') }}">
+<form method="POST" action="{{ route('password.update') }}">
                         @csrf
 
-                        {{-- HIDDEN FIELDS --}}
-                        <input type="hidden" name="email" value="{{ $email ?? old('email') }}">
+<input type="hidden" name="email" value="{{ $email ?? old('email') }}">
                         <input type="hidden" name="token" value="{{ $token ?? old('token') }}">
 
                         <div class="mb-3">

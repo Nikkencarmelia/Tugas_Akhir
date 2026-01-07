@@ -63,10 +63,10 @@
             .col-aksi {
                 width: 10%;
                 position: relative;
-                overflow: visible !important; /* Fix: Izinkan overflow agar dropdown muncul keluar dari sel tabel */
-                padding-right: 0.5rem; /* Tambahan: Sedikit padding ekstra untuk ruang button */
+                overflow: visible !important;
+                padding-right: 0.5rem;
             }
-            .table td.col-aksi { overflow: visible !important; } /* Override khusus untuk td.col-aksi */
+            .table td.col-aksi { overflow: visible !important; }
 
             .btn-table-action { border: none; border-radius: .4rem; padding: .35rem .7rem; font-size: .85rem; font-weight: 500; transition: all .3s ease; margin-right: .25rem; white-space: nowrap; }
             .btn-table-warning { background: #F59E0B; color: white; }
@@ -139,7 +139,7 @@
                 .dropdown-menu { min-width: 100px; }
                 .badge-harga-normal, .badge-harga-diskon, .badge-harga-naik { max-width: 80px; font-size: .6rem; }
                 .product-detail-body .row { flex-direction: column; }
-                .col-aksi { padding-right: 0.25rem; } /* Adjust untuk mobile */
+                .col-aksi { padding-right: 0.25rem; }
                 .header-left { flex-direction: column; align-items: flex-start; gap: .5rem; }
                 .dashboard-title { font-size: 1.4rem; }
             }
@@ -154,7 +154,7 @@
             <div class="product-detail-card">
                 <div class="product-detail-header">
                     <div class="header-left">
-                        {{-- DYNAMIC BACK URL DARI SESSION --}}
+
                         @php
                             $refData = \Illuminate\Support\Facades\Session::get('batch_referrer', ['route' => 'produk.data', 'query' => []]);
                             $backUrl = route($refData['route']);
@@ -315,8 +315,7 @@
 
         </div>
 
-        <!-- Toast Container -->
-        <div class="toast-container position-fixed top-0 end-0 p-3">
+<div class="toast-container position-fixed top-0 end-0 p-3">
             @if (session('success'))
                 <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
                     <div class="d-flex">
@@ -355,7 +354,7 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Tanggal Masuk</label>
-                                <input type="date" id="tgl_masuk_add" name="tgl_masuk" class="form-control" value="{{ now()->format('Y-m-d') }}">
+                                <input type="date" id="tgl_masuk_add" name="tgl_masuk" class="form-control" value="{{ now()->format('Y-m-d') }}" required>
                             </div>
 
                             <div class="mb-3">
@@ -366,6 +365,7 @@
                                     name="tgl_kadaluwarsa"
                                     class="form-control"
                                     value="{{ old('tgl_kadaluwarsa', $default_kadaluarsa) }}"
+                                    required
                                 >
                                 <small class="text-muted">Otomatis berdasarkan tanggal masuk + {{ $produk->estimasi_kadaluwarsa_hari ?? 0 }} hari</small>
                             </div>
@@ -377,12 +377,12 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Harga Normal</label>
-                                <input type="number" name="harga_normal" min="0" class="form-control" required>
+                                <input type="number" name="harga_normal" min="1" class="form-control" required oninput="if(this.value === '0') this.value = '';">
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Harga Saat Ini</label>
-                                <input type="number" name="harga_saat_ini" min="0" class="form-control" required>
+                                <input type="number" name="harga_saat_ini" min="1" class="form-control" required oninput="if(this.value === '0') this.value = '';">
                             </div>
 
                             <button class="btn btn-success w-100">Tambah Batch</button>
@@ -420,11 +420,11 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Harga Normal (Rp)</label>
-                                <input type="number" min="0" class="form-control" id="editHargaNormal" name="harga_normal" required>
+                                <input type="number" min="1" class="form-control" id="editHargaNormal" name="harga_normal" required oninput="if(this.value === '0') this.value = '';">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Harga Saat Ini (Rp)</label>
-                                <input type="number" min="0" class="form-control" id="editHargaSaatIni" name="harga_saat_ini" required>
+                                <input type="number" min="1" class="form-control" id="editHargaSaatIni" name="harga_saat_ini" required oninput="if(this.value === '0') this.value = '';">
                             </div>
 
                             <button type="submit" class="btn btn-primary w-100">Update Batch</button>
@@ -508,7 +508,7 @@
                             @method('PUT')
                             <div class="mb-3">
                                 <label class="form-label">Harga Baru (Rp)</label>
-                                <input type="number" id="hargaBaru" name="harga_saat_ini" class="form-control" min="0" required>
+                                <input type="number" id="hargaBaru" name="harga_saat_ini" class="form-control" min="1" required oninput="if(this.value === '0') this.value = '';">
                                 <small class="text-muted">Masukkan harga baru untuk harga saat ini</small>
                             </div>
                             <div class="mb-3">
@@ -566,6 +566,7 @@
                     <div class="mb-3">
                         <label class="form-label">Bukti Foto</label>
                         <input type="file" name="gambar" id="inputFotoRusak" class="form-control" accept="image/*" required>
+                        <small class="text-muted">Format: JPG, JPEG, PNG. Maks 5MB.</small>
                         <div class="mt-2 text-center">
                             <img id="previewFotoRusak" src="#" alt="Preview Foto" class="img-fluid rounded border d-none" style="max-height: 200px; object-fit: contain;">
                         </div>
@@ -637,8 +638,7 @@
             document.getElementById('hargaForm').action = `/staff_produk/batch/naik/${batchId}`;
         }
 
-        // AJAX LIVE SEARCH
-        const searchInput = document.getElementById('batchSearch');
+const searchInput = document.getElementById('batchSearch');
         let timeout = null;
 
         if (searchInput) {
@@ -649,46 +649,40 @@
                 timeout = setTimeout(() => {
                     const url = new URL(window.location.href);
                     url.searchParams.set('search', query);
-                    url.searchParams.delete('page'); // Reset to page 1 on new search
+                    url.searchParams.delete('page');
 
                     fetch(url)
                         .then(response => response.text())
                         .then(html => {
                             const parser = new DOMParser();
                             const doc = parser.parseFromString(html, 'text/html');
-                            
-                            // Update Table
-                            const newTable = doc.querySelector('#batchTable tbody');
+
+const newTable = doc.querySelector('#batchTable tbody');
                             const currentTable = document.querySelector('#batchTable tbody');
-                            
+
                             if (newTable && currentTable) {
                                 currentTable.innerHTML = newTable.innerHTML;
                             }
 
-                            // Update Pagination
-                            const newNav = doc.querySelector('nav[aria-label="Batch pagination"]');
+const newNav = doc.querySelector('nav[aria-label="Batch pagination"]');
                             const currentNav = document.querySelector('nav[aria-label="Batch pagination"]');
-                            
+
                             if (newNav && currentNav) {
                                 currentNav.innerHTML = newNav.innerHTML;
                             }
-                            
-                            // Update URL without reload
-                            window.history.pushState({}, '', url);
-                            
-                            // Re-init badges color
-                            colorizeBadges();
+
+window.history.pushState({}, '', url);
+
+colorizeBadges();
                         })
                         .catch(err => console.error('Search failed', err));
-                }, 500); // Debounce 500ms
+                }, 500);
             });
         }
 
-        // Event listener untuk diskon
-        document.addEventListener('DOMContentLoaded', function() {
-            // FUNGSI SEARCH (Removed - uses server side)
+document.addEventListener('DOMContentLoaded', function() {
 
-            const discountPercent = document.getElementById('discountPercent');
+const discountPercent = document.getElementById('discountPercent');
             if (discountPercent) {
                 discountPercent.addEventListener('input', function() {
                     const hargaNormalText = document.getElementById('discountHargaNormal').value;
@@ -703,8 +697,7 @@
                 });
             }
 
-            // Initialize toasts if they exist
-            @if (session('success'))
+@if (session('success'))
                 var successToastEl = document.getElementById('successToast');
                 var successToast = new bootstrap.Toast(successToastEl);
                 successToast.show();
@@ -717,28 +710,77 @@
             @endif
         });
 
-
-        function deleteBatch() {
+function deleteBatch() {
             const id = document.getElementById('deleteBatchId').value;
             window.location.href = `/staff_produk/batch/delete/${id}`;
         }
 
-        // FIX: Tambahkan fungsi ini agar id_batch bisa diset saat modal dibuka
-        function setRusakBatch(id) {
+function setRusakBatch(id) {
             document.getElementById('rusakBatchId').value = id;
         }
 
         document.addEventListener('DOMContentLoaded', colorizeBadges);
-        
-        // Preview Foto Rusak
-        document.addEventListener('DOMContentLoaded', function() {
+
+document.addEventListener('DOMContentLoaded', function() {
             const inputFoto = document.getElementById('inputFotoRusak');
             const previewFoto = document.getElementById('previewFotoRusak');
+
+            // Setup Validation Toast
+            const toastId = 'validationToast';
+            let toastEl = document.getElementById(toastId);
+            if (!toastEl) {
+                // Find or create toast container
+                let toastContainer = document.querySelector('.toast-container');
+                if (!toastContainer) {
+                    toastContainer = document.createElement('div');
+                    toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+                    toastContainer.style.zIndex = '2000'; // High z-index for modals
+                    document.body.appendChild(toastContainer);
+                }
+
+                toastEl = document.createElement('div');
+                toastEl.id = toastId;
+                toastEl.className = 'toast align-items-center text-white bg-danger border-0';
+                toastEl.setAttribute('role', 'alert');
+                toastEl.setAttribute('aria-live', 'assertive');
+                toastEl.setAttribute('aria-atomic', 'true');
+                toastEl.innerHTML = `
+                    <div class="d-flex">
+                        <div class="toast-body" id="toastBody"></div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                `;
+                toastContainer.appendChild(toastEl);
+            }
+            const toastBody = document.getElementById('toastBody');
+            const toast = new bootstrap.Toast(toastEl);
+
+            function showToast(message) {
+                toastBody.textContent = message;
+                toast.show();
+            }
 
             if (inputFoto && previewFoto) {
                 inputFoto.addEventListener('change', function() {
                     const file = this.files[0];
                     if (file) {
+                        if (!file.type.startsWith('image/')) {
+                            showToast('File yang dipilih bukan gambar!');
+                            this.value = '';
+                            previewFoto.src = '#';
+                            previewFoto.classList.add('d-none');
+                            return;
+                        }
+
+                        const maxSize = 5 * 1024 * 1024; // 5MB
+                        if (file.size > maxSize) {
+                            showToast('Ukuran file terlalu besar! Maksimal 5MB.');
+                            this.value = '';
+                            previewFoto.src = '#';
+                            previewFoto.classList.add('d-none');
+                            return;
+                        }
+
                         const reader = new FileReader();
                         reader.onload = function(e) {
                             previewFoto.src = e.target.result;
@@ -801,8 +843,7 @@
             updateKadaluarsa();
         });
 
-
-        </script>
+</script>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 

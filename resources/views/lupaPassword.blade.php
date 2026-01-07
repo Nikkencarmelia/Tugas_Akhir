@@ -41,8 +41,8 @@
                 font-size: 0.9rem;
             }
             .form-control:focus {
-                border-color: #198754 !important; /* warna border success */
-                box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, .25) !important; /* efek glow hijau */
+                border-color: #198754 !important;
+                box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, .25) !important;
             }
             .google-icon {
                 cursor: pointer;
@@ -56,19 +56,16 @@
         <div class="container d-flex align-items-center justify-content-center login-container">
             <div class="row w-100 shadow-lg" style="max-width:1000px;border-radius:20px;overflow:hidden">
 
-                <!-- KIRI -->
-                <div class="col-md-6 p-5 left-box d-flex flex-column justify-content-center">
+<div class="col-md-6 p-5 left-box d-flex flex-column justify-content-center">
                     <h2 class="fw-bold mb-2">Food Center</h2>
                     <p>Dinas Ketahanan Pangan Kabupaten Kutai Barat</p>
                 </div>
 
-                <!-- KANAN -->
-                <div class="col-md-6 p-5 right-box">
+<div class="col-md-6 p-5 right-box">
                     <h2 class="fw-bold mb-4">Lupa Kata Sandi</h2>
                     <p class="text-muted mb-4">Masukkan email Anda dan kami akan mengirimkan link untuk mereset kata sandi.</p>
 
-                    {{-- ERROR --}}
-                    @if ($errors->any())
+@if ($errors->any())
                         <div class="alert alert-danger">
                             <ul class="mb-0">
                                 @foreach ($errors->all() as $error)
@@ -78,13 +75,11 @@
                         </div>
                     @endif
 
-                    {{-- SUCCESS --}}
-                    @if (session('success'))
+@if (session('success'))
                         <div class="alert alert-success">{{ session('success') }}</div>
                     @endif
 
-                    {{-- FORM LUPA PASSWORD --}}
-                    <form method="POST" action="{{ route('password.email') }}">
+<form method="POST" action="{{ route('password.email') }}">
                         @csrf
 
                         <div class="mb-3">
@@ -121,7 +116,7 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
         <script>
-            // Gak ada JS interaksi, cuma placeholder
+
             console.log('Forgot password UI loaded');
         </script>
     </body>

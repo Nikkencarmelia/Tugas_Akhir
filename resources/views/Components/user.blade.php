@@ -8,13 +8,11 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-        <!-- font -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-        <!-- Font Awesome Icons -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
         <title>User Components</title>
 
@@ -54,8 +52,7 @@
                 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             }
 
-            /* Force white navbar on mobile/responsive */
-            @media (max-width: 991px) {
+@media (max-width: 991px) {
                 .navbar {
                     background-color: #ffffff !important;
                     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
@@ -100,7 +97,7 @@
             }
 
             .container {
-                margin-top: 80px; /* Offset untuk navbar fixed */
+                margin-top: 80px;
             }
 
             footer {
@@ -147,7 +144,7 @@
     </head>
 
     <body>
-        <!-- navbar -->
+
         <nav class="navbar navbar-expand-lg @yield('navbar-class', 'white')">
             <div class="container-fluid">
                 <a class="navbar-brand" href="#">Food Center</a>
@@ -162,7 +159,7 @@
                             <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="/">Beranda</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('user.produk*') ? 'active' : '' }}" href="{{ route('user.produk') }}">Produk</a>
+                            <a class="nav-link {{ request()->routeIs('produk*') ? 'active' : '' }}" href="{{ route('produk') }}">Produk</a>
                         </li>
 
                         @auth
@@ -188,47 +185,7 @@
                                 </span>
                             </a>
                         </li>
-                        
-                        <!-- Notification Bell -->
-                        <li class="nav-item dropdown">
-                            @php
-                                $waitingPayment = \App\Models\Pemesanan::where('id_user', Auth::id())
-                                    ->where('status_pesanan', 'menunggu_pembayaran')
-                                    ->latest()
-                                    ->get();
-                                $notifCount = $waitingPayment->count();
-                            @endphp
-                            <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fa-solid fa-bell"></i>
-                                @if($notifCount > 0)
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem; padding: 0.25em 0.5em;">
-                                    {{ $notifCount }}
-                                </span>
-                                @endif
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 py-0" style="width: 320px; max-height: 400px; overflow-y: auto; border-radius: 12px;">
-                                <li><h6 class="dropdown-header fw-bold border-bottom py-3">Notifikasi</h6></li>
-                                @forelse($waitingPayment as $notif)
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-start gap-2 py-3 border-bottom" href="{{ route('pemesanan.riwayat.pesanan') }}">
-                                        <div class="bg-warning bg-opacity-10 text-warning p-2 rounded-circle">
-                                            <i class="fa-solid fa-file-invoice-dollar"></i>
-                                        </div>
-                                        <div class="text-wrap">
-                                            <p class="mb-0 small fw-bold">Menunggu Pembayaran</p>
-                                            <p class="mb-1 small text-muted">Pesanan #{{ $notif->kode_pesanan }} perlu dibayar.</p>
-                                            <small class="text-secondary" style="font-size: 0.7rem;">{{ $notif->created_at->diffForHumans() }}</small>
-                                        </div>
-                                    </a>
-                                </li>
-                                @empty
-                                <li><div class="dropdown-item text-center text-muted small py-4">Tidak ada notifikasi baru</div></li>
-                                @endforelse
-                                <li>
-                                    <a href="{{ route('pemesanan.riwayat.pesanan') }}" class="dropdown-item text-center small fw-bold text-success py-2">Lihat Semua Pesanan</a>
-                                </li>
-                            </ul>
-                        </li>
+
                         <li class="nav-item ms-2">
                             <button type="button" class="btn btn-secondary shadow-sm" data-bs-toggle="modal" data-bs-target="#logoutModal" style="border-radius: 20px; padding: 8px 16px; font-weight: 500; font-size: 14px;">Logout</button>
                         </li>
@@ -241,133 +198,123 @@
             </div>
         </nav>
 
-        <!-- konten dari halaman lain -->
         @hasSection('content_full')
-        @yield('content_full')
-        @else
-            <div class="container mt-4">
-                @yield('content')
-            </div>
-        @endif
+                @yield('content_full')
+                @else
+                    <div class="container mt-4">
+                        @yield('content')
+                    </div>
+                @endif
 
-        <!-- footer -->
         <footer>
             <div class="container">
                 <div class="row">
 
-                <!-- Kiri: Info Food Center -->
-                <div class="col-md-6 pe-md-5">
-                    <h5>Food Center</h5>
-                    <p class="mb-1">Dinas Ketahanan Pangan Kabupaten Kutai Barat</p>
-                    <p class="mb-3">Komplek Perkantoran, Blok E, Barong Tongkok, Kec. Barong Tongkok, Kabupaten Kutai Barat, Kalimantan Timur 75777</p>
-                    <p class="mb-0 small">Copyright © 2025 Dinas Ketahanan Pangan Kabupaten Kutai Barat. All rights reserved.</p>
-                </div>
-
-                <!-- Tengah: Menu Utama -->
-                <div class="col-md-3">
-                    <h6>Menu Utama</h6>
-                    <ul class="list-unstyled">
-                    <li><a href="#">Beranda</a></li>
-                    <li><a href="#">Produk</a></li>
-                    <li><a href="#">Cara Belanja</a></li>
-                    <li><a href="#">Tentang Kami</a></li>
-                    </ul>
-                </div>
-
-                <!-- Kanan: Kontak Kami -->
-                <div class="col-md-3">
-                    <h6>Kontak Kami</h6>
-                    <p class="mb-2"><i class="fa-solid fa-phone me-2"></i>0812345678</p>
-                    <p class="mb-0"><i class="fa-solid fa-envelope me-2"></i>email@gmail.com</p>
-                </div>
-
-                </div>
-            </div>
-        </footer>
-
-        <!-- Logout Confirmation Modal -->
-        <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg">
-                    <div class="modal-header bg-danger text-white border-0">
-                        <h5 class="modal-title fw-bold" id="logoutModalLabel">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>Konfirmasi Logout
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="col-md-6 pe-md-5">
+                        <h5>Food Center</h5>
+                        <p class="mb-1">Dinas Ketahanan Pangan Kabupaten Kutai Barat</p>
+                        <p class="mb-3">Komplek Perkantoran, Blok E, Barong Tongkok, Kec. Barong Tongkok, Kabupaten Kutai Barat, Kalimantan Timur 75777</p>
+                        <p class="mb-0 small">Copyright © 2026 Dinas Ketahanan Pangan Kabupaten Kutai Barat. All rights reserved.</p>
                     </div>
-                    <div class="modal-body p-4 text-center">
-                        <h5 class="mb-0">Apakah Anda yakin ingin keluar dari akun?</h5>
+
+                    <div class="col-md-3">
+                        <h6>Menu Utama</h6>
+                        <ul class="list-unstyled">
+                            <li><a href="/">Beranda</a></li>
+                            <li><a href="/produk">Produk</a></li>
+                            <li><a href="/keranjang">Keranjang</a></li>
+                            <li><a href="/login">Login</a></li>
+                            <li><a href="/register">Register</a></li>
+                            </ul>
+                        </div>
+
+                    <div class="col-md-3">
+                        <h6>Kontak Kami</h6>
+                        <p class="mb-2"><i class="fa-solid fa-phone me-2"></i>081234567890</p>
+                        <p class="mb-0"><i class="fa-solid fa-envelope me-2"></i>email@gmail.com</p>
                     </div>
-                    <div class="modal-footer border-0 justify-content-center">
-                        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Batal</button>
-                        <form method="POST" action="{{ route('logout') }}" style="display: inline;">
-                            @csrf
-                            <button type="submit" class="btn btn-danger px-4">Ya, Logout</button>
-                        </form>
+
+                        </div>
+                    </div>
+                </footer>
+
+                <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow-lg">
+                            <div class="modal-header bg-danger text-white border-0">
+                                <h5 class="modal-title fw-bold" id="logoutModalLabel">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Konfirmasi Logout
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body p-4 text-center">
+                                <h5 class="mb-0">Apakah Anda yakin ingin keluar dari akun?</h5>
+                            </div>
+                            <div class="modal-footer border-0 justify-content-center">
+                                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Batal</button>
+                                <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+                                    @csrf
+                                    <button type="submit" class="btn btn-danger px-4">Ya, Logout</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        <script>
-            // Logout function helper
-            window.logout = function() {
-                const modalLogout = new bootstrap.Modal(document.getElementById('logoutModal'));
-                modalLogout.show();
-            };
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+                <script>
 
-            // === ROBUST NAVBAR TOGGLE ===
-            document.addEventListener('DOMContentLoaded', function() {
-                const toggler = document.getElementById('navbarToggler');
-                const collapseEl = document.getElementById('navbarNav');
-                
-                if (toggler && collapseEl) {
-                    const bsCollapse = new bootstrap.Collapse(collapseEl, { toggle: false });
-                    
-                    toggler.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        bsCollapse.toggle();
+                    window.logout = function() {
+                        const modalLogout = new bootstrap.Modal(document.getElementById('logoutModal'));
+                        modalLogout.show();
+                    };
+
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const toggler = document.getElementById('navbarToggler');
+                        const collapseEl = document.getElementById('navbarNav');
+
+                        if (toggler && collapseEl) {
+                            const bsCollapse = new bootstrap.Collapse(collapseEl, { toggle: false });
+
+                            toggler.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                bsCollapse.toggle();
+                            });
+
+                            collapseEl.addEventListener('show.bs.collapse', () => toggler.setAttribute('aria-expanded', 'true'));
+                            collapseEl.addEventListener('hide.bs.collapse', () => toggler.setAttribute('aria-expanded', 'false'));
+                        }
                     });
 
-                    // Pastikan icon/state sinkron saat tutup (misal klik di luar atau resize)
-                    collapseEl.addEventListener('show.bs.collapse', () => toggler.setAttribute('aria-expanded', 'true'));
-                    collapseEl.addEventListener('hide.bs.collapse', () => toggler.setAttribute('aria-expanded', 'false'));
-                }
-            });
+                    const isLandingPage = document.querySelector('.navbar').classList.contains('transparent');
 
-            // Check if current page is landing page
-            const isLandingPage = document.querySelector('.navbar').classList.contains('transparent');
-            
-            // Only apply scroll behavior on landing page and desktop
-            if (isLandingPage) {
-                window.addEventListener('scroll', function () {
-                    // Skip on mobile
-                    if (window.innerWidth <= 991) return;
-                    
-                    const navbar = document.querySelector('.navbar');
-                    if (window.scrollY > 50) {
-                        navbar.classList.remove('transparent');
-                        navbar.classList.add('white');
-                    } else {
-                        navbar.classList.add('transparent');
-                        navbar.classList.remove('white');
-                    }
-                });
-            }
+                    if (isLandingPage) {
+                        window.addEventListener('scroll', function () {
 
-            //button aktif di halaman itu pada navbar
-            document.addEventListener('DOMContentLoaded', function () {
-                const currentPath = window.location.pathname;
-                const origin = window.location.origin;
-                
-                document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
-                    const href = link.getAttribute('href');
-                    if (href === currentPath || href === origin + currentPath) {
-                        link.classList.add('active');
+                            if (window.innerWidth <= 991) return;
+
+                            const navbar = document.querySelector('.navbar');
+                            if (window.scrollY > 50) {
+                                navbar.classList.remove('transparent');
+                                navbar.classList.add('white');
+                            } else {
+                                navbar.classList.add('transparent');
+                                navbar.classList.remove('white');
+                            }
+                        });
                     }
-                });
-            });
-        </script>
-    </body>
-</html>
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                            const currentPath = window.location.pathname;
+                            const origin = window.location.origin;
+
+                        document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
+                            const href = link.getAttribute('href');
+                            if (href === currentPath || href === origin + currentPath) {
+                                link.classList.add('active');
+                            }
+                        });
+                    });
+            </script>
+        </body>
+    </html>

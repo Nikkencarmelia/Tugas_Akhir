@@ -2,34 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ResetPasswordMail;
+use App\Models\Batch;
+use App\Models\Keranjang;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use App\Mail\ResetPasswordMail;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
-use App\Models\Keranjang;
-use App\Models\Produk;
-use App\Models\Batch;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    /**
-     * Sync cart dari session ke database (untuk user yang login)
-     */
     private function syncCartToDatabase()
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return;
         }
 
         $user = Auth::user();
         $cart = Session::get('cart', []);
 
-        // Ambil semua cart keys yang ada di session
         $sessionCartKeys = [];
         foreach ($cart as $key => $item) {
             $sessionCartKeys[] = [
@@ -38,23 +33,21 @@ class AuthController extends Controller
             ];
         }
 
-        // Hapus item yang tidak ada lagi di session
         $existingKeranjangs = Keranjang::where('id_user', $user->id)->get();
         foreach ($existingKeranjangs as $keranjang) {
             $found = false;
             foreach ($sessionCartKeys as $key) {
-                if ($keranjang->id_produk == $key['id_produk'] && 
+                if ($keranjang->id_produk == $key['id_produk'] &&
                     $keranjang->id_batch == $key['id_batch']) {
                     $found = true;
                     break;
                 }
             }
-            if (!$found) {
+            if (! $found) {
                 $keranjang->delete();
             }
         }
 
-        // Update atau create item dari session ke database
         foreach ($cart as $item) {
             Keranjang::updateOrCreate(
                 [
@@ -69,13 +62,9 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Load cart dari database ke session (untuk user yang login)
-     * Merge dengan session cart yang ada jika ada
-     */
     private function loadCartFromDatabase()
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return;
         }
 
@@ -84,15 +73,13 @@ class AuthController extends Controller
             ->where('id_user', $user->id)
             ->get();
 
-        // Ambil cart dari database
         $cartFromDb = [];
         foreach ($keranjangs as $keranjang) {
             $produk = $keranjang->produk;
-            if (!$produk || $produk->status_tampil !== 'Ditampilkan') {
-                continue; // Skip produk yang tidak ditampilkan
+            if (! $produk || $produk->status_tampil !== 'Ditampilkan') {
+                continue;
             }
 
-            // Cek stok masih tersedia
             $batchQuery = Batch::where('id_produk', $produk->id)->where('stok', '>', 0);
             if ($keranjang->id_batch) {
                 $batchQuery->where('id', $keranjang->id_batch);
@@ -100,10 +87,9 @@ class AuthController extends Controller
             $totalStok = $batchQuery->sum('stok');
 
             if ($totalStok <= 0) {
-                continue; // Skip jika stok habis
+                continue;
             }
 
-            // Ambil batch untuk harga
             $batchQueryForPrice = Batch::where('id_produk', $produk->id)->where('stok', '>', 0);
             if ($keranjang->id_batch) {
                 $batchQueryForPrice->where('id', $keranjang->id_batch);
@@ -112,13 +98,13 @@ class AuthController extends Controller
             }
             $batchTertua = $batchQueryForPrice->first();
 
-            if (!$batchTertua) {
+            if (! $batchTertua) {
                 continue;
             }
 
             $cartKey = $produk->id;
             if ($keranjang->id_batch) {
-                $cartKey = $produk->id . '_' . $keranjang->id_batch;
+                $cartKey = $produk->id.'_'.$keranjang->id_batch;
             }
 
             $cartFromDb[$cartKey] = [
@@ -126,30 +112,27 @@ class AuthController extends Controller
                 'batch_id' => $keranjang->id_batch,
                 'nama_produk' => $produk->nama_produk,
                 'harga' => $batchTertua->harga_saat_ini,
-                'gambar' => $produk->gambar ? asset('storage/' . $produk->gambar) : asset('images/default-product.jpg'),
-                'satuan_berat' => ($produk->jumlah_satuan ?? 1) . ' ' . ($produk->satuan?->nama_satuan ?? 'pcs'),
-                'quantity' => min($keranjang->quantity, $totalStok) // Pastikan tidak melebihi stok
+                'gambar' => $produk->gambar ? asset('storage/'.$produk->gambar) : asset('images/default-product.jpg'),
+                'satuan_berat' => ($produk->jumlah_satuan ?? 1).' '.($produk->satuan?->nama_satuan ?? 'pcs'),
+                'quantity' => min($keranjang->quantity, $totalStok),
             ];
         }
 
-        // Merge dengan session cart yang ada (session cart diutamakan jika ada konflik)
         $sessionCart = Session::get('cart', []);
         $mergedCart = $cartFromDb;
 
         foreach ($sessionCart as $key => $item) {
             if (isset($mergedCart[$key])) {
-                // Jika item sudah ada di database, gunakan yang dari database (lebih up-to-date)
-                // Tapi bisa juga merge quantity jika diperlukan
+
                 continue;
             } else {
-                // Item baru di session yang belum ada di database, tambahkan
+
                 $mergedCart[$key] = $item;
             }
         }
 
         Session::put('cart', $mergedCart);
-        
-        // Sync kembali ke database untuk memastikan session cart yang baru juga tersimpan
+
         $this->syncCartToDatabase();
     }
 
@@ -161,13 +144,13 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required'
+            'email' => 'required|email',
+            'password' => 'required',
         ]);
 
-        if (!Auth::attempt($credentials)) {
+        if (! Auth::attempt($credentials)) {
             return back()->withErrors([
-                'email' => 'Email atau password salah'
+                'email' => 'Email atau password salah',
             ]);
         }
 
@@ -176,12 +159,10 @@ class AuthController extends Controller
         $user = Auth::user();
         $user->update(['status_online' => 'aktif']);
 
-        // Load cart dari database untuk user yang login
         if ($user->role === 'user') {
             $this->loadCartFromDatabase();
         }
 
-        // IF KURIR: Sync status_antar
         if ($user->role === 'kurir') {
             $kurir = \App\Models\Kurir::firstOrCreate(['id_user' => $user->id]);
             $kurir->syncStatus();
@@ -195,7 +176,7 @@ class AuthController extends Controller
             case 'staff_purchasing':
                 return redirect()->route('staff_purchasing.dashboard');
             case 'kurir':
-            return redirect()->route('kurir.pengiriman');
+                return redirect()->route('kurir.pengiriman');
             default:
                 return redirect()->route('beranda');
         }
@@ -210,18 +191,27 @@ class AuthController extends Controller
     {
         $request->validate([
             'nama_lengkap' => 'required|string|max:255',
-            'email'        => 'required|email|unique:users,email',
-            'no_telepon'   => 'nullable|string|max:20',
-            'password'     => 'required|min:6|confirmed',
+            'email' => 'required|email|unique:users,email',
+            'no_telepon' => 'required|string|max:20',
+            'password' => 'required|min:6|confirmed',
+        ], [
+            'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
+            'nama_lengkap.max' => 'Nama lengkap maksimal 255 karakter.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah terdaftar.',
+            'password.required' => 'Kata sandi wajib diisi.',
+            'password.min' => 'Kata sandi minimal 6 karakter.',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
         ]);
 
         User::create([
-            'nama_lengkap'  => $request->nama_lengkap,
-            'email'         => $request->email,
-            'no_telepon'    => $request->no_telepon,
-            'role'          => 'user',
+            'nama_lengkap' => $request->nama_lengkap,
+            'email' => $request->email,
+            'no_telepon' => $request->no_telepon,
+            'role' => 'user',
             'status_online' => 'tidak_aktif',
-            'password'      => Hash::make($request->password),
+            'password' => Hash::make($request->password),
         ]);
 
         return redirect()
@@ -233,17 +223,15 @@ class AuthController extends Controller
     {
         if (Auth::check()) {
             $user = Auth::user();
-            
-            // Simpan cart ke database sebelum logout (untuk user)
+
             if ($user->role === 'user') {
                 $this->syncCartToDatabase();
             }
-            
+
             $user->update([
-                'status_online' => 'tidak_aktif'
+                'status_online' => 'tidak_aktif',
             ]);
 
-            // IF KURIR: Sync status_antar
             if ($user->role === 'kurir') {
                 $kurir = \App\Models\Kurir::where('id_user', $user->id)->first();
                 if ($kurir) {
@@ -257,7 +245,7 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return redirect()->route('beranda');
     }
 
     public function showForgotPassword()
@@ -268,7 +256,7 @@ class AuthController extends Controller
     public function forgotPassword(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:users,email'
+            'email' => 'required|email|exists:users,email',
         ]);
 
         $user = User::where('email', $request->email)->first();
@@ -292,21 +280,22 @@ class AuthController extends Controller
     {
         $email = $request->query('email');
 
-        if (!$email) {
+        if (! $email) {
             return redirect()->route('login')->with('error', 'Email tidak ditemukan.');
         }
 
         $tokenRecord = DB::table('password_reset_tokens')->where('email', $email)->where('token', $token)->first();
 
-        if (!$tokenRecord || now()->diffInMinutes($tokenRecord->created_at) > 60) {
-            // Hapus token invalid
+        if (! $tokenRecord || now()->diffInMinutes($tokenRecord->created_at) > 60) {
+
             DB::table('password_reset_tokens')->where('email', $email)->delete();
+
             return redirect()->route('login')->with('error', 'Token tidak valid atau kadaluarsa.');
         }
 
         return view('lupaPasswordKonfirmasi', [
             'token' => $token,
-            'email' => $email
+            'email' => $email,
         ]);
     }
 
@@ -320,12 +309,12 @@ class AuthController extends Controller
 
         $tokenRecord = DB::table('password_reset_tokens')->where('email', $request->email)->where('token', $request->token)->first();
 
-        if (!$tokenRecord || now()->diffInMinutes($tokenRecord->created_at) > 60) {
+        if (! $tokenRecord || now()->diffInMinutes($tokenRecord->created_at) > 60) {
             return back()->withErrors(['email' => 'Token tidak valid atau kadaluarsa.']);
         }
 
         $user = User::where('email', $request->email)->first();
-        if (!$user) {
+        if (! $user) {
             return back()->withErrors(['email' => 'User tidak ditemukan.']);
         }
 

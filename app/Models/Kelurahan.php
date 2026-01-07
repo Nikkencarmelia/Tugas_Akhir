@@ -14,12 +14,13 @@ class Kelurahan extends Model
         'nama_kelurahan',
     ];
 
-    public function kecamatan(){
-    return $this->belongsTo(Kecamatan::class,'id_kecamatan');
+    public function kecamatan()
+    {
+        return $this->belongsTo(Kecamatan::class, 'id_kecamatan');
     }
 
-    public function kodePos(){
-        return $this->hasMany(KodePos::class,'id_kelurahan');
+    public function kodePos()
+    {
+        return $this->hasMany(KodePos::class, 'id_kelurahan');
     }
-
 }

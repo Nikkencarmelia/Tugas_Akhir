@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Pemesanan extends Model
 {
@@ -25,7 +25,7 @@ class Pemesanan extends Model
         'subtotal',
         'ongkir',
         'total',
-        'status_pesanan'
+        'status_pesanan',
     ];
 
     public function transaksi()

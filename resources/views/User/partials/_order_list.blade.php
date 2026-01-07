@@ -10,7 +10,7 @@
                         <i class="{{ $order->opsi_pengiriman == 'dipick_up' ? 'bi bi-shop' : 'fa-solid fa-truck' }}"></i>
                         {{ $order->opsi_pengiriman == 'dipick_up' ? 'Pick Up' : 'Diantar' }}
                     </span>
-                    
+
                     @if($order->opsi_pengiriman != 'dipick_up' && $order->id_kurir && $order->kurir)
                         <div class="vehicle-badge">
                             <i class="fa-solid {{ ($order->kurir->kurir->jenis_kendaraan ?? '') == 'Motor' ? 'fa-motorcycle' : 'fa-truck-pickup' }} me-1"></i>
@@ -32,25 +32,38 @@
 
         @php
             $status = $order->status_pesanan;
-            
-            $statusClass = 'status-' . $status;
-            if(in_array($status, ['dibatalkan', 'ditolak_staff', 'ditolak_kurir'])) $statusClass = 'status-dibatalkan';
-            elseif(in_array($status, ['menunggu_konfirmasi_pembayaran', 'menunggu_verifikasi_pembayaran'])) $statusClass = 'status-verif';
-            elseif(in_array($status, ['menunggu_cari_kurir', 'menunggu_konfirmasi_kurir'])) $statusClass = 'status-diproses';
-            elseif(in_array($status, ['menunggu_konfirmasi'])) $statusClass = 'status-menunggu_konfirmasi';
-            elseif($status == 'sedang_diantar') $statusClass = 'status-dikirim';
 
-            $statusLabel = ucwords(str_replace('_', ' ', $status));
-            if(in_array($status, ['dibatalkan', 'ditolak_staff', 'ditolak_kurir'])) $statusLabel = 'Dibatalkan';
-            
-            if($status == 'ditolak_staff') $statusLabel = 'Pesanan Dibatalkan oleh Staff';
-            elseif($status == 'ditolak_kurir') $statusLabel = 'Pesanan Ditolak Kurir';
-            elseif(in_array($status, ['menunggu_konfirmasi_pembayaran', 'menunggu_verifikasi_pembayaran'])) $statusLabel = 'Menunggu Verifikasi Pembayaran';
-            elseif(in_array($status, ['dikirim', 'sedang_diantar'])) $statusLabel = 'Dikirim';
-            elseif(in_array($status, ['menunggu_konfirmasi'])) $statusLabel = 'Menunggu Konfirmasi';
-            elseif(in_array($status, ['menunggu_cari_kurir', 'menunggu_konfirmasi_kurir'])) $statusLabel = 'Diproses';
-            elseif($status == 'pesanan_telah_diambil') {
-                $statusLabel = ($order->opsi_pengiriman == 'diantar') ? 'Pesanan telah diambil kurir' : 'Pesanan telah diambil';
+if (in_array($status, ['dibatalkan', 'ditolak_staff'])) {
+                $statusClass = 'status-dibatalkan';
+            } elseif (in_array($status, ['menunggu_cari_kurir', 'menunggu_konfirmasi_kurir', 'ditolak_kurir'])) {
+                $statusClass = 'status-diproses';
+            } elseif (in_array($status, ['menunggu_konfirmasi'])) {
+                $statusClass = 'status-menunggu_konfirmasi';
+            } elseif (in_array($status, ['menunggu_konfirmasi_pembayaran'])) {
+                $statusClass = 'status-menunggu_konfirmasi_pembayaran';
+            } elseif (in_array($status, ['dikirim', 'sedang_diantar', 'pesanan_telah_diambil'])) {
+                $statusClass = 'status-dikirim';
+            } else {
+                $statusClass = 'status-' . $status;
+            }
+
+if ($status == 'ditolak_staff') {
+                $statusLabel = 'Pesanan Dibatalkan oleh Staff';
+            } elseif ($status == 'dibatalkan') {
+                $statusLabel = 'Dibatalkan';
+            } elseif ($status == 'ditolak_kurir') {
+                $statusLabel = 'Diproses (Mencari Kurir Baru)';
+            } elseif ($status == 'menunggu_konfirmasi_pembayaran') {
+                $statusLabel = 'Menunggu Konfirmasi Pembayaran';
+            } elseif (in_array($status, ['dikirim', 'sedang_diantar', 'pesanan_telah_diambil'])) {
+                $statusLabel = 'Dikirim';
+                if($status == 'pesanan_telah_diambil' && $order->opsi_pengiriman == 'diantar') $statusLabel = 'Pesanan telah diambil kurir';
+            } elseif ($status == 'menunggu_konfirmasi') {
+                $statusLabel = 'Menunggu Konfirmasi Staff';
+            } elseif (in_array($status, ['menunggu_cari_kurir', 'menunggu_konfirmasi_kurir'])) {
+                $statusLabel = 'Diproses (Mencari Kurir)';
+            } else {
+                $statusLabel = ucwords(str_replace('_', ' ', $status));
             }
         @endphp
 

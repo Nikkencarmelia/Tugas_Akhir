@@ -29,8 +29,7 @@
             margin: 0;
         }
 
-        /* Tab Pill Styles - Matching Profile Page */
-        .orders-tabs {
+.orders-tabs {
             display: flex;
             gap: 0.5rem;
             justify-content: center;
@@ -86,8 +85,7 @@
             padding: 0.6rem 1rem;
         }
 
-        /* Card Styles */
-        .order-card {
+.order-card {
             background: white;
             border-radius: 12px;
             padding: 1.5rem;
@@ -129,29 +127,27 @@
             font-size: 1.1rem;
         }
 
-        .order-status { 
-            display: flex; 
-            align-items: center; 
-            gap: .5rem; 
-            padding: 6px 12px; 
-            border-radius: 20px; 
-            font-size: 13px; 
-            font-weight: 500; 
-            width: fit-content; 
-            margin-bottom: 1rem; 
+        .order-status {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            width: fit-content;
+            margin-bottom: 1rem;
         }
 
-        /* Status Colors - Matched with Detail Pesanan */
-        .status-menunggu_konfirmasi { background: #f1f3f5; color: #495057; }
+.status-menunggu_konfirmasi { background: #f1f3f5; color: #495057; }
         .status-menunggu_pembayaran { background: #fff4e6; color: #d9480f; }
         .status-diproses { background: #fef9c3; color: #854d0e; }
         .status-dikirim { background: #e0f2fe; color: #0369a1; }
         .status-selesai { background: #dcfce7; color: #166534; }
         .status-dibatalkan { background: #fee2e2; color: #991b1b; }
-        .status-verif { background: #fff7ed; color: #9a3412; }
+        .status-menunggu_konfirmasi_pembayaran { background: #fff7ed; color: #9a3412; }
 
-        /* Additional Statuses - Staff Sync */
-        .status-sedang_diantar { background: #e0f2fe; color: #0369a1; }
+.status-sedang_diantar { background: #e0f2fe; color: #0369a1; }
         .status-siap_diambil { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .status-pesanan_telah_diambil { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
 
@@ -220,29 +216,29 @@
             transition: all .2s;
         }
 
-        .btn-primary-order { 
-            background: #198754; 
-            color: white; 
-            border: 1px solid #198754; 
+        .btn-primary-order {
+            background: #198754;
+            color: white;
+            border: 1px solid #198754;
         }
-        .btn-primary-order:hover { 
-            background: #157347; 
+        .btn-primary-order:hover {
+            background: #157347;
             border-color: #157347;
             color: white;
         }
-        .btn-outline-success-order { 
-            background: white; 
-            color: #0d6efd; 
-            border: 1px solid #0d6efd; 
+        .btn-outline-success-order {
+            background: white;
+            color: #0d6efd;
+            border: 1px solid #0d6efd;
         }
-        .btn-outline-success-order:hover { 
-            background: #0d6efd; 
-            color: white; 
+        .btn-outline-success-order:hover {
+            background: #0d6efd;
+            color: white;
         }
-        .btn-danger-order { 
-            background: #fee2e2; 
-            color: #991b1b; 
-            border: 1px solid #fecaca; 
+        .btn-danger-order {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
         }
         .btn-danger-order:hover {
             background: #fecaca;
@@ -259,7 +255,7 @@
     </style>
 
     <div class="container py-5">
-        <!-- Toast Message -->
+
         <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index: 10000;">
             <div id="liveToast" class="toast align-items-center text-bg-success border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="d-flex">
@@ -298,7 +294,7 @@
         </div>
 
         <div id="tabContent">
-            <!-- Panels will be loaded via AJAX if needed, or rendered initially -->
+
             <div class="tab-panel active" id="panel-konfirmasi">
                 @include('User.partials._order_list', ['collection' => $konfirmasi_pesanan, 'title' => 'menunggu konfirmasi'])
             </div>
@@ -322,11 +318,10 @@
 
     @extends('components.user')
     @section('content')
-    <!-- Content logic already handled above in hybrid style -->
+
     @endsection
 
-    <!-- Cancellation Confirmation Modal -->
-    <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header border-bottom-0 pt-4 px-4">
@@ -348,7 +343,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Toast check
+
             @if(session('checkout_success') || session('success'))
                 const toastEl = document.getElementById('liveToast');
                 const toastMessage = document.getElementById('toastMessage');
@@ -360,33 +355,29 @@
             @endif
 
             let activeTab = '{{ request('tab', 'konfirmasi') }}';
-            
-            // Initial Active Tab
-            $('.orders-tab').removeClass('active');
+
+$('.orders-tab').removeClass('active');
             $(`.orders-tab[data-tab="${activeTab}"]`).addClass('active');
             $('.tab-panel').removeClass('active');
             $(`#panel-${activeTab}`).addClass('active');
 
-            // Tab Switching Logic
-            $('.orders-tab').on('click', function(e) {
+$('.orders-tab').on('click', function(e) {
                 e.preventDefault();
                 const tab = $(this).data('tab');
                 activeTab = tab;
-                
+
                 $('.orders-tab').removeClass('active');
                 $(this).addClass('active');
-                
+
                 $('.tab-panel').removeClass('active');
                 $(`#panel-${tab}`).addClass('active');
-                
-                // Update URL without reload
-                const url = new URL(window.location);
+
+const url = new URL(window.location);
                 url.searchParams.set('tab', tab);
                 window.history.pushState({}, '', url);
             });
 
-            // AJAX Filter & Search
-            let searchTimeout;
+let searchTimeout;
             $('input[name="search"], #sortSelect').on('input change', function() {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => {
@@ -397,7 +388,7 @@
             function fetchFilteredData(url = '{{ route('pemesanan.riwayat.pesanan') }}') {
                 const search = $('input[name="search"]').val();
                 const sort = $('#sortSelect').val();
-                
+
                 $.ajax({
                     url: url,
                     data: { search, sort },
@@ -409,23 +400,19 @@
                         $('#panel-dikirim').html(data.dikirim);
                         $('#panel-selesai').html(data.selesai);
                         $('#panel-dibatalkan').html(data.dibatalkan);
-                        
-                        // Re-initialize confirmCancel buttons for new AJAX content
-                        // (Wait, they are onlick so it's fine)
-                    }
+
+}
                 });
             }
 
-            // Pagination Link Interception
-            $(document).on('click', '.ajax-pagination a', function(e) {
+$(document).on('click', '.ajax-pagination a', function(e) {
                 e.preventDefault();
                 const url = $(this).attr('href');
                 fetchFilteredData(url);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
-            // Modal handling
-            let cancelUrl = '';
+let cancelUrl = '';
             window.confirmCancel = function(url) {
                 cancelUrl = url;
                 const modal = new bootstrap.Modal(document.getElementById('cancelOrderModal'));
@@ -437,18 +424,18 @@
                     const form = document.createElement('form');
                     form.method = 'POST';
                     form.action = cancelUrl;
-                    
+
                     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
                     const csrfInput = document.createElement('input');
                     csrfInput.type = 'hidden';
                     csrfInput.name = '_token';
                     csrfInput.value = csrfToken;
-                    
+
                     const methodInput = document.createElement('input');
                     methodInput.type = 'hidden';
                     methodInput.name = '_method';
                     methodInput.value = 'DELETE';
-                    
+
                     form.appendChild(csrfInput);
                     form.appendChild(methodInput);
                     document.body.appendChild(form);

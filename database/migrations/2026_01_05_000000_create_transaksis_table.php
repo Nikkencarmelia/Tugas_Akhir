@@ -12,7 +12,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('id_pemesanan')->constrained('pemesanans')->cascadeOnDelete();
             $table->string('bukti_pembayaran');
-            $table->enum('status', ['menunggu', 'valid', 'invalid'])->default('menunggu');
             $table->timestamps();
         });
     }
