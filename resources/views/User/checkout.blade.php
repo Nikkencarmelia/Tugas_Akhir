@@ -169,7 +169,7 @@
 <div id="pickupSection">
                                 <div class="alert alert-info mb-2">
                                     <i class="fa fa-map-marker-alt"></i> <strong>Alamat Pickup:</strong><br>
-                                    Jl. Contoh No. 123, RT 01/RW 01, Kelurahan Pickup, Kecamatan Pickup, Kota Contoh, 12345.
+                                    Komplek Perkantoran, Blok E, Barong Tongkok, Kec. Barong Tongkok, Kabupaten Kutai Barat, Kalimantan Timur 75777.
                                 </div>
                             </div>
                         </form>
