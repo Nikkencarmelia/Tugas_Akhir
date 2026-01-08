@@ -4,7 +4,7 @@
     <title>Produk</title>
 </head>
 <body>
-@extends('components.user')
+@extends('Components.user')
 
 @section('content')
 <style>
