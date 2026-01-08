@@ -190,7 +190,7 @@
         </p>
     @else
         <h6 class="mt-3 mb-1 fw-bold">Alamat Pengambilan (Toko)</h6>
-        <p class="mb-1">Jl. Ketintang No. 156, Surabaya</p>
+        <p class="mb-1">Komplek Perkantoran, Blok E, Barong Tongkok, Kec. Barong Tongkok, Kabupaten Kutai Barat, Kalimantan Timur 75777</p>
         <p class="mb-1 text-muted small">Silakan tunjukkan kode pesanan ini saat pengambilan.</p>
     @endif
   </div>
