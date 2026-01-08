@@ -95,7 +95,7 @@ class ProdukDiskonController extends Controller
 
                 $gambarPath = $produk->gambar;
                 if ($gambarPath && ! str_starts_with($gambarPath, 'http') && ! str_starts_with($gambarPath, '/')) {
-                    $gambarPath = asset('storage/'.$gambarPath);
+                    $gambarPath = asset($gambarPath);
                 }
                 $produk->gambar = $gambarPath ?: asset('images/default-image.jpg');
 
@@ -200,7 +200,7 @@ class ProdukDiskonController extends Controller
         $produk->supplier = $supplierNama;
         $gambarPath = $produk->gambar;
         if ($gambarPath && ! str_starts_with($gambarPath, 'http') && ! str_starts_with($gambarPath, '/')) {
-            $gambarPath = asset('storage/'.$gambarPath);
+            $gambarPath = asset($gambarPath);
         }
         $produk->gambar = $gambarPath ?: asset('images/default-image.jpg');
         $produk->satuan_berat = $produk->satuan_berat ?? 'pcs';

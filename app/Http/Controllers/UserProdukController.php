@@ -68,7 +68,7 @@ class UserProdukController extends Controller
                 'batch_id' => $batchTertua->id,
                 'quantity' => 1,
                 'gambar' => $produk->gambar
-                    ? asset('storage/'.$produk->gambar)
+                    ? asset($produk->gambar)
                     : asset('images/default-product.jpg'),
                 'nama_produk' => $produk->nama_produk,
                 'satuan_berat' => ($produk->jumlah_satuan ?? 1).' '.($produk->satuan?->nama_satuan ?? 'pcs'),
@@ -130,7 +130,7 @@ class UserProdukController extends Controller
                     'is_diskon' => $isDiskon,
                     'persen_diskon' => $persenDiskon,
                     'gambar_url' => $produk->gambar
-                        ? asset('storage/'.$produk->gambar)
+                        ? asset($produk->gambar)
                         : asset('images/default-product.jpg'),
                 ];
             })

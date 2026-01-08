@@ -80,7 +80,7 @@
 </head>
 <body>
 
-@extends('components.staff_purchasing')
+@extends('Components.staff_purchasing')
 @section('content')
 <div class="container py-5">
 
@@ -145,8 +145,8 @@
                     $src = asset('images/default-product.png');
                     if($img) {
                          if(str_contains($img, 'http')) $src = $img;
-                         elseif(str_starts_with($img, 'storage/')) $src = asset($img);
-                         else $src = asset('storage/'.$img);
+                         elseif(str_starts_with($img, 'images/')) $src = asset($img);
+                         else $src = asset($img);
                     }
                 @endphp
                 @php
@@ -237,8 +237,8 @@
                     $src = asset('images/default-product.png');
                     if($img) {
                          if(str_contains($img, 'http')) $src = $img;
-                         elseif(str_starts_with($img, 'storage/')) $src = asset($img);
-                         else $src = asset('storage/'.$img);
+                         elseif(str_starts_with($img, 'images/')) $src = asset($img);
+                         else $src = asset($img);
                     }
                 @endphp
                 @php
@@ -332,8 +332,8 @@ $img = $item->gambar ?? '';
                     $src = asset('images/default-product.png');
                     if($img) {
                          if(str_contains($img, 'http')) $src = $img;
-                         elseif(str_starts_with($img, 'storage/')) $src = asset($img);
-                         else $src = asset('storage/'.$img);
+                         elseif(str_starts_with($img, 'images/')) $src = asset($img);
+                         else $src = asset($img);
                     }
                 @endphp
 
@@ -475,8 +475,8 @@ $item = null;
                     $src = asset('images/default-product.png');
                     if($img) {
                          if(str_contains($img, 'http')) $src = $img;
-                         elseif(str_starts_with($img, 'storage/')) $src = asset($img);
-                         else $src = asset('storage/'.$img);
+                         elseif(str_starts_with($img, 'images/')) $src = asset($img);
+                         else $src = asset($img);
                     }
                 @endphp
 
@@ -538,7 +538,7 @@ $item = null;
                         @endphp
                         @if($bukti)
                             <button type="button" class="btn btn-outline-info btn-sm btnLihatBukti"
-                                data-bukti="{{ asset('storage/' . $bukti) }}">
+                                data-bukti="{{ asset($bukti) }}">
                                 <i class="fa-solid fa-file-invoice-dollar me-1"></i>Lihat Bukti Pembayaran
                             </button>
                         @endif

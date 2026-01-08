@@ -98,7 +98,7 @@
 </head>
 
 <body>
-@extends('components.staff_purchasing')
+@extends('Components.staff_purchasing')
 @section('content')
 <div class="container py-5">
 

@@ -112,7 +112,7 @@ class AuthController extends Controller
                 'batch_id' => $keranjang->id_batch,
                 'nama_produk' => $produk->nama_produk,
                 'harga' => $batchTertua->harga_saat_ini,
-                'gambar' => $produk->gambar ? asset('storage/'.$produk->gambar) : asset('images/default-product.jpg'),
+                'gambar' => $produk->gambar ? asset($produk->gambar) : asset('images/default-product.jpg'),
                 'satuan_berat' => ($produk->jumlah_satuan ?? 1).' '.($produk->satuan?->nama_satuan ?? 'pcs'),
                 'quantity' => min($keranjang->quantity, $totalStok),
             ];

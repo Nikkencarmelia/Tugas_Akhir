@@ -149,7 +149,7 @@
 </head>
 
 <body>
-@extends('components.super_admin')
+@extends('Components.super_admin')
 @section('content')
 
 <div class="dashboard-header">
@@ -217,7 +217,7 @@
                                                 $img = $item->produk->gambar ?? '';
                                                 $src = asset('images/default-product.png');
                                                 if(str_starts_with($img, 'images/')) $src = asset($img);
-                                                elseif($img) $src = asset('storage/' . $img);
+                                                elseif($img) $src = asset($img);
                                             @endphp
                                             <img src="{{ $src }}" style="width:100%; height:100%; object-fit:cover;">
                                         </div>

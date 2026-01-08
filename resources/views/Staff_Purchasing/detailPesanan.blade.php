@@ -62,7 +62,7 @@
     </style>
 </head>
 <body>
-    @extends('components.staff_purchasing')
+    @extends('Components.staff_purchasing')
 
     @section('content')
     <div class="container py-5">
@@ -170,8 +170,10 @@
                     $supplierName = $item->produk && $item->produk->supplier ? $item->produk->supplier->nama_supplier : 'Non-Supplier';
 
 $imagePath = $item->gambar;
-                    if (!str_contains($imagePath, 'http') && !str_starts_with($imagePath, 'storage/')) {
-                         $imagePath = 'storage/' . $imagePath;
+                    if (str_starts_with($imagePath, 'images/')) {
+                        // OK
+                    } else if (!str_contains($imagePath, 'http')) {
+                         // $imagePath = $imagePath; 
                     }
                     $src = asset($imagePath);
                 @endphp

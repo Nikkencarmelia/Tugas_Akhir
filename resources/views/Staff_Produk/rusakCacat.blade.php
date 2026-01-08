@@ -227,7 +227,7 @@
                 <td>
                     <div class="d-flex align-items-center">
                         <div class="img-container">
-                            <img src="{{ asset('storage') }}/${p.gambar}" alt="${p.nama_produk}">
+                            <img src="{{ asset('') }}${p.gambar}" alt="${p.nama_produk}">
                             <span class="badge-supplier">${supplierStr}</span>
                         </div>
                         <div class="product-info">

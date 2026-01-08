@@ -357,7 +357,7 @@ const baseBatchUrl = batchUrl.replace(':id', p.id);
                 <td>
                     <div class="d-flex align-items-center">
                         <div class="img-container">
-                            <img src="{{ asset('storage') }}/${p.gambar}" alt="${p.nama_produk}">
+                            <img src="{{ asset('') }}${p.gambar}" alt="${p.nama_produk}">
                             <span class="badge-supplier">${supplierStr}</span>
                         </div>
                         <div class="product-info">
@@ -529,7 +529,7 @@ const baseBatchUrl = batchUrl.replace(':id', p.id);
                 const p = produkData.find(x => x.id == id);
                 if (!p) return;
 
-                document.getElementById('detailGambar').src = '{{ asset('storage') }}/' + p.gambar;
+                document.getElementById('detailGambar').src = '{{ asset('') }}' + p.gambar;
                 document.getElementById('detailNama').textContent = p.nama_produk;
                 document.getElementById('detailDeskripsi').textContent = p.deskripsi || '-';
 

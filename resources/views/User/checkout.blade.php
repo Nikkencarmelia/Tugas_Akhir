@@ -39,7 +39,7 @@
     </style>
 </head>
 <body>
-    @extends('components.user')
+    @extends('Components.user')
     @section('content')
 
     <div class="container checkout-container">

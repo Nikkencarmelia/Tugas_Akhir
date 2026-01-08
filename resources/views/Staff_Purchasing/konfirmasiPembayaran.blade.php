@@ -73,7 +73,7 @@
 </head>
 <body>
 
-@extends('components.staff_purchasing')
+@extends('Components.staff_purchasing')
 @section('content')
 <div class="container py-5">
 
@@ -109,14 +109,14 @@
             $imagePath = $firstItem->gambar ?? '';
             if (str_starts_with($imagePath, 'images/')) {
                 $src = asset($imagePath);
-            } elseif (!str_contains($imagePath, 'http') && !str_starts_with($imagePath, 'storage/') && $imagePath) {
-                $src = asset('storage/' . $imagePath);
+            } elseif (str_starts_with($imagePath, 'images/')) {
+                $src = asset($imagePath);
             } else {
                 $src = $imagePath ? asset($imagePath) : asset('images/default-product.png');
             }
 
             $buktiSrc = $order->bukti_pembayaran
-                ? asset('storage/' . $order->bukti_pembayaran)
+                ? asset($order->bukti_pembayaran)
                 : asset('images/placeholder-bukti.jpg');
         @endphp
 
@@ -221,7 +221,7 @@
                     </div>
                     <div class="modal-body text-center p-4">
                 @if($order->transaksi && $order->transaksi->bukti_pembayaran)
-                    <img src="{{ asset('storage/' . $order->transaksi->bukti_pembayaran) }}" alt="Bukti Pembayaran" class="img-fluid rounded shadow-sm" style="max-height: 70vh;">
+                    <img src="{{ asset($order->transaksi->bukti_pembayaran) }}" alt="Bukti Pembayaran" class="img-fluid rounded shadow-sm" style="max-height: 70vh;">
                 @else
                     <p class="text-muted">Bukti pembayaran tidak tersedia.</p>
                 @endif

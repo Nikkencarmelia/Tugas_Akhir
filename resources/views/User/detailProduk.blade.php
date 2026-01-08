@@ -4,7 +4,7 @@
     <title>Detail Produk</title>
 </head>
 <body>
-@extends('components.user')
+@extends('Components.user')
 
 @section('content')
 <style>
@@ -267,7 +267,7 @@
     @endif
 
     <div class="image-section">
-        <div class="product-image" style="background-image: url('{{ $produk->gambar ? asset('storage/' . $produk->gambar) : asset('images/default-product.jpg') }}');">
+        <div class="product-image" style="background-image: url('{{ $produk->gambar ? asset($produk->gambar) : asset('images/default-product.jpg') }}');">
             @if(!$produk->gambar)
                 {{ $produk->nama_produk }}
             @endif

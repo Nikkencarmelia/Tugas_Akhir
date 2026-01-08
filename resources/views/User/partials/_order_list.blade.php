@@ -93,7 +93,7 @@ if ($status == 'ditolak_staff') {
                         } elseif (str_starts_with($orderItem->gambar, 'images/')) {
                             $imgSrc = asset($orderItem->gambar);
                         } else {
-                            $imgSrc = asset('storage/' . $orderItem->gambar);
+                            $imgSrc = asset($orderItem->gambar);
                         }
                     }
                 @endphp

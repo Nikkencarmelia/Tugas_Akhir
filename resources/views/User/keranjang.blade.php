@@ -384,7 +384,7 @@
     </head>
 
     <body>
-        @extends('components.user')
+        @extends('Components.user')
         @section('content')
 
         <div class="container py-5">

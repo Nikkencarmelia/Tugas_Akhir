@@ -76,7 +76,7 @@ class ProdukRusakCacatController extends Controller
                 'keterangan' => $rusak->keterangan ?? '-',
                 'tanggal_ditemukan' => $tanggalDitemukan,
                 'tingkat_kerusakan' => ucfirst($rusak->tingkat_rusak ?? 'Sedang'),
-                'bukti_foto' => $rusak->gambar ? asset('storage/'.$rusak->gambar) : asset('storage/'.$produk->gambar),
+                'bukti_foto' => $rusak->gambar ? asset($rusak->gambar) : asset($produk->gambar),
             ];
         });
 
@@ -125,7 +125,10 @@ class ProdukRusakCacatController extends Controller
                 throw new \Exception('File gambar tidak valid atau tidak terupload.');
             }
 
-            $path = $request->file('gambar')->store('produk_rusak', 'public');
+            $file = $request->file('gambar');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/produk_rusak'), $filename);
+            $path = 'images/produk_rusak/' . $filename;
             Log::info('Image uploaded to: '.$path);
 
             $rusak = Produk_Rusak::create([

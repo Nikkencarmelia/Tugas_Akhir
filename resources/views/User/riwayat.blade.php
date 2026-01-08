@@ -316,7 +316,7 @@
         </div>
     </div>
 
-    @extends('components.user')
+    @extends('Components.user')
     @section('content')
 
     @endsection

@@ -261,7 +261,7 @@
     </style>
 </head>
 <body>
-@extends('components.user')
+@extends('Components.user')
 
 @section('navbar-class')
     transparent
@@ -308,7 +308,7 @@
                                 <div class="col-12 col-sm-6 col-md-4">
                                     <div class="square-card h-100">
                                         <div class="card-img-wrapper">
-                                            <img src="{{ asset('storage/' . $person->gambar) }}" alt="{{ $person->nama }}" onerror="this.src='{{ asset('images/default-avatar.png') }}'">
+                                            <img src="{{ asset($person->gambar) }}" alt="{{ $person->nama }}" onerror="this.src='{{ asset('images/default-avatar.png') }}'">
                                         </div>
                                         <div class="card-content">
                                             <h5 class="mb-2">{{ $person->nama }}</h5>
@@ -359,7 +359,7 @@
                     @if($item['is_diskon'])
                         <span class="badge-diskon">-{{ $item['persen_diskon'] }}%</span>
                     @endif
-                    <img src="{{ $item['gambar'] }}" alt="{{ $item['nama_produk'] }}" onerror="this.src='{{ asset('images/default-product.jpg') }}'">
+                    <img src="{{ $item['gambar'] }}" alt="{{ $item['nama_produk'] }}" onerror="this.src='{{ asset('images/default-product.png') }}'">
                     <h5 class="card-title">{{ $item['nama_produk'] }}</h5>
                     <p class="card-subtitle">{{ $item['satuan_berat'] }}</p>
                     @if($item['is_diskon'])
@@ -402,7 +402,7 @@
                         @if($item['is_diskon'])
                             <span class="badge-diskon">-{{ $item['persen_diskon'] }}%</span>
                         @endif
-                        <img src="{{ $item['gambar'] }}" alt="{{ $item['nama_produk'] }}" onerror="this.src='{{ asset('images/default-product.jpg') }}'">
+                        <img src="{{ $item['gambar'] }}" alt="{{ $item['nama_produk'] }}" onerror="this.src='{{ asset('images/default-product.png') }}'">
                         <h5 class="card-title">{{ $item['nama_produk'] }}</h5>
                         <p class="card-subtitle">{{ $item['satuan_berat'] }}</p>
                         @if($item['is_diskon'])

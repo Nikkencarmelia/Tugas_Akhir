@@ -269,7 +269,7 @@
         </style>
     </head>
     <body>
-        @extends('components.super_admin')
+        @extends('Components.super_admin')
         @section('content')
         <div class="container py-5">
 
@@ -306,7 +306,7 @@
 
                             <td>
                                 @if($item->gambar)
-                                    <img src="{{ asset('storage/'.$item->gambar) }}" class="img-thumbnail" width="60">
+                                    <img src="{{ asset($item->gambar) }}" class="img-thumbnail" width="60">
                                 @else
                                     <span class="text-muted">No Image</span>
                                 @endif
@@ -370,7 +370,7 @@
                                                 <input type="file" name="gambar" class="form-control" accept="image/*">
                                                 @if($item->gambar)
                                                     <div class="mt-2">
-                                                        <img src="{{ asset('storage/'.$item->gambar) }}" class="img-preview" alt="Gambar Saat Ini" style="display: block; max-width: 200px; border-radius: 10px;">
+                                                        <img src="{{ asset($item->gambar) }}" class="img-preview" alt="Gambar Saat Ini" style="display: block; max-width: 200px; border-radius: 10px;">
                                                     </div>
                                                     <small class="text-muted">Upload gambar baru untuk mengganti.</small>
                                                 @else

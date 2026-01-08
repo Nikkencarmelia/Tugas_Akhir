@@ -44,7 +44,7 @@
             @if($produk->gambar)
                 <div class="mb-2">
                     <small class="text-muted">Gambar Saat Ini:</small><br>
-                    <img src="{{ asset('storage/' . $produk->gambar) }}" alt="Gambar Saat Ini" class="current-image">
+                    <img src="{{ asset($produk->gambar) }}" alt="Gambar Saat Ini" class="current-image">
                 </div>
                 <small class="text-muted">Upload gambar baru untuk mengganti.</small>
             @endif

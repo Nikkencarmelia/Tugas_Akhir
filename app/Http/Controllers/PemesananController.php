@@ -348,7 +348,11 @@ class PemesananController extends Controller
         ]);
 
         if ($request->hasFile('bukti_pembayaran')) {
-            $path = $request->file('bukti_pembayaran')->store('bukti_pembayaran', 'public');
+            $file = $request->file('bukti_pembayaran');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/bukti_pembayaran'), $filename);
+            $path = 'images/bukti_pembayaran/' . $filename;
+            
             Transaksi::updateOrCreate(
                 ['id_pemesanan' => $pemesanan->id],
                 ['bukti_pembayaran' => $path]

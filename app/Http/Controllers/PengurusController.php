@@ -24,7 +24,10 @@ class PengurusController extends Controller
             'gambar' => 'required|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
-        $gambar = $request->file('gambar')->store('pengurus', 'public');
+        $file = $request->file('gambar');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $file->move(public_path('images/pengurus'), $filename);
+        $gambar = 'images/pengurus/' . $filename;
 
         Pengurus::create([
             'nama' => $request->nama,
@@ -53,10 +56,13 @@ class PengurusController extends Controller
         if ($request->filled('deskripsi')) $data['deskripsi'] = $request->deskripsi;
 
         if ($request->hasFile('gambar')) {
-            if ($pengurus->gambar) {
-                Storage::disk('public')->delete($pengurus->gambar);
+            if ($pengurus->gambar && file_exists(public_path($pengurus->gambar))) {
+                unlink(public_path($pengurus->gambar));
             }
-            $data['gambar'] = $request->file('gambar')->store('pengurus', 'public');
+            $file = $request->file('gambar');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/pengurus'), $filename);
+            $data['gambar'] = 'images/pengurus/' . $filename;
         }
 
         if (!empty($data)) {
@@ -71,8 +77,8 @@ class PengurusController extends Controller
     {
         $pengurus = Pengurus::findOrFail($id);
 
-        if ($pengurus->gambar) {
-            Storage::disk('public')->delete($pengurus->gambar);
+        if ($pengurus->gambar && file_exists(public_path($pengurus->gambar))) {
+            unlink(public_path($pengurus->gambar));
         }
 
         $pengurus->delete();

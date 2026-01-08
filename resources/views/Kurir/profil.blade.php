@@ -266,7 +266,7 @@
     </head>
 
     <body>
-        @extends('components.kurir')
+        @extends('Components.kurir')
         @section('content')
 
         <div class="container py-5">

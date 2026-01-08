@@ -427,7 +427,7 @@
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     <div class="img-container">
-                                                        <img src="{{ asset('storage/' . ($p->gambar ?? 'images/default.png')) }}" alt="{{ $p->nama_produk }}">
+                                                        <img src="{{ asset($p->gambar ?? 'images/default.png') }}" alt="{{ $p->nama_produk }}">
                                                         <span class="badge-supplier">{{ $p->supplier->nama_supplier ?? 'N/A' }}</span>
                                                     </div>
                                                     <div class="product-info">
@@ -537,7 +537,7 @@ const detailModal = document.getElementById('detailModal');
                 const produkData = JSON.parse(button.getAttribute('data-produk'));
 
                 document.getElementById('detailGambar').src =
-                    produkData.gambar ? `/storage/${produkData.gambar}` : '';
+                    produkData.gambar ? `/${produkData.gambar}` : '';
                 document.getElementById('detailNama').textContent =
                     produkData.nama_produk ?? '-';
                 document.getElementById('detailDeskripsi').textContent =

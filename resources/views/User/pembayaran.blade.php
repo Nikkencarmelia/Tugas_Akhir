@@ -12,7 +12,7 @@
         </style>
     </head>
     <body>
-        @extends('components.user')
+        @extends('Components.user')
         @section('content')
 
         <div class="container checkout-container py-5">
@@ -137,7 +137,7 @@
                                         } elseif (str_starts_with($item->gambar, 'images/')) {
                                             $imgSrc = asset($item->gambar);
                                         } else {
-                                            $imgSrc = asset('storage/' . $item->gambar);
+                                            $imgSrc = asset($item->gambar);
                                         }
                                     }
                                 @endphp

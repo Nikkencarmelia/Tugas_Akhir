@@ -372,7 +372,7 @@ const baseBatchUrl = batchUrl.replace(':id', p.id);
                 <td>
                     <div class="d-flex align-items-center">
                         <div class="img-container">
-                            <img src="{{ asset('storage') }}/${p.gambar || 'images/default-produk.png'}"
+                            <img src="{{ asset('') }}/${p.gambar || 'images/default-produk.png'}"
                                 alt="${p.nama_produk}"
                                 onerror="this.src='{{ asset('images/default-produk.png') }}'">
                             <span class="badge-supplier">${supplierStr}</span>
@@ -444,7 +444,7 @@ tableBody.addEventListener('click', e => {
         const p = produkData.find(x => x.id == id);
         if (!p) return;
 
-        document.getElementById('detailGambar').src = '{{ asset('storage') }}/' + (p.gambar || 'images/default-produk.png');
+        document.getElementById('detailGambar').src = '{{ asset('') }}/' + (p.gambar || 'images/default-produk.png');
         document.getElementById('detailNama').textContent = p.nama_produk;
         document.getElementById('detailDeskripsi').textContent = p.deskripsi || '-';
 

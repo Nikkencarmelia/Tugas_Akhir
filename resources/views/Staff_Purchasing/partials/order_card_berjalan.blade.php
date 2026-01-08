@@ -5,8 +5,8 @@
     $imagePath = $firstItem->gambar ?? '';
     if (str_starts_with($imagePath, 'images/')) {
         $src = asset($imagePath);
-    } elseif (!str_contains($imagePath, 'http') && !str_starts_with($imagePath, 'storage/') && $imagePath) {
-        $src = asset('storage/' . $imagePath);
+    } elseif (str_starts_with($imagePath, 'images/')) {
+        $src = asset($imagePath);
     } else {
         $src = $imagePath ? asset($imagePath) : asset('images/default-product.png');
     }

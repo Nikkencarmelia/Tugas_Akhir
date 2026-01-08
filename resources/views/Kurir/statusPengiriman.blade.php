@@ -4,7 +4,7 @@
     <title>Status Pengiriman</title>
 </head>
 <body>
-@extends('components.kurir')
+@extends('Components.kurir')
 
 @section('content')
 <style>
@@ -68,8 +68,6 @@
             $imagePath = $firstItem->gambar ?? '';
             if (str_starts_with($imagePath, 'images/')) {
                 $src = asset($imagePath);
-            } elseif (!str_contains($imagePath, 'http') && !str_starts_with($imagePath, 'storage/') && $imagePath) {
-                $src = asset('storage/' . $imagePath);
             } else {
                 $src = $imagePath ? asset($imagePath) : asset('images/default-product.png');
             }
@@ -158,8 +156,6 @@
             $imagePath = $firstItem->gambar ?? '';
             if (str_starts_with($imagePath, 'images/')) {
                 $src = asset($imagePath);
-            } elseif (!str_contains($imagePath, 'http') && !str_starts_with($imagePath, 'storage/') && $imagePath) {
-                $src = asset('storage/' . $imagePath);
             } else {
                 $src = $imagePath ? asset($imagePath) : asset('images/default-product.png');
             }

@@ -125,7 +125,7 @@
             <div class="product-detail-body">
                 <div class="row align-items-start">
                     <div class="col-md-4">
-                        <img src="{{ asset('storage/' . ($produk->gambar ?? 'default/no_image.jpg')) }}" alt="Produk">
+                        <img src="{{ asset($produk->gambar ?? 'default/no_image.jpg') }}" alt="Produk">
                     </div>
                     <div class="col-md-8">
                         <h4 class="fw-bold">{{ $produk->nama_produk ?? '-' }}</h4>

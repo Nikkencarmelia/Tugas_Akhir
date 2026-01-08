@@ -175,7 +175,7 @@
                 <div class="product-detail-body">
                     <div class="row align-items-start">
                         <div class="col-md-4">
-                            <img src="{{ asset('storage/'.$produk->gambar) }}" alt="Produk">
+                            <img src="{{ asset($produk->gambar) }}" alt="Produk">
                         </div>
 
                         <div class="col-md-8">

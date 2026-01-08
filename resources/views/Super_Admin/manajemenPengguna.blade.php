@@ -123,7 +123,7 @@
     </style>
 </head>
 <body>
-@extends('components.super_admin')
+@extends('Components.super_admin')
 @section('content')
 <div class="container py-5">
     <div class="orders-header">
