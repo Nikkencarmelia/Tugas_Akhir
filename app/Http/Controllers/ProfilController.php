@@ -45,7 +45,7 @@ class ProfilController extends Controller
         $rules = [
             'nama_lengkap' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,'.$user->id,
-            'no_telepon' => 'nullable|string|max:20',
+            'no_telepon' => 'nullable|regex:/^[0-9]+$/|max:20',
         ];
 
         $request->validate($rules);
@@ -126,7 +126,7 @@ class ProfilController extends Controller
         $rules = [
             'nama_lengkap' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,'.$user->id,
-            'no_telepon' => 'nullable|string|max:20',
+            'no_telepon' => 'nullable|regex:/^[0-9]+$/|max:20',
             'jenis_kendaraan' => 'required|in:motor,mobil',
         ];
 

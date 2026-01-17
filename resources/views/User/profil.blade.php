@@ -325,7 +325,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="telepon" class="form-label">Nomor Telepon</label>
-                        <input type="tel" class="form-control @error('no_telepon') is-invalid @enderror" id="telepon" name="no_telepon" value="{{ old('no_telepon', $user->no_telepon) }}">
+                        <input type="tel" class="form-control @error('no_telepon') is-invalid @enderror" id="telepon" name="no_telepon" value="{{ old('no_telepon', $user->no_telepon) }}" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                         @error('no_telepon')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -402,7 +402,7 @@
 
                                 <div class="mb-3">
                                     <label for="noTelp" class="form-label">Nomor Telepon</label>
-                                    <input type="tel" class="form-control @error('no_telpon') is-invalid @enderror" id="noTelp" name="no_telpon" placeholder="Masukkan nomor telepon penerima" value="{{ old('no_telpon') }}" required>
+                                    <input type="tel" class="form-control @error('no_telpon') is-invalid @enderror" id="noTelp" name="no_telpon" placeholder="Masukkan nomor telepon penerima" value="{{ old('no_telpon') }}" required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                                     @error('no_telpon')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -479,7 +479,7 @@
 
                                 <div class="mb-3">
                                     <label for="editNoTelp" class="form-label">Nomor Telepon</label>
-                                    <input type="tel" class="form-control" id="editNoTelp" name="no_telpon" required>
+                                    <input type="tel" class="form-control" id="editNoTelp" name="no_telpon" required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                                 </div>
 
                                 <div class="mb-3">
@@ -767,8 +767,7 @@ document.querySelectorAll('.edit-alamat').forEach(btn => {
                         document.getElementById('editAlamatLengkap').value = alamat;
 
 if (kec) {
-                            const urlKelurahan = `{{ route('user.ajax.kelurahan') }}?id_kecamatan=${kec}`;
-                            $.get(urlKelurahan, function(data) {
+                            $.get(`/user/kelurahan/${kec}`, function(data) {
                                 $('#editKelurahan').html('<option disabled selected>Pilih Kelurahan</option>');
                                 data.forEach(function(kelData) {
                                     const selected = kelData.id == kel ? 'selected' : '';
@@ -777,8 +776,7 @@ if (kec) {
                                 enableSelect('editKelurahan');
 
 if (kel) {
-                                    const urlKodepos = `{{ route('user.ajax.kodepos') }}?id_kelurahan=${kel}`;
-                                    $.get(urlKodepos, function(kpData) {
+                                    $.get(`/user/kodepos/${kel}`, function(kpData) {
                                         $('#editKodePos').html('<option disabled selected>Pilih Kode Pos</option>');
                                         kpData.forEach(function(kpItem) {
                                             const selected = kpItem.id == kp ? 'selected' : '';

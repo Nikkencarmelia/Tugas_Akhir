@@ -13,6 +13,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\Keranjang;
 
 class PemesananController extends Controller
 {
@@ -56,13 +57,23 @@ class PemesananController extends Controller
                 ->whereIn('status_pesanan', (array) $statuses);
 
             if ($search) {
-                $q->where(function ($sq) use ($search) {
-                    $sq->where('kode_pesanan', 'LIKE', "%{$search}%")
-                        ->orWhereHas('detailPesanan', function ($dq) use ($search) {
-                            $dq->where('nama_produk', 'LIKE', "%{$search}%");
-                        });
-                });
-            }
+            $q->where(function ($sq) use ($search) {
+                $sq->where('kode_pesanan', 'LIKE', "%{$search}%")
+                    ->orWhere('total', 'LIKE', "%{$search}%")
+                    ->orWhere('nama_kelurahan', 'LIKE', "%{$search}%")
+                    ->orWhere('status_pesanan', 'LIKE', "%{$search}%")
+                    ->orWhereHas('detailPesanan', function ($dq) use ($search) {
+                        $dq->where('nama_produk', 'LIKE', "%{$search}%");
+                    });
+
+                // Simple mapping for common human-readable terms
+                $searchLower = strtolower($search);
+                if (str_contains('diproses', $searchLower)) $sq->orWhere('status_pesanan', 'diproses');
+                if (str_contains('dikirim', $searchLower)) $sq->orWhere('status_pesanan', 'dikirim');
+                if (str_contains('selesai', $searchLower)) $sq->orWhere('status_pesanan', 'selesai');
+                if (str_contains('batal', $searchLower)) $sq->orWhere('status_pesanan', 'LIKE', '%batal%');
+            });
+        }
 
             if ($sort === 'terlama') {
                 $q->orderBy('updated_at', 'asc');
@@ -210,7 +221,7 @@ class PemesananController extends Controller
         $validated = $request->validate([
             'opsi_pengiriman' => 'required|in:diantar,dipick_up',
             'nama_penerima' => 'required|string|max:255',
-            'no_telepon' => 'required|string|max:20',
+            'no_telepon' => 'required|regex:/^[0-9]+$/|max:20',
             'id_alamat' => 'nullable|exists:alamats,id',
             'alamat_lengkap' => 'nullable|required_if:opsi_pengiriman,diantar|string|max:1000',
             'nama_kecamatan' => 'nullable|required_if:opsi_pengiriman,diantar|string|max:100',
@@ -258,6 +269,9 @@ class PemesananController extends Controller
             $productIds = array_column($validated['items'], 'id_produk');
             $products = \App\Models\Produk::with('satuan')->whereIn('id', $productIds)->get()->keyBy('id');
 
+            $cart = session('cart', []);
+            $isBuyNow = session()->has('buy_now');
+
             foreach ($validated['items'] as $item) {
                 $productDB = $products[$item['id_produk']] ?? null;
                 $namaSatuan = $productDB && $productDB->satuan ? $productDB->satuan->nama_satuan : 'pcs';
@@ -276,6 +290,23 @@ class PemesananController extends Controller
                     'harga_total' => $item['harga_satuan'] * $item['quantity'],
                 ]);
 
+                // Hapus dari database keranjang
+                Keranjang::where('id_user', Auth::id())
+                    ->where('id_produk', $item['id_produk'])
+                    ->where('id_batch', $item['id_batch'] ?? null)
+                    ->delete();
+
+                // Hapus dari array session cart
+                if (! $isBuyNow) {
+                    $cartKey = $item['id_produk'];
+                    if (! empty($item['id_batch'])) {
+                        $cartKey .= '_'.$item['id_batch'];
+                    }
+                    if (isset($cart[$cartKey])) {
+                        unset($cart[$cartKey]);
+                    }
+                }
+
                 if (! empty($item['id_batch'])) {
                     $batch = Batch::find($item['id_batch']);
                     if ($batch) {
@@ -292,10 +323,10 @@ class PemesananController extends Controller
                 }
             }
 
-            if (session()->has('buy_now')) {
+            if ($isBuyNow) {
                 session()->forget('buy_now');
             } else {
-                session()->forget('cart');
+                session(['cart' => $cart]);
             }
 
             return $pemesanan;

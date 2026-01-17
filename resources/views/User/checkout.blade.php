@@ -90,7 +90,7 @@
 
                             <div class="mb-2">
                                 <label class="form-label">Nomor Telepon</label>
-                                <input type="text" id="teleponInput" class="form-control form-control-sm" placeholder="08xxxxxxxxxx" required>
+                                <input type="tel" id="teleponInput" class="form-control form-control-sm" placeholder="08xxxxxxxxxx" required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                             </div>
 
 <div id="deliverySection">

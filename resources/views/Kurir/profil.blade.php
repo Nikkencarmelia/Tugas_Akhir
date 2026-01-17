@@ -315,7 +315,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="telepon" class="form-label">Nomor Telepon</label>
-                        <input type="tel" class="form-control {{ $errors->has('no_telepon') ? 'is-invalid' : '' }}" id="telepon" name="no_telepon" value="{{ old('no_telepon', $user->no_telepon ?? '') }}">
+                        <input type="tel" class="form-control {{ $errors->has('no_telepon') ? 'is-invalid' : '' }}" id="telepon" name="no_telepon" value="{{ old('no_telepon', $user->no_telepon ?? '') }}" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                         @error('no_telepon')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror

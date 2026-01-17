@@ -201,17 +201,15 @@
                     </button>
                 </div>
 
-                <form method="GET" action="{{ route('staff_purchasing.ongkir.index') }}" class="search-controls mb-3">
-                    <input type="hidden" name="tab" value="kecamatan">
-                    <div class="input-group flex-grow-1">
+                <div class="search-controls mb-3">
+                    <div class="input-group flex-grow-1 search-wrapper">
                         <span class="input-group-text"><i class="fas fa-search"></i></span>
-                        <input type="text" name="search_kecamatan" class="form-control" placeholder="Cari kecamatan..." value="{{ request('search_kecamatan') }}">
-                        <button type="submit" class="btn btn-outline-secondary">Cari</button>
+                        <input type="text" id="kecamatanSearch" class="form-control" name="search_kecamatan" placeholder="Cari kecamatan..." value="{{ request('search_kecamatan') }}">
                     </div>
-                </form>
+                </div>
 
                 <div class="table-responsive">
-                    <table class="table table-bordered align-middle">
+                    <table class="table table-bordered align-middle" id="tableKecamatan">
                         <thead class="table-light">
                             <tr>
                                 <th style="width: 60px">No</th>
@@ -259,29 +257,27 @@
                     </button>
                 </div>
 
-                <form method="GET" action="{{ route('staff_purchasing.ongkir.index') }}" class="row mb-3 g-0">
-                    <input type="hidden" name="tab" value="kelurahan">
+                <div class="row mb-3 g-0">
                     <div class="col-md-6 mb-2">
                         <label class="form-label">Kecamatan</label>
-                        <select class="form-select" name="filter_kec_kelurahan" onchange="this.form.submit()">
+                        <select class="form-select" id="filterKecKelurahan">
                             <option value="">Semua Kecamatan</option>
                             @foreach($kecamatan as $kec)
-                                <option value="{{ $kec->id }}" {{ request('filter_kec_kelurahan') == $kec->id ? 'selected' : '' }}>{{ $kec->nama_kecamatan }}</option>
+                                <option value="{{ $kec->id }}">{{ $kec->nama_kecamatan }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-md-6 mb-2">
                         <label class="form-label">Cari Kelurahan</label>
-                        <div class="input-group">
+                        <div class="input-group search-wrapper">
                             <span class="input-group-text"><i class="fas fa-search"></i></span>
-                            <input type="text" name="search_kelurahan" class="form-control" placeholder="Cari kelurahan..." value="{{ request('search_kelurahan') }}">
-                            <button type="submit" class="btn btn-outline-secondary">Cari</button>
+                            <input type="text" id="kelurahanSearch" class="form-control" placeholder="Cari kelurahan...">
                         </div>
                     </div>
-                </form>
+                </div>
 
                 <div class="table-responsive">
-                    <table class="table table-bordered align-middle">
+                    <table class="table table-bordered align-middle" id="tableKelurahan">
                         <thead class="table-light">
                             <tr>
                                 <th style="width: 60px">No</th>
@@ -327,38 +323,36 @@
                     </button>
                 </div>
 
-                <form method="GET" action="{{ route('staff_purchasing.ongkir.index') }}" class="row mb-3 g-0">
-                    <input type="hidden" name="tab" value="kodepos">
+                <div class="row mb-3 g-0">
                     <div class="col-md-4 mb-2">
                         <label class="form-label">Kecamatan</label>
-                        <select class="form-select" name="filter_kec_kodepos" onchange="this.form.submit()">
+                        <select class="form-select" id="filterKecKodepos">
                             <option value="">Semua Kecamatan</option>
                             @foreach($kecamatan as $kec)
-                                <option value="{{ $kec->id }}" {{ request('filter_kec_kodepos') == $kec->id ? 'selected' : '' }}>{{ $kec->nama_kecamatan }}</option>
+                                <option value="{{ $kec->id }}">{{ $kec->nama_kecamatan }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-md-4 mb-2">
                         <label class="form-label">Kelurahan</label>
-                        <select class="form-select" name="filter_kel_kodepos" onchange="this.form.submit()">
+                        <select class="form-select" id="filterKelKodepos">
                             <option value="">Semua Kelurahan</option>
                             @foreach($filter_kelurahans as $id => $nama)
-                                <option value="{{ $id }}" {{ request('filter_kel_kodepos') == $id ? 'selected' : '' }}>{{ $nama }}</option>
+                                <option value="{{ $id }}">{{ $nama }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-md-4 mb-2">
                         <label class="form-label">Cari Kode Pos</label>
-                        <div class="input-group">
+                        <div class="input-group search-wrapper">
                             <span class="input-group-text"><i class="fas fa-search"></i></span>
-                            <input type="text" name="search_kodepos" class="form-control" placeholder="Cari kode pos..." value="{{ request('search_kodepos') }}">
-                            <button type="submit" class="btn btn-outline-secondary">Cari</button>
+                            <input type="text" id="kodeposSearch" class="form-control" placeholder="Cari kode pos...">
                         </div>
                     </div>
-                </form>
+                </div>
 
                 <div class="table-responsive">
-                    <table class="table table-bordered align-middle">
+                    <table class="table table-bordered align-middle" id="tableKodePos">
                         <thead class="table-light">
                             <tr>
                                 <th style="width: 60px">No</th>
@@ -417,11 +411,11 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Ongkir Minimal Mobil (Rp)</label>
-                            <input type="number" class="form-control" id="ongkirMobilKecamatan" name="ongkir_minimal_mobil" min="1" step="1000" required oninput="if(this.value === '0') this.value = '';">
+                            <input type="number" class="form-control" id="ongkirMobilKecamatan" name="ongkir_minimal_mobil" min="0" step="1000" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Ongkir Minimal Motor (Rp)</label>
-                            <input type="number" class="form-control" id="ongkirMotorKecamatan" name="ongkir_minimal_motor" min="1" step="1000" required oninput="if(this.value === '0') this.value = '';">
+                            <input type="number" class="form-control" id="ongkirMotorKecamatan" name="ongkir_minimal_motor" min="0" step="1000" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -711,6 +705,69 @@ let deleteUrl = '';
                 if (hiddenId) hiddenId.value = '';
             });
         });
+
+            // Live Search Logic
+            function initLiveSearch(inputId, tableId, filterConfig = []) {
+                const input = document.getElementById(inputId);
+                const table = document.getElementById(tableId);
+                if (!input || !table) return;
+
+                const filterElements = filterConfig.map(conf => ({
+                    element: document.getElementById(conf.elementId),
+                    attr: conf.attr
+                }));
+
+                const performFilter = () => {
+                    const term = input.value.toLowerCase().trim();
+                    const rows = Array.from(table.querySelectorAll('tbody tr'));
+                    
+                    let hasVisible = false;
+                    rows.forEach(row => {
+                        if (row.classList.contains('no-results-row')) return;
+                        
+                        let matchesSearch = row.innerText.toLowerCase().includes(term);
+                        let matchesFilters = filterElements.every(filter => {
+                            if (!filter.element || filter.element.value === '') return true;
+                            return row.getAttribute(filter.attr) === filter.element.value;
+                        });
+
+                        if (matchesSearch && matchesFilters) {
+                            row.style.display = '';
+                            hasVisible = true;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+
+                    let noResultsRow = table.querySelector('.no-results-row');
+                    if (!hasVisible && (term !== '' || filterElements.some(f => f.element && f.element.value !== ''))) {
+                        if (!noResultsRow) {
+                            noResultsRow = document.createElement('tr');
+                            noResultsRow.className = 'no-results-row';
+                            noResultsRow.innerHTML = `<td colspan="${table.rows[0].cells.length}" class="text-center py-3 text-muted">Tidak ditemukan data yang cocok.</td>`;
+                            table.querySelector('tbody').appendChild(noResultsRow);
+                        } else {
+                            noResultsRow.style.display = '';
+                        }
+                    } else if (noResultsRow) {
+                        noResultsRow.style.display = 'none';
+                    }
+                };
+
+                input.addEventListener('input', performFilter);
+                filterElements.forEach(f => {
+                    if (f.element) f.element.addEventListener('change', performFilter);
+                });
+            }
+
+            initLiveSearch('kecamatanSearch', 'tableKecamatan');
+            initLiveSearch('kelurahanSearch', 'tableKelurahan', [
+                { elementId: 'filterKecKelurahan', attr: 'data-kec' }
+            ]);
+            initLiveSearch('kodeposSearch', 'tableKodePos', [
+                { elementId: 'filterKecKodepos', attr: 'data-kec' },
+                { elementId: 'filterKelKodepos', attr: 'data-kel' }
+            ]);
     </script>
 </body>
 </html>

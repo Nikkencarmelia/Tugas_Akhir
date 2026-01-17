@@ -90,7 +90,7 @@
                     @enderror
                 </div>
                 <div class="mb-3">
-                    <input type="tel" name="no_telepon" class="form-control @error('no_telepon') is-invalid @enderror" value="{{ old('no_telepon') }}" placeholder="No Telepon" required>
+                    <input type="tel" name="no_telepon" class="form-control @error('no_telepon') is-invalid @enderror" value="{{ old('no_telepon') }}" placeholder="No Telepon" required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                     @error('no_telepon')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror

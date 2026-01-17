@@ -39,7 +39,7 @@ class AlamatController extends Controller
 
         $request->validate([
             'nama_penerima' => 'required|string|max:100',
-            'no_telpon' => 'required|string|max:20',
+            'no_telpon' => 'required|regex:/^[0-9]+$/|max:20',
             'id_kecamatan' => 'required|exists:kecamatans,id',
             'id_kelurahan' => 'required|exists:kelurahans,id',
             'id_kode_pos' => 'required|exists:kode_pos,id',
@@ -69,7 +69,7 @@ class AlamatController extends Controller
 
         $request->validate([
             'nama_penerima' => 'required|string|max:100',
-            'no_telpon' => 'required|string|max:20',
+            'no_telpon' => 'required|regex:/^[0-9]+$/|max:20',
             'id_kecamatan' => 'required|exists:kecamatans,id',
             'id_kelurahan' => 'required|exists:kelurahans,id',
             'id_kode_pos' => 'required|exists:kode_pos,id',

@@ -65,14 +65,13 @@ Route::prefix('user')->middleware('auth')->name('user.')->group(function () {
     Route::put('/profil/password', [ProfilController::class, 'userUpdatePassword'])->name('profil.password');
 
     // Alamat & AJAX
-    Route::post('/alamat', [UserProfilController::class, 'storeAlamat'])->name('alamat.store');
-    Route::put('/alamat/{id}', [UserProfilController::class, 'updateAlamat'])->name('alamat.update');
-    Route::delete('/alamat/{id}', [UserProfilController::class, 'destroyAlamat'])->name('alamat.destroy');
+    Route::post('/alamat', [AlamatController::class, 'store'])->name('alamat.store');
+    Route::put('/alamat/{id}', [AlamatController::class, 'update'])->name('alamat.update');
+    Route::delete('/alamat/{id}', [AlamatController::class, 'destroy'])->name('alamat.destroy');
     
     // Alamat AJAX - Dynamic Dropdowns
-    Route::get('/kecamatan-by-provinsi', [UserProfilController::class, 'getKecamatanByProvinsi'])->name('ajax.kecamatan');
-    Route::get('/kelurahan-by-kecamatan', [UserProfilController::class, 'getKelurahanByKecamatan'])->name('ajax.kelurahan');
-    Route::get('/kode-pos-by-kelurahan', [UserProfilController::class, 'getKodePosByKelurahan'])->name('ajax.kodepos');
+    Route::get('/kelurahan/{id}', [AlamatController::class, 'kelurahanByKecamatan'])->name('ajax.kelurahan');
+    Route::get('/kodepos/{id}', [AlamatController::class, 'kodePosByKelurahan'])->name('ajax.kodepos');
 });
 
 // Keranjang (Cart)

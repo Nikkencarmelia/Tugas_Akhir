@@ -256,22 +256,73 @@ document.addEventListener('DOMContentLoaded', function() {
         toastContainer.addEventListener('hidden.bs.toast', () => toastContainer.remove());
     }
 
-document.getElementById('searchUser').addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
+    document.getElementById('searchUser').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
         const rows = document.querySelectorAll('#tableUser tbody tr');
         let index = 1;
+        let hasVisible = false;
+
         rows.forEach(row => {
-            const nama = row.dataset.nama.toLowerCase();
-            const email = row.dataset.email.toLowerCase();
-            const telpon = row.dataset.telpon.toLowerCase();
-            if (nama.includes(searchTerm) || email.includes(searchTerm) || telpon.includes(searchTerm)) {
+            if (row.classList.contains('no-results-row')) return;
+
+            const nama = (row.dataset.nama || '').toLowerCase();
+            const email = (row.dataset.email || '').toLowerCase();
+            const telpon = (row.dataset.telpon || '').toLowerCase();
+            const role = (row.dataset.role || '').toLowerCase();
+            const status = (row.dataset.aktif || '').toLowerCase();
+
+            const matches = nama.includes(searchTerm) || 
+                          email.includes(searchTerm) || 
+                          telpon.includes(searchTerm) || 
+                          role.includes(searchTerm) || 
+                          status.includes(searchTerm);
+
+            if (matches) {
                 row.style.display = '';
                 row.querySelector('td:first-child').textContent = index++;
+                hasVisible = true;
+                highlightText(row, searchTerm);
             } else {
                 row.style.display = 'none';
             }
         });
+
+        const table = document.getElementById('tableUser');
+        let noResultsRow = table.querySelector('.no-results-row');
+        if (!hasVisible && searchTerm !== '') {
+            if (!noResultsRow) {
+                noResultsRow = document.createElement('tr');
+                noResultsRow.className = 'no-results-row';
+                noResultsRow.innerHTML = `<td colspan="7" class="text-center py-4 text-muted">Tidak ditemukan pengguna yang cocok dengan "${this.value}"</td>`;
+                table.querySelector('tbody').appendChild(noResultsRow);
+            } else {
+                noResultsRow.style.display = '';
+                noResultsRow.querySelector('td').innerText = `Tidak ditemukan pengguna yang cocok dengan "${this.value}"`;
+            }
+        } else if (noResultsRow) {
+            noResultsRow.style.display = 'none';
+        }
     });
+
+    function highlightText(row, term) {
+        const columns = [2, 3, 4, 5, 6]; // Nama, Email, Telpon, Role, Status
+        columns.forEach(colIndex => {
+            const el = row.querySelector(`td:nth-child(${colIndex})`);
+            if (!el) return;
+            
+            // For columns with badges (Role and Status), target the span inside
+            const target = el.querySelector('span.badge') || el;
+            const originalText = target.textContent;
+            
+            if (!term) {
+                target.innerHTML = originalText;
+                return;
+            }
+            
+            const regex = new RegExp(`(${term})`, 'gi');
+            target.innerHTML = originalText.replace(regex, '<mark style="background-color: yellow; padding: 0.1em; border-radius: 2px;">$1</mark>');
+        });
+    }
 
 document.addEventListener('click', function(e) {
         if (e.target.closest('.btn-edit-user')) {

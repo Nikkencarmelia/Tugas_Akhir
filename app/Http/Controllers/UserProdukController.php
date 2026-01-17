@@ -86,7 +86,7 @@ class UserProdukController extends Controller
 
     public function produk(Request $request)
     {
-        $produks = Produk::with(['kategori', 'satuan', 'batch'])
+        $produks = Produk::with(['kategori', 'satuan', 'batch', 'supplier'])
             ->where('status_tampil', 'Ditampilkan')
             ->whereHas('batch', fn ($q) => $q->where('stok', '>', 0))
             ->latest('created_at')
@@ -117,6 +117,7 @@ class UserProdukController extends Controller
                     'batch_id' => $batchTertua->id,
                     'quantity' => 1,
                     'nama_produk' => $produk->nama_produk,
+                    'supplier' => $produk->supplier?->nama_supplier ?? '',
                     'deskripsi' => $produk->deskripsi ?? '',
                     'kategori' => $produk->kategori?->nama_kategori ?? 'Produk Lainnya',
                     'jumlah_satuan' => $produk->jumlah_satuan ?? 1,

@@ -240,6 +240,7 @@
                             <div class="col-6 col-sm-4 col-md-3 col-lg-2 produk-item"
                                  data-id="{{ $produk['id'] }}"
                                  data-nama="{{ strtolower($produk['nama_produk']) }}"
+                                 data-supplier="{{ strtolower($produk['supplier']) }}"
                                  data-kategori="{{ strtolower($produk['kategori']) }}"
                                  data-deskripsi="{{ strtolower($produk['deskripsi']) }}">
                                 <div class="produk-card text-center d-flex flex-column justify-content-between">
@@ -251,6 +252,9 @@
                                          onerror="this.src='{{ asset('images/default-product.jpg') }}'">
                                     <div class="mt-2">
                                         <h5 class="card-title produk-nama">{{ $produk['nama_produk'] }}</h5>
+                                        <p class="card-subtitle mb-0 fw-bold supplier-name">
+                                            {{ $produk['supplier'] }}
+                                        </p>
                                         <p class="card-subtitle">
                                             {{ $produk['jumlah_satuan'] }} {{ $produk['satuan'] }}
                                         </p>
@@ -335,9 +339,9 @@
             let visibleCount = 0;
             let visibleCategories = new Set();
 
-            document.querySelectorAll('.produk-nama').forEach(el => {
+            document.querySelectorAll('.produk-nama, .supplier-name').forEach(el => {
                 const original = el.dataset.original || el.textContent.trim();
-                el.dataset.original = original;
+                if (!el.dataset.original) el.dataset.original = original;
                 el.innerHTML = original;
             });
 
@@ -355,19 +359,24 @@
 
             produkItems.forEach(item => {
                 const nama = item.dataset.nama || '';
+                const supplier = item.dataset.supplier || '';
                 const kategori = item.dataset.kategori || '';
                 const deskripsi = item.dataset.deskripsi || '';
 
-                const matches = nama.includes(termLower) || kategori.includes(termLower) || deskripsi.includes(termLower);
+                const matches = nama.includes(termLower) || supplier.includes(termLower) || kategori.includes(termLower) || deskripsi.includes(termLower);
 
                 if (matches) {
                     item.style.display = 'block';
                     visibleCount++;
                     visibleCategories.add(item.dataset.kategori);
 
-                    const namaEl = item.querySelector('.produk-nama');
-                    if (namaEl && nama.includes(termLower)) {
-                        namaEl.innerHTML = highlightText(namaEl.dataset.original, term);
+                    if (nama.includes(termLower)) {
+                        const namaEl = item.querySelector('.produk-nama');
+                        if (namaEl) namaEl.innerHTML = highlightText(namaEl.dataset.original, term);
+                    }
+                    if (supplier.includes(termLower)) {
+                        const suppEl = item.querySelector('.supplier-name');
+                        if (suppEl) suppEl.innerHTML = highlightText(suppEl.dataset.original, term);
                     }
                 } else {
                     item.style.display = 'none';

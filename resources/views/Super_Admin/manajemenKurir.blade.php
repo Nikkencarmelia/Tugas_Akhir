@@ -266,44 +266,76 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 
-    document.getElementById('searchKurir').addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
+    const searchInput = document.getElementById('searchKurir');
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
         const rows = document.querySelectorAll('#tableKurir tbody tr');
         let index = 1;
+        let hasVisible = false;
 
         rows.forEach(row => {
+            if (row.classList.contains('no-results-row')) return;
+            
+            const nama = (row.dataset.nama || '').toLowerCase();
+            const email = (row.dataset.email || '').toLowerCase();
+            const telpon = (row.dataset.telpon || '').toLowerCase();
+            const kendaraan = (row.dataset.kendaraan || '').toLowerCase();
+            const statusOnline = (row.dataset.statusonline || '').toLowerCase();
+            const statusAntar = (row.dataset.statusantar || '').toLowerCase();
 
-            if (!row.dataset.nama) return;
+            const matches = nama.includes(searchTerm) || 
+                          email.includes(searchTerm) || 
+                          telpon.includes(searchTerm) || 
+                          kendaraan.includes(searchTerm) || 
+                          statusOnline.includes(searchTerm) || 
+                          statusAntar.includes(searchTerm);
 
-            const nama = row.dataset.nama.toLowerCase();
-            const email = row.dataset.email.toLowerCase();
-            const telpon = row.dataset.telpon.toLowerCase();
-
-            if (nama.includes(searchTerm) || email.includes(searchTerm) || telpon.includes(searchTerm)) {
+            if (matches) {
                 row.style.display = '';
                 row.querySelector('td:first-child').textContent = index++;
+                hasVisible = true;
+                highlightText(row, searchTerm);
             } else {
                 row.style.display = 'none';
             }
         });
 
-let noResultsRow = document.getElementById('noResultsRow');
-        let visibleRows = Array.from(rows).filter(r => r.style.display !== 'none' && r.dataset.nama);
-
-        if (visibleRows.length === 0 && searchTerm !== '') {
+        const table = document.getElementById('tableKurir');
+        let noResultsRow = table.querySelector('.no-results-row');
+        if (!hasVisible && searchTerm !== '') {
             if (!noResultsRow) {
                 noResultsRow = document.createElement('tr');
-                noResultsRow.id = 'noResultsRow';
-                noResultsRow.innerHTML = `<td colspan="9" class="text-center text-muted">Tidak ada data kurir yang cocok dengan pencarian "${searchTerm}".</td>`;
-                document.querySelector('#tableKurir tbody').appendChild(noResultsRow);
+                noResultsRow.className = 'no-results-row';
+                noResultsRow.innerHTML = `<td colspan="9" class="text-center py-4 text-muted">Tidak ditemukan kurir yang cocok dengan "${this.value}"</td>`;
+                table.querySelector('tbody').appendChild(noResultsRow);
             } else {
                 noResultsRow.style.display = '';
-                noResultsRow.innerHTML = `<td colspan="9" class="text-center text-muted">Tidak ada data kurir yang cocok dengan pencarian "${searchTerm}".</td>`;
+                noResultsRow.querySelector('td').innerText = `Tidak ditemukan kurir yang cocok dengan "${this.value}"`;
             }
         } else if (noResultsRow) {
             noResultsRow.style.display = 'none';
         }
     });
+
+    function highlightText(row, term) {
+        const columns = [2, 3, 4, 6, 7, 8]; // Nama, Email, Telpon, Kendaraan, Status Online, Status Antar
+        columns.forEach(colIndex => {
+            const el = row.querySelector(`td:nth-child(${colIndex})`);
+            if (!el) return;
+            
+            // For columns with badges, target the span inside
+            const target = el.querySelector('span.badge') || el;
+            const originalText = target.textContent;
+            
+            if (!term) {
+                target.innerHTML = originalText;
+                return;
+            }
+            
+            const regex = new RegExp(`(${term})`, 'gi');
+            target.innerHTML = originalText.replace(regex, '<mark style="background-color: yellow; padding: 0.1em; border-radius: 2px;">$1</mark>');
+        });
+    }
 
 document.querySelectorAll('.btn-edit-kurir').forEach(btn => {
         btn.addEventListener('click', function() {

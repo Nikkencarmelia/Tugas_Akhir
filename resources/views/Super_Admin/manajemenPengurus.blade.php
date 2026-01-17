@@ -302,7 +302,8 @@
                     <tbody>
                         @forelse($kepengurusan as $item)
                         <tr data-nama="{{ strtolower($item->nama) }}"
-                            data-jabatan="{{ strtolower($item->jabatan) }}">
+                            data-jabatan="{{ strtolower($item->jabatan) }}"
+                            data-deskripsi="{{ strtolower($item->deskripsi) }}">
 
                             <td>
                                 @if($item->gambar)
@@ -314,7 +315,7 @@
 
                             <td>{{ $item->nama }}</td>
                             <td>{{ $item->jabatan }}</td>
-                            <td class="deskripsi-text">
+                            <td class="deskripsi-text searchable-text">
                                 {{ $item->deskripsi }}
                             </td>
 
@@ -512,13 +513,52 @@
                 const tableRows = document.querySelectorAll('#tablePengurus tbody tr');
 
                 searchInput.addEventListener('input', function() {
-                    const val = this.value.toLowerCase();
+                    const val = this.value.toLowerCase().trim();
+                    let hasVisible = false;
+
                     tableRows.forEach(row => {
                         const nama = (row.dataset.nama || '').toLowerCase();
                         const jabatan = (row.dataset.jabatan || '').toLowerCase();
-                        row.style.display = (nama.includes(val) || jabatan.includes(val)) ? '' : 'none';
+                        const deskripsi = (row.dataset.deskripsi || '').toLowerCase();
+                        const matches = nama.includes(val) || jabatan.includes(val) || deskripsi.includes(val);
+
+                        if (matches) {
+                            row.style.display = '';
+                            hasVisible = true;
+                            highlightText(row, val);
+                        } else {
+                            row.style.display = 'none';
+                        }
                     });
+
+                    let noResultsRow = table.querySelector('.no-results-row');
+                    if (!hasVisible && val !== '') {
+                        if (!noResultsRow) {
+                            noResultsRow = document.createElement('tr');
+                            noResultsRow.className = 'no-results-row';
+                            noResultsRow.innerHTML = `<td colspan="5" class="text-center py-4 text-muted">Tidak ditemukan pengurus yang cocok dengan "${this.value}"</td>`;
+                            table.querySelector('tbody').appendChild(noResultsRow);
+                        } else {
+                            noResultsRow.style.display = '';
+                            noResultsRow.querySelector('td').innerText = `Tidak ditemukan pengurus yang cocok dengan "${this.value}"`;
+                        }
+                    } else if (noResultsRow) {
+                        noResultsRow.style.display = 'none';
+                    }
                 });
+
+                function highlightText(row, term) {
+                    const elements = row.querySelectorAll('.searchable-text, td:nth-child(2), td:nth-child(3)');
+                    elements.forEach(el => {
+                        const originalText = el.textContent;
+                        if (!term) {
+                            el.innerHTML = originalText;
+                            return;
+                        }
+                        const regex = new RegExp(`(${term})`, 'gi');
+                        el.innerHTML = originalText.replace(regex, '<mark style="background-color: yellow; padding: 0.1em; border-radius: 2px;">$1</mark>');
+                    });
+                }
 
                 const addFileInput = document.querySelector('#modalTambah input[name="gambar"]');
                 const addPreview = document.querySelector('#modalTambah .img-preview');

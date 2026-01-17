@@ -59,13 +59,13 @@
                 </div>
 
                 <!-- Toast Container for Notifications -->
-                <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                <div class="toast-container position-fixed top-0 end-0 p-3">
                     <div id="validationToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
                         <div class="d-flex">
                             <div class="toast-body" id="toastBody">
                                 Pesan kesalahan akan muncul di sini.
                             </div>
-                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                         </div>
                     </div>
                 </div>
@@ -76,28 +76,39 @@
                         const imagePreview = document.getElementById('imgPreview');
                         const toastEl = document.getElementById('validationToast');
                         const toastBody = document.getElementById('toastBody');
-                        const toast = new bootstrap.Toast(toastEl);
+                        const toast = new bootstrap.Toast(toastEl, { delay: 5000 });
 
                         function showToast(message) {
                             toastBody.textContent = message;
                             toast.show();
                         }
 
+                        // Handle server-side validation errors
+                        @if ($errors->any())
+                            @php
+                                $allErrors = implode(' ', $errors->all());
+                            @endphp
+                            showToast("{{ $allErrors }}");
+                        @endif
+
                         if (gambarInput && imagePreview) {
                             gambarInput.addEventListener('change', function(e) {
                                 const file = e.target.files[0];
                                 
                                 if (file) {
-                                    if (!file.type.startsWith('image/')) {
-                                        showToast('File yang dipilih bukan gambar!');
+                                    // Validasi Tipe File
+                                    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                                    if (!allowedTypes.includes(file.type)) {
+                                        showToast('Tipe file harus berupa gambar (JPG, PNG, JPEG)!');
                                         e.target.value = '';
                                         imagePreview.style.display = 'none';
                                         return;
                                     }
 
-                                    const maxSize = 5 * 1024 * 1024; // 5MB
+                                    // Validasi Ukuran File (5MB)
+                                    const maxSize = 5 * 1024 * 1024;
                                     if (file.size > maxSize) {
-                                        showToast('Ukuran file terlalu besar! Maksimal 5MB.');
+                                        showToast('Ukuran gambar terlalu besar! Maksimal adalah 5MB.');
                                         e.target.value = '';
                                         imagePreview.style.display = 'none';
                                         return;
