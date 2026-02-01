@@ -35,14 +35,14 @@
 
 if (in_array($status, ['dibatalkan', 'ditolak_staff'])) {
                 $statusClass = 'status-dibatalkan';
-            } elseif (in_array($status, ['menunggu_cari_kurir', 'menunggu_konfirmasi_kurir', 'ditolak_kurir'])) {
-                $statusClass = 'status-diproses';
-            } elseif (in_array($status, ['menunggu_konfirmasi'])) {
+            } elseif (in_array($status, ['menunggu_konfirmasi', 'menunggu_konfirmasi_kurir', 'menunggu_cari_kurir', 'ditolak_kurir'])) {
                 $statusClass = 'status-menunggu_konfirmasi';
             } elseif (in_array($status, ['menunggu_konfirmasi_pembayaran'])) {
                 $statusClass = 'status-menunggu_konfirmasi_pembayaran';
-            } elseif (in_array($status, ['dikirim', 'sedang_diantar', 'pesanan_telah_diambil'])) {
+            } elseif (in_array($status, ['dikirim'])) {
                 $statusClass = 'status-dikirim';
+            } elseif (in_array($status, ['sedang_diantar', 'pesanan_telah_diambil'])) {
+                $statusClass = 'status-diproses';
             } else {
                 $statusClass = 'status-' . $status;
             }
@@ -51,17 +51,16 @@ if ($status == 'ditolak_staff') {
                 $statusLabel = 'Pesanan Dibatalkan oleh Staff';
             } elseif ($status == 'dibatalkan') {
                 $statusLabel = 'Dibatalkan';
-            } elseif ($status == 'ditolak_kurir') {
-                $statusLabel = 'Diproses (Mencari Kurir Baru)';
             } elseif ($status == 'menunggu_konfirmasi_pembayaran') {
                 $statusLabel = 'Menunggu Konfirmasi Pembayaran';
-            } elseif (in_array($status, ['dikirim', 'sedang_diantar', 'pesanan_telah_diambil'])) {
+            } elseif (in_array($status, ['dikirim'])) {
                 $statusLabel = 'Dikirim';
-                if($status == 'pesanan_telah_diambil' && $order->opsi_pengiriman == 'diantar') $statusLabel = 'Pesanan telah diambil kurir';
-            } elseif ($status == 'menunggu_konfirmasi') {
-                $statusLabel = 'Menunggu Konfirmasi Staff';
-            } elseif (in_array($status, ['menunggu_cari_kurir', 'menunggu_konfirmasi_kurir'])) {
-                $statusLabel = 'Diproses (Mencari Kurir)';
+            } elseif (in_array($status, ['sedang_diantar', 'pesanan_telah_diambil'])) {
+                $statusLabel = 'Diproses';
+                if($status == 'pesanan_telah_diambil') $statusLabel = 'Pesanan telah diambil kurir';
+                if($status == 'sedang_diantar') $statusLabel = 'Pesanan sedang disiapkan kurir';
+            } elseif (in_array($status, ['menunggu_konfirmasi', 'menunggu_konfirmasi_kurir', 'ditolak_kurir', 'menunggu_cari_kurir'])) {
+                $statusLabel = 'Menunggu Konfirmasi';
             } else {
                 $statusLabel = ucwords(str_replace('_', ' ', $status));
             }
@@ -73,7 +72,7 @@ if ($status == 'ditolak_staff') {
                 @elseif($statusClass == 'status-dibatalkan') <i class="fas fa-times-circle"></i>
                 @elseif($statusClass == 'status-dikirim') <i class="fas fa-truck"></i>
                 @elseif($statusClass == 'status-menunggu_konfirmasi') <i class="fas fa-hourglass-half"></i>
-                @elseif($statusClass == 'status-verif') <i class="fas fa-clock"></i>
+                @elseif($statusClass == 'status-menunggu_konfirmasi_pembayaran') <i class="fas fa-clock"></i>
                 @elseif($status == 'menunggu_pembayaran') <i class="fas fa-wallet"></i>
                 @elseif($status == 'siap_diambil') <i class="fas fa-box-open"></i>
                 @elseif($status == 'pesanan_telah_diambil') <i class="fas fa-check-double"></i>

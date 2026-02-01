@@ -84,16 +84,16 @@ class PemesananController extends Controller
             return $q;
         };
 
-        $konfirmasi_pesanan = $queryBuilder(['menunggu_konfirmasi', 'menunggu_cari_kurir', 'menunggu_konfirmasi_kurir', 'ditolak_kurir'])
+        $konfirmasi_pesanan = $queryBuilder(['menunggu_konfirmasi', 'menunggu_cari_kurir', 'menunggu_konfirmasi_kurir'])
             ->paginate(10, ['*'], 'page_konfirmasi');
 
         $menunggu_pembayaran = $queryBuilder(['menunggu_pembayaran'])
             ->paginate(10, ['*'], 'page_menunggu');
 
-        $diproses = $queryBuilder(['menunggu_konfirmasi_pembayaran', 'diproses', 'siap_diambil'])
+        $diproses = $queryBuilder(['menunggu_konfirmasi_pembayaran', 'diproses', 'siap_diambil', 'pesanan_telah_diambil', 'sedang_diantar'])
             ->paginate(10, ['*'], 'page_proses');
 
-        $dikirim = $queryBuilder(['dikirim', 'sedang_diantar', 'pesanan_telah_diambil'])
+        $dikirim = $queryBuilder(['dikirim'])
             ->paginate(10, ['*'], 'page_dikirim');
 
         $selesai = $queryBuilder(['selesai'])
@@ -103,10 +103,10 @@ class PemesananController extends Controller
             ->paginate(10, ['*'], 'page_dibatalkan');
 
         $counts = [
-            'konfirmasi' => $queryBuilder(['menunggu_konfirmasi', 'menunggu_cari_kurir', 'menunggu_konfirmasi_kurir', 'ditolak_kurir'])->count(),
+            'konfirmasi' => $queryBuilder(['menunggu_konfirmasi', 'menunggu_cari_kurir', 'menunggu_konfirmasi_kurir'])->count(),
             'menunggu' => $queryBuilder(['menunggu_pembayaran'])->count(),
-            'proses' => $queryBuilder(['menunggu_konfirmasi_pembayaran', 'diproses', 'siap_diambil'])->count(),
-            'dikirim' => $queryBuilder(['dikirim', 'sedang_diantar', 'pesanan_telah_diambil'])->count(),
+            'proses' => $queryBuilder(['menunggu_konfirmasi_pembayaran', 'diproses', 'siap_diambil', 'pesanan_telah_diambil', 'sedang_diantar'])->count(),
+            'dikirim' => $queryBuilder(['dikirim'])->count(),
             'selesai' => $queryBuilder(['selesai'])->count(),
             'dibatalkan' => $queryBuilder(['dibatalkan', 'ditolak_staff'])->count(),
         ];
@@ -143,13 +143,13 @@ class PemesananController extends Controller
             $selectedKeys = $request->get('selected_items', []);
 
             if (empty($selectedKeys)) {
-                $checkout = $keranjang;
-            } else {
-                $checkout = [];
-                foreach ($selectedKeys as $key) {
-                    if (isset($keranjang[$key])) {
-                        $checkout[$key] = $keranjang[$key];
-                    }
+                return redirect()->route('keranjang.index')->with('error', 'Pilih minimal satu produk untuk di-checkout.');
+            }
+
+            $checkout = [];
+            foreach ($selectedKeys as $key) {
+                if (isset($keranjang[$key])) {
+                    $checkout[$key] = $keranjang[$key];
                 }
             }
         }
@@ -350,6 +350,10 @@ class PemesananController extends Controller
             abort(403);
         }
 
+        if ($pemesanan->status_pesanan === 'ditolak_kurir' && ! (Auth::user()?->is_admin ?? false)) {
+            abort(404);
+        }
+
         $pemesanan->load('detailPesanan');
 
         return view('User.detailPesanan', compact('pemesanan'));
@@ -535,9 +539,7 @@ class PemesananController extends Controller
             ->get();
 
         $kurirs = User::where('role', 'kurir')
-            ->whereHas('kurir', function ($query) {
-                $query->whereNotNull('jenis_kendaraan');
-            })->with('kurir')->get();
+            ->with('kurir')->get();
 
         return view('Staff_Purchasing.cariKurir', compact('pesanan_baru', 'menunggu_konfirmasi', 'ditolak_kurir', 'kurirs'));
     }
@@ -622,27 +624,42 @@ class PemesananController extends Controller
         return back()->with('success', $message);
     }
 
-    public function riwayatPurchasing()
+    public function riwayatPurchasing(Request $request)
     {
-        $dikirim = Pemesanan::with(['detailPesanan.produk', 'user', 'alamat'])
-            ->whereIn('status_pesanan', ['dikirim', 'sedang_diantar'])
-            ->latest('updated_at')
-            ->get();
+        $search = $request->get('search');
+        $sort = $request->get('sort', 'terbaru');
 
-        $selesai = Pemesanan::with(['detailPesanan.produk', 'user', 'alamat'])
-            ->where('status_pesanan', 'selesai')
-            ->latest('updated_at')
-            ->get();
+        $queryBuilder = function ($statuses) use ($search, $sort) {
+            $q = Pemesanan::with(['detailPesanan.produk', 'user', 'alamat', 'transaksi'])
+                ->whereIn('status_pesanan', (array) $statuses);
 
-        $dibatalkan = Pemesanan::with(['detailPesanan.produk', 'user', 'alamat', 'transaksi'])
-            ->whereIn('status_pesanan', ['dibatalkan', 'ditolak_staff', 'ditolak_kurir'])
-            ->latest('updated_at')
-            ->get();
+            if ($search) {
+                $q->where(function ($sq) use ($search) {
+                    $sq->where('kode_pesanan', 'LIKE', "%{$search}%")
+                        ->orWhere('nama_penerima', 'LIKE', "%{$search}%")
+                        ->orWhereHas('user', function ($uq) use ($search) {
+                            $uq->where('nama_lengkap', 'LIKE', "%{$search}%");
+                        })
+                        ->orWhereHas('detailPesanan', function ($dq) use ($search) {
+                            $dq->where('nama_produk', 'LIKE', "%{$search}%");
+                        });
+                });
+            }
 
-        $telah_diambil = Pemesanan::with(['detailPesanan.produk', 'user', 'alamat'])
-            ->where('status_pesanan', 'pesanan_telah_diambil')
-            ->latest('updated_at')
-            ->get();
+            if ($sort === 'terlama') {
+                $q->orderBy('created_at', 'asc');
+            } else {
+                $q->orderBy('created_at', 'desc');
+            }
+
+            return $q;
+        };
+
+        $dikirim = $queryBuilder(['dikirim', 'sedang_diantar'])->paginate(10, ['*'], 'page_dikirim')->withQueryString();
+        $selesai = $queryBuilder(['selesai'])->paginate(10, ['*'], 'page_selesai')->withQueryString();
+        $dibatalkan = $queryBuilder(['dibatalkan', 'ditolak_staff'])->paginate(10, ['*'], 'page_dibatalkan')->withQueryString();
+        $telah_diambil = $queryBuilder(['pesanan_telah_diambil'])->paginate(10, ['*'], 'page_diambil')->withQueryString();
+
 
         return view('Staff_Purchasing.riwayat', compact('dikirim', 'selesai', 'dibatalkan', 'telah_diambil'));
     }

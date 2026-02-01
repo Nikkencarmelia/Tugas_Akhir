@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pengurus;
 use App\Models\Produk;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class UserProdukController extends Controller
 {
@@ -25,12 +26,20 @@ class UserProdukController extends Controller
         $produkTerbaru = $this->mapProdukDetails($produkTerbaruRaw);
 
         $produkTerlarisRaw = Produk::with(['satuan', 'batch'])
-            ->withSum(['detailPesanans as total_terjual'], 'quantity')
+            ->withSum(['detailPesanans as total_terjual' => function ($query) {
+                $query->whereHas('pemesanan', function ($q) {
+                    $q->where('status_pesanan', 'selesai');
+                });
+            }], 'quantity')
             ->where('status_tampil', 'Ditampilkan')
             ->whereHas('batch', function ($q) {
                 $q->where('stok', '>', 0);
             })
-            ->has('detailPesanans')
+            ->whereHas('detailPesanans', function ($query) {
+                $query->whereHas('pemesanan', function ($q) {
+                    $q->where('status_pesanan', 'selesai');
+                });
+            })
             ->orderByDesc('total_terjual')
             ->take(12)
             ->get();
@@ -86,10 +95,26 @@ class UserProdukController extends Controller
 
     public function produk(Request $request)
     {
-        $produks = Produk::with(['kategori', 'satuan', 'batch', 'supplier'])
+        $search = $request->get('search');
+
+        $query = Produk::with(['kategori', 'satuan', 'batch', 'supplier'])
             ->where('status_tampil', 'Ditampilkan')
-            ->whereHas('batch', fn ($q) => $q->where('stok', '>', 0))
-            ->latest('created_at')
+            ->whereHas('batch', fn ($q) => $q->where('stok', '>', 0));
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_produk', 'LIKE', "%{$search}%")
+                    ->orWhere('deskripsi', 'LIKE', "%{$search}%")
+                    ->orWhereHas('kategori', function ($kq) use ($search) {
+                        $kq->where('nama_kategori', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('supplier', function ($sq) use ($search) {
+                        $sq->where('nama_supplier', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        $produks = $query->latest('created_at')
             ->get()
             ->map(function ($produk) {
                 $batchTertua = $produk->batch
@@ -120,6 +145,7 @@ class UserProdukController extends Controller
                     'supplier' => $produk->supplier?->nama_supplier ?? '',
                     'deskripsi' => $produk->deskripsi ?? '',
                     'kategori' => $produk->kategori?->nama_kategori ?? 'Produk Lainnya',
+                    'kategori_slug' => Str::slug($produk->kategori?->nama_kategori ?? 'Produk Lainnya'),
                     'jumlah_satuan' => $produk->jumlah_satuan ?? 1,
                     'satuan' => $produk->satuan?->nama_satuan ?? 'pcs',
                     'harga_formatted' => $hargaSaatIni > 0
@@ -139,6 +165,7 @@ class UserProdukController extends Controller
             ->values();
 
         $produksGrouped = $produks->groupBy('kategori')->sortKeys();
+
 
         return view('User.produk', compact('produks', 'produksGrouped'));
     }

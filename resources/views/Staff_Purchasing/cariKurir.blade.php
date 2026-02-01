@@ -122,11 +122,139 @@
         </select>
     </div>
 
-<div class="tab-content">
-
+    <div class="tab-content">
         <div class="tab-panel active" id="pesanan-baru">
             @forelse($pesanan_baru as $order)
-                @include('Staff_Purchasing.partials.order_card_cari_kurir', ['order' => $order, 'canAssign' => true])
+                @php
+                    $firstItem = $order->detailPesanan->first();
+                    $supplier = $firstItem && $firstItem->produk && $firstItem->produk->supplier ? $firstItem->produk->supplier->nama_supplier : 'Non-Supplier';
+                    $metode = $order->opsi_pengiriman;
+                    $imagePath = $firstItem->gambar ?? '';
+                    if (str_starts_with($imagePath, 'images/')) {
+                        $src = asset($imagePath);
+                    } elseif (!str_contains($imagePath, 'http') && !str_starts_with($imagePath, 'storage/') && $imagePath) {
+                        $src = asset('storage/' . $imagePath);
+                    } else {
+                        $src = $imagePath ? asset($imagePath) : asset('images/default-product.png');
+                    }
+                @endphp
+
+                <div class="order-card"
+                    data-date="{{ $order->updated_at->timestamp }}"
+                    data-product="{{ strtolower($firstItem->nama_produk ?? '') }}"
+                    data-supplier="{{ strtolower($supplier) }}">
+
+                    <div class="order-header">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="order-meta">
+                                <div><i class="fa-regular fa-calendar me-2"></i>{{ $order->created_at->format('d M Y, H:i') }}</div>
+                                <div class="text-secondary fw-bold">ID: {{ $order->kode_pesanan }}</div>
+                                <div>
+                                    @if($metode == 'dipick_up')
+                                        <span class="badge-metode"><i class="bi bi-shop"></i> Pick Up</span>
+                                    @else
+                                        <div class="d-flex flex-wrap gap-1 mb-1">
+                                            <span class="badge-metode"><i class="fa-solid fa-truck"></i> Diantar</span>
+                                            <span class="badge-alamat"><i class="fa-solid fa-location-dot"></i> {{ $order->nama_kelurahan }}</span>
+                                            @if($order->kendaraan)
+                                                <span class="badge-kendaraan"><i class="fa-solid fa-truck-pickup"></i> {{ $order->kendaraan }}</span>
+                                            @endif
+                                        </div>
+                                    @endif
+                                </div>
+
+                                @php
+                                    $status = $order->status_pesanan;
+                                    $statusClass = 'status-' . $status;
+                                    $statusLabel = ucwords(str_replace('_', ' ', $status));
+
+                                    if(in_array($status, ['dibatalkan', 'ditolak_staff', 'ditolak_kurir'])) {
+                                        $statusClass = 'status-dibatalkan';
+                                        if($status == 'ditolak_staff') $statusLabel = 'Ditolak Staff';
+                                        elseif($status == 'ditolak_kurir') $statusLabel = 'Ditolak Kurir';
+                                    }
+                                    elseif(in_array($status, ['menunggu_konfirmasi_pembayaran', 'menunggu_verifikasi_pembayaran', 'menunggu_pembayaran_diverifikasi'])) {
+                                        $statusClass = 'status-verif';
+                                        $statusLabel = 'Menunggu Verifikasi';
+                                    }
+                                    elseif($status == 'menunggu_konfirmasi_kurir') {
+                                        $statusClass = 'status-menunggu_konfirmasi_kurir';
+                                        $statusLabel = 'Menunggu Konfirmasi Kurir';
+                                    }
+                                    elseif($status == 'menunggu_cari_kurir') {
+                                        $statusClass = 'status-menunggu_konfirmasi';
+                                        $statusLabel = 'Menunggu Cari Kurir';
+                                    }
+                                    elseif($status == 'menunggu_konfirmasi') {
+                                        $statusClass = 'status-menunggu_konfirmasi';
+                                        $statusLabel = 'Menunggu Konfirmasi';
+                                    }
+
+                                    $icon = 'fa-box';
+                                    if($status == 'selesai') $icon = 'fa-check-circle';
+                                    elseif($statusClass == 'status-dibatalkan') $icon = 'fa-times-circle';
+                                    elseif(in_array($status, ['dikirim', 'sedang_diantar'])) $icon = 'fa-truck';
+                                    elseif($statusClass == 'status-menunggu_konfirmasi' || $statusClass == 'status-menunggu_konfirmasi_kurir') $icon = 'fa-hourglass-half';
+                                    elseif($statusClass == 'status-verif') $icon = 'fa-clock';
+                                    elseif($status == 'menunggu_pembayaran') $icon = 'fa-wallet';
+                                    elseif($status == 'siap_diambil') $icon = 'fa-box-open';
+                                    elseif($status == 'pesanan_telah_diambil') $icon = 'fa-check-double';
+                                @endphp
+                                <div class="mt-2">
+                                    <span class="order-status {{ $statusClass }} py-1 px-2" style="font-size: 12px; margin: 0; display: inline-flex;">
+                                        <i class="fas {{ $icon }}"></i> {{ $statusLabel }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if($firstItem)
+                    <div class="order-product">
+                        <div class="img-container">
+                            <img src="{{ $src }}" alt="Produk">
+                            <span class="badge-supplier">{{ $supplier }}</span>
+                        </div>
+                        <div class="order-product-details flex-grow-1">
+                            <h6>{{ $firstItem->nama_produk }}</h6>
+                            <p class="mb-1 text-muted small">
+                                {{ $firstItem->quantity }} x Rp {{ number_format($firstItem->harga_satuan, 0, ',', '.') }}
+                                / {{ $firstItem->jumlah_satuan }} {{ $firstItem->satuan }}
+                            </p>
+
+                            @if($order->detailPesanan->count() > 1)
+                            <div class="produk-lain mb-2">+ {{ $order->detailPesanan->count() - 1 }} produk lain</div>
+                            @endif
+
+                            <div class="border-top mt-2 pt-2 small text-muted">
+                                <div class="d-flex justify-content-between">
+                                    <span>Subtotal:</span>
+                                    <span>Rp {{ number_format($order->subtotal, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Ongkir:</span>
+                                    <span>Rp {{ number_format($order->ongkir, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between fw-bold text-success mt-1">
+                                    <span>Total:</span>
+                                    <span>Rp {{ number_format($order->total, 0, ',', '.') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    <div class="order-actions">
+                        <button class="btn btn-success btn-sm btnCariKurir"
+                                data-kode="{{ $order->kode_pesanan }}"
+                                data-kendaraan="{{ $order->kendaraan }}"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalCariKurir">
+                            <i class="fa-solid fa-truck me-1"></i>Cari Kurir
+                        </button>
+                        <a href="{{ route('staff_purchasing.detail_pesanan', $order->id) }}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-eye me-1"></i>Lihat Detail</a>
+                    </div>
+                </div>
             @empty
                 <div class="text-center py-5"><h5 class="text-muted">Tidak ada pesanan baru.</h5></div>
             @endforelse
@@ -134,7 +262,129 @@
 
 <div class="tab-panel" id="menunggu-konfirmasi">
             @forelse($menunggu_konfirmasi as $order)
-                @include('Staff_Purchasing.partials.order_card_cari_kurir', ['order' => $order, 'canAssign' => false])
+                @php
+                    $firstItem = $order->detailPesanan->first();
+                    $supplier = $firstItem && $firstItem->produk && $firstItem->produk->supplier ? $firstItem->produk->supplier->nama_supplier : 'Non-Supplier';
+                    $metode = $order->opsi_pengiriman;
+                    $imagePath = $firstItem->gambar ?? '';
+                    if (str_starts_with($imagePath, 'images/')) {
+                        $src = asset($imagePath);
+                    } elseif (!str_contains($imagePath, 'http') && !str_starts_with($imagePath, 'storage/') && $imagePath) {
+                        $src = asset('storage/' . $imagePath);
+                    } else {
+                        $src = $imagePath ? asset($imagePath) : asset('images/default-product.png');
+                    }
+                @endphp
+
+                <div class="order-card"
+                    data-date="{{ $order->updated_at->timestamp }}"
+                    data-product="{{ strtolower($firstItem->nama_produk ?? '') }}"
+                    data-supplier="{{ strtolower($supplier) }}">
+
+                    <div class="order-header">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="order-meta">
+                                <div><i class="fa-regular fa-calendar me-2"></i>{{ $order->created_at->format('d M Y, H:i') }}</div>
+                                <div class="text-secondary fw-bold">ID: {{ $order->kode_pesanan }}</div>
+                                <div>
+                                    @if($metode == 'dipick_up')
+                                        <span class="badge-metode"><i class="bi bi-shop"></i> Pick Up</span>
+                                    @else
+                                        <div class="d-flex flex-wrap gap-1 mb-1">
+                                            <span class="badge-metode"><i class="fa-solid fa-truck"></i> Diantar</span>
+                                            <span class="badge-alamat"><i class="fa-solid fa-location-dot"></i> {{ $order->nama_kelurahan }}</span>
+                                            @if($order->kendaraan)
+                                                <span class="badge-kendaraan"><i class="fa-solid fa-truck-pickup"></i> {{ $order->kendaraan }}</span>
+                                            @endif
+                                        </div>
+                                    @endif
+                                </div>
+
+                                @php
+                                    $status = $order->status_pesanan;
+                                    $statusClass = 'status-' . $status;
+                                    $statusLabel = ucwords(str_replace('_', ' ', $status));
+
+                                    if(in_array($status, ['dibatalkan', 'ditolak_staff', 'ditolak_kurir'])) {
+                                        $statusClass = 'status-dibatalkan';
+                                        if($status == 'ditolak_staff') $statusLabel = 'Ditolak Staff';
+                                        elseif($status == 'ditolak_kurir') $statusLabel = 'Ditolak Kurir';
+                                    }
+                                    elseif(in_array($status, ['menunggu_konfirmasi_pembayaran', 'menunggu_verifikasi_pembayaran', 'menunggu_pembayaran_diverifikasi'])) {
+                                        $statusClass = 'status-verif';
+                                        $statusLabel = 'Menunggu Verifikasi';
+                                    }
+                                    elseif($status == 'menunggu_konfirmasi_kurir') {
+                                        $statusClass = 'status-menunggu_konfirmasi_kurir';
+                                        $statusLabel = 'Menunggu Konfirmasi Kurir';
+                                    }
+                                    elseif($status == 'menunggu_cari_kurir') {
+                                        $statusClass = 'status-menunggu_konfirmasi';
+                                        $statusLabel = 'Menunggu Cari Kurir';
+                                    }
+                                    elseif($status == 'menunggu_konfirmasi') {
+                                        $statusClass = 'status-menunggu_konfirmasi';
+                                        $statusLabel = 'Menunggu Konfirmasi';
+                                    }
+
+                                    $icon = 'fa-box';
+                                    if($status == 'selesai') $icon = 'fa-check-circle';
+                                    elseif($statusClass == 'status-dibatalkan') $icon = 'fa-times-circle';
+                                    elseif(in_array($status, ['dikirim', 'sedang_diantar'])) $icon = 'fa-truck';
+                                    elseif($statusClass == 'status-menunggu_konfirmasi' || $statusClass == 'status-menunggu_konfirmasi_kurir') $icon = 'fa-hourglass-half';
+                                    elseif($statusClass == 'status-verif') $icon = 'fa-clock';
+                                    elseif($status == 'menunggu_pembayaran') $icon = 'fa-wallet';
+                                    elseif($status == 'siap_diambil') $icon = 'fa-box-open';
+                                    elseif($status == 'pesanan_telah_diambil') $icon = 'fa-check-double';
+                                @endphp
+                                <div class="mt-2">
+                                    <span class="order-status {{ $statusClass }} py-1 px-2" style="font-size: 12px; margin: 0; display: inline-flex;">
+                                        <i class="fas {{ $icon }}"></i> {{ $statusLabel }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if($firstItem)
+                    <div class="order-product">
+                        <div class="img-container">
+                            <img src="{{ $src }}" alt="Produk">
+                            <span class="badge-supplier">{{ $supplier }}</span>
+                        </div>
+                        <div class="order-product-details flex-grow-1">
+                            <h6>{{ $firstItem->nama_produk }}</h6>
+                            <p class="mb-1 text-muted small">
+                                {{ $firstItem->quantity }} x Rp {{ number_format($firstItem->harga_satuan, 0, ',', '.') }}
+                                / {{ $firstItem->jumlah_satuan }} {{ $firstItem->satuan }}
+                            </p>
+
+                            @if($order->detailPesanan->count() > 1)
+                            <div class="produk-lain mb-2">+ {{ $order->detailPesanan->count() - 1 }} produk lain</div>
+                            @endif
+
+                            <div class="border-top mt-2 pt-2 small text-muted">
+                                <div class="d-flex justify-content-between">
+                                    <span>Subtotal:</span>
+                                    <span>Rp {{ number_format($order->subtotal, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Ongkir:</span>
+                                    <span>Rp {{ number_format($order->ongkir, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between fw-bold text-success mt-1">
+                                    <span>Total:</span>
+                                    <span>Rp {{ number_format($order->total, 0, ',', '.') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    <div class="order-actions">
+                        <a href="{{ route('staff_purchasing.detail_pesanan', $order->id) }}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-eye me-1"></i>Lihat Detail</a>
+                    </div>
+                </div>
             @empty
                 <div class="text-center py-5"><h5 class="text-muted">Tidak ada pesanan menunggu konfirmasi.</h5></div>
             @endforelse
@@ -142,7 +392,136 @@
 
 <div class="tab-panel" id="cari-kurir-lagi">
             @forelse($ditolak_kurir as $order)
-                @include('Staff_Purchasing.partials.order_card_cari_kurir', ['order' => $order, 'canAssign' => true])
+                @php
+                    $firstItem = $order->detailPesanan->first();
+                    $supplier = $firstItem && $firstItem->produk && $firstItem->produk->supplier ? $firstItem->produk->supplier->nama_supplier : 'Non-Supplier';
+                    $metode = $order->opsi_pengiriman;
+                    $imagePath = $firstItem->gambar ?? '';
+                    if (str_starts_with($imagePath, 'images/')) {
+                        $src = asset($imagePath);
+                    } elseif (!str_contains($imagePath, 'http') && !str_starts_with($imagePath, 'storage/') && $imagePath) {
+                        $src = asset('storage/' . $imagePath);
+                    } else {
+                        $src = $imagePath ? asset($imagePath) : asset('images/default-product.png');
+                    }
+                @endphp
+
+                <div class="order-card"
+                    data-date="{{ $order->updated_at->timestamp }}"
+                    data-product="{{ strtolower($firstItem->nama_produk ?? '') }}"
+                    data-supplier="{{ strtolower($supplier) }}">
+
+                    <div class="order-header">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="order-meta">
+                                <div><i class="fa-regular fa-calendar me-2"></i>{{ $order->created_at->format('d M Y, H:i') }}</div>
+                                <div class="text-secondary fw-bold">ID: {{ $order->kode_pesanan }}</div>
+                                <div>
+                                    @if($metode == 'dipick_up')
+                                        <span class="badge-metode"><i class="bi bi-shop"></i> Pick Up</span>
+                                    @else
+                                        <div class="d-flex flex-wrap gap-1 mb-1">
+                                            <span class="badge-metode"><i class="fa-solid fa-truck"></i> Diantar</span>
+                                            <span class="badge-alamat"><i class="fa-solid fa-location-dot"></i> {{ $order->nama_kelurahan }}</span>
+                                            @if($order->kendaraan)
+                                                <span class="badge-kendaraan"><i class="fa-solid fa-truck-pickup"></i> {{ $order->kendaraan }}</span>
+                                            @endif
+                                        </div>
+                                    @endif
+                                </div>
+
+                                @php
+                                    $status = $order->status_pesanan;
+                                    $statusClass = 'status-' . $status;
+                                    $statusLabel = ucwords(str_replace('_', ' ', $status));
+
+                                    if(in_array($status, ['dibatalkan', 'ditolak_staff', 'ditolak_kurir'])) {
+                                        $statusClass = 'status-dibatalkan';
+                                        if($status == 'ditolak_staff') $statusLabel = 'Ditolak Staff';
+                                        elseif($status == 'ditolak_kurir') $statusLabel = 'Ditolak Kurir';
+                                    }
+                                    elseif(in_array($status, ['menunggu_konfirmasi_pembayaran', 'menunggu_verifikasi_pembayaran', 'menunggu_pembayaran_diverifikasi'])) {
+                                        $statusClass = 'status-verif';
+                                        $statusLabel = 'Menunggu Verifikasi';
+                                    }
+                                    elseif($status == 'menunggu_konfirmasi_kurir') {
+                                        $statusClass = 'status-menunggu_konfirmasi_kurir';
+                                        $statusLabel = 'Menunggu Konfirmasi Kurir';
+                                    }
+                                    elseif($status == 'menunggu_cari_kurir') {
+                                        $statusClass = 'status-menunggu_konfirmasi';
+                                        $statusLabel = 'Menunggu Cari Kurir';
+                                    }
+                                    elseif($status == 'menunggu_konfirmasi') {
+                                        $statusClass = 'status-menunggu_konfirmasi';
+                                        $statusLabel = 'Menunggu Konfirmasi';
+                                    }
+
+                                    $icon = 'fa-box';
+                                    if($status == 'selesai') $icon = 'fa-check-circle';
+                                    elseif($statusClass == 'status-dibatalkan') $icon = 'fa-times-circle';
+                                    elseif(in_array($status, ['dikirim', 'sedang_diantar'])) $icon = 'fa-truck';
+                                    elseif($statusClass == 'status-menunggu_konfirmasi' || $statusClass == 'status-menunggu_konfirmasi_kurir') $icon = 'fa-hourglass-half';
+                                    elseif($statusClass == 'status-verif') $icon = 'fa-clock';
+                                    elseif($status == 'menunggu_pembayaran') $icon = 'fa-wallet';
+                                    elseif($status == 'siap_diambil') $icon = 'fa-box-open';
+                                    elseif($status == 'pesanan_telah_diambil') $icon = 'fa-check-double';
+                                @endphp
+                                <div class="mt-2">
+                                    <span class="order-status {{ $statusClass }} py-1 px-2" style="font-size: 12px; margin: 0; display: inline-flex;">
+                                        <i class="fas {{ $icon }}"></i> {{ $statusLabel }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if($firstItem)
+                    <div class="order-product">
+                        <div class="img-container">
+                            <img src="{{ $src }}" alt="Produk">
+                            <span class="badge-supplier">{{ $supplier }}</span>
+                        </div>
+                        <div class="order-product-details flex-grow-1">
+                            <h6>{{ $firstItem->nama_produk }}</h6>
+                            <p class="mb-1 text-muted small">
+                                {{ $firstItem->quantity }} x Rp {{ number_format($firstItem->harga_satuan, 0, ',', '.') }}
+                                / {{ $firstItem->jumlah_satuan }} {{ $firstItem->satuan }}
+                            </p>
+
+                            @if($order->detailPesanan->count() > 1)
+                            <div class="produk-lain mb-2">+ {{ $order->detailPesanan->count() - 1 }} produk lain</div>
+                            @endif
+
+                            <div class="border-top mt-2 pt-2 small text-muted">
+                                <div class="d-flex justify-content-between">
+                                    <span>Subtotal:</span>
+                                    <span>Rp {{ number_format($order->subtotal, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Ongkir:</span>
+                                    <span>Rp {{ number_format($order->ongkir, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between fw-bold text-success mt-1">
+                                    <span>Total:</span>
+                                    <span>Rp {{ number_format($order->total, 0, ',', '.') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    <div class="order-actions">
+                        <button class="btn btn-success btn-sm btnCariKurir"
+                                data-kode="{{ $order->kode_pesanan }}"
+                                data-kendaraan="{{ $order->kendaraan }}"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalCariKurir">
+                            <i class="fa-solid fa-truck me-1"></i>Cari Kurir
+                        </button>
+                        <a href="{{ route('staff_purchasing.detail_pesanan', $order->id) }}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-eye me-1"></i>Lihat Detail</a>
+                    </div>
+                </div>
             @empty
                 <div class="text-center py-5"><h5 class="text-muted">Tidak ada pesanan ditolak kurir.</h5></div>
             @endforelse
@@ -190,14 +569,14 @@
                             @forelse($kurirs as $kurir)
                             <tr data-nama="{{ strtolower($kurir->nama_lengkap) }}"
                                 data-telp="{{ strtolower($kurir->no_telepon) }}"
-                                data-kendaraan="{{ $kurir->kurir->jenis_kendaraan ?? 'Motor' }}"
+                                data-kendaraan="{{ $kurir->kurir?->jenis_kendaraan ?? 'motor' }}"
                                 data-statusonline="{{ $kurir->status_online ?? 'aktif' }}"
-                                data-statusantar="{{ strtolower($kurir->kurir->status_antar ?? 'siap') }}">
+                                data-statusantar="{{ strtolower($kurir->kurir?->status_antar ?? 'siap') }}">
                                 <td>{{ $kurir->nama_lengkap }}</td>
                                 <td>{{ $kurir->no_telepon }}</td>
-                                <td>{{ ucfirst($kurir->kurir->jenis_kendaraan ?? '-') }}</td>
+                                <td>{{ ucfirst($kurir->kurir?->jenis_kendaraan ?? 'motor') }}</td>
                                 <td><span class="badge badge-online-{{ strtolower(str_replace([' ', '_'], '-', $kurir->status_online ?? 'aktif')) }}">{{ ucfirst($kurir->status_online) }}</span></td>
-                                <td><span class="badge badge-antar-{{ strtolower(str_replace([' ', '_'], '-', $kurir->kurir->status_antar ?? 'siap')) }}">{{ $kurir->kurir->status_antar == 'sedang_antar' ? 'Sedang Antar' : ($kurir->kurir->status_antar == 'siap' ? 'Siap' : ($kurir->kurir->status_antar ?? 'Siap')) }}</span></td>
+                                <td><span class="badge badge-antar-{{ strtolower(str_replace([' ', '_'], '-', $kurir->kurir?->status_antar ?? 'siap')) }}">{{ ($kurir->kurir?->status_antar ?? '') == 'sedang_antar' ? 'Sedang Antar' : ($kurir->kurir?->status_antar ?? 'Siap') }}</span></td>
                                 <td>
                                     <form action="{{ route('staff_purchasing.assign_kurir') }}" method="POST">
                                         @csrf
@@ -294,8 +673,8 @@ const searchKurir = document.getElementById('searchKurir');
         }
 
         const searchText = searchKurir.value.toLowerCase().trim();
-        const online = filterOnline.value.toLowerCase();
-        const kendaraan = filterKendaraan.value.toLowerCase();
+        const online = filterOnline.value.toLowerCase().trim();
+        const kendaraan = filterKendaraan.value.toLowerCase().trim();
         const rows = kurirTableBody.querySelectorAll('tr');
 
         rows.forEach(row => {
@@ -308,8 +687,12 @@ const searchKurir = document.getElementById('searchKurir');
             const onlineStatusMatch = row.dataset.statusonline.toLowerCase().includes(searchText);
 
             const searchMatch = nameMatch || telpMatch || kndraanMatch || statusAntarMatch || onlineStatusMatch;
-            const onlineMatch = online === "" || row.dataset.statusonline.toLowerCase() === online;
-            const kendaraanMatch = kendaraan === "" || row.dataset.kendaraan.toLowerCase() === kendaraan;
+            
+            const rowOnline = row.dataset.statusonline.toLowerCase().trim();
+            const onlineMatch = online === "" || rowOnline === online;
+
+            const rowKendaraan = row.dataset.kendaraan.toLowerCase().trim();
+            const kendaraanMatch = kendaraan === "" || rowKendaraan === kendaraan;
 
             if (searchMatch && onlineMatch && kendaraanMatch) {
                 row.style.display = "";
@@ -330,8 +713,8 @@ if (modalCariKurir) {
             const kode = button.getAttribute('data-kode');
             const kendaraan = button.getAttribute('data-kendaraan');
 
-const modalKodeInput = modalCariKurir.querySelector('.modalKodePesanan');
-            if (modalKodeInput) modalKodeInput.value = kode;
+            const modalKodeInputs = modalCariKurir.querySelectorAll('.modalKodePesanan');
+            modalKodeInputs.forEach(input => input.value = kode);
             if (filterKendaraan) filterKendaraan.value = kendaraan || "";
 
 searchKurir.value = "";
@@ -340,10 +723,6 @@ searchKurir.value = "";
 filterKurirTable();
         });
     }
-
-    document.querySelectorAll('.btnPilihKurir').forEach(btn => btn.addEventListener('click', () => {
-
-    }));
 
 const badges = document.querySelectorAll('.badge-supplier');
     const colors = [

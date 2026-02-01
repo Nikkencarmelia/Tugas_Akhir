@@ -21,7 +21,7 @@
         .order-meta .alamat { background: #e8f5e9; color: #1b5e20; padding: 3px 8px; border-radius: 6px; font-size: 13px; display: inline-block; }
         .order-meta .metode { background: #e3f2fd; color: #0d47a1; padding: 3px 8px; border-radius: 6px; font-size: 13px; display: inline-block; }
 
-.badge-metode { background: #e3f2fd; color: #0d47a1; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
+        .badge-metode { background: #e3f2fd; color: #0d47a1; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
         .badge-alamat { background: #e8f5e9; color: #1b5e20; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
         .badge-kendaraan { background: #fef9c3; color: #854d0e; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #fde68a; }
         .order-number { font-weight: 600; color: #495057; }
@@ -57,13 +57,13 @@
             margin-bottom: 1rem;
         }
 
-.status-menunggu_konfirmasi { background: #f1f3f5; color: #495057; }
+        .status-menunggu_konfirmasi { background: #f1f3f5; color: #495057; }
         .status-menunggu_pembayaran { background: #fff4e6; color: #d9480f; }
         .status-diproses { background: #fef9c3; color: #854d0e; }
         .status-dikirim { background: #e0f2fe; color: #0369a1; }
         .status-selesai { background: #dcfce7; color: #166534; }
         .status-dibatalkan { background: #fee2e2; color: #991b1b; }
-        .status-menunggu_konfirmasi_pembayaran { background: #fff7ed; color: #9a3412; }
+        .status-verif { background: #fff7ed; color: #9a3412; }
         .status-siap_diambil { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .status-pesanan_telah_diambil { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
         .status-menunggu_konfirmasi_kurir { background: #fef9c3; color: #854d0e; }
@@ -75,6 +75,7 @@
             .order-actions { justify-content: center; }
             .select-controls { flex-direction: column; }
             .select-controls .d-flex { flex-direction: column; width: 100%; }
+            .order-status { margin: 0 auto 1rem auto; }
         }
     </style>
 </head>
@@ -170,8 +171,28 @@
                                             @endif
                                         </div>
                                     @endif
-                                    <span class="order-status status-pesanan_telah_diambil">
-                                        <i class="fas fa-check-double"></i> Pesanan Sudah Diambil
+                                </div>
+                                <div class="mt-2">
+                                    @php
+                                        $statusClass = 'status-' . $status;
+                                        $statusLabel = ucwords(str_replace('_', ' ', $status));
+
+                                        if(in_array($status, ['dibatalkan', 'ditolak_staff', 'ditolak_kurir'])) {
+                                            $statusClass = 'status-dibatalkan';
+                                            $statusLabel = 'Dibatalkan';
+                                            if($status == 'ditolak_kurir') $statusLabel = 'Ditolak Kurir';
+                                        }
+
+                                        $icon = 'fa-box';
+                                        if($status == 'selesai') $icon = 'fa-check-circle';
+                                        elseif($statusClass == 'status-dibatalkan') $icon = 'fa-times-circle';
+                                        elseif(in_array($status, ['dikirim', 'sedang_diantar'])) $icon = 'fa-truck';
+                                        elseif($status == 'siap_diambil' || $status == 'pesanan_telah_diambil') $icon = 'fas fa-check-double';
+                                        elseif($status == 'diproses') $icon = 'fa-hourglass-half';
+                                        elseif($status == 'menunggu_pembayaran' || $status == 'menunggu_konfirmasi_pembayaran') $icon = 'fa-wallet';
+                                    @endphp
+                                    <span class="order-status {{ $statusClass }} py-1 px-2" style="font-size: 12px; margin: 0; display: inline-flex;">
+                                        <i class="fas {{ $icon }}"></i> {{ $statusLabel }}
                                     </span>
                                 </div>
                             </div>
@@ -186,7 +207,25 @@
                         <div class="order-product-details flex-grow-1">
                             <h6>{{ $productName }}</h6>
                             <p class="mb-1 text-muted small">{{ $qty }} x Rp {{ number_format($price, 0, ',', '.') }} / {{ $unit }}</p>
-                            <div class="fw-bold text-success mt-1">Total: Rp {{ number_format($total, 0, ',', '.') }}</div>
+                            
+                            @if($otherCount > 0)
+                            <div class="produk-lain mb-2">+ {{ $otherCount }} produk lain</div>
+                            @endif
+
+                            <div class="border-top mt-2 pt-2 small text-muted">
+                                <div class="d-flex justify-content-between">
+                                    <span>Subtotal:</span>
+                                    <span>Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Ongkir:</span>
+                                    <span>Rp {{ number_format($ongkir, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between fw-bold text-success mt-1">
+                                    <span>Total:</span>
+                                    <span>Rp {{ number_format($total, 0, ',', '.') }}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     @endif
@@ -262,7 +301,11 @@
                                             @endif
                                         </div>
                                     @endif
-                                    <span class="order-status status-dikirim"><i class="fas fa-truck"></i> Dikirim</span>
+                                </div>
+                                <div class="mt-2">
+                                    <span class="order-status status-dikirim py-1 px-2" style="font-size: 12px; margin: 0; display: inline-flex;">
+                                        <i class="fas fa-truck"></i> Dikirim
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -276,7 +319,25 @@
                         <div class="order-product-details flex-grow-1">
                             <h6>{{ $productName }}</h6>
                             <p class="mb-1 text-muted small">{{ $qty }} x Rp {{ number_format($price, 0, ',', '.') }} / {{ $unit }}</p>
-                            <div class="fw-bold text-success mt-1">Total: Rp {{ number_format($total, 0, ',', '.') }}</div>
+
+                            @if($otherCount > 0)
+                            <div class="produk-lain mb-2">+ {{ $otherCount }} produk lain</div>
+                            @endif
+
+                            <div class="border-top mt-2 pt-2 small text-muted">
+                                <div class="d-flex justify-content-between">
+                                    <span>Subtotal:</span>
+                                    <span>Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Ongkir:</span>
+                                    <span>Rp {{ number_format($ongkir, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between fw-bold text-success mt-1">
+                                    <span>Total:</span>
+                                    <span>Rp {{ number_format($total, 0, ',', '.') }}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     @endif
@@ -455,21 +516,27 @@ $img = $item->gambar ?? '';
                     $kode = $isObj ? $order->kode_pesanan : $order['kode_pesanan'];
                     $metode = $isObj ? $order->opsi_pengiriman : $order['opsi_pengiriman'];
                     $kendaraan = $isObj ? $order->kendaraan : ($order['kendaraan'] ?? null);
-
+                    $subtotal = $isObj ? $order->subtotal : $order['subtotal'];
+                    $ongkir = $isObj ? $order->ongkir : $order['ongkir'];
                     $total = $isObj ? $order->total : $order['total'];
                     $status = $isObj ? $order->status_pesanan : $order['status_pesanan'];
                     $penerima = $isObj ? $order->nama_penerima : ($order['nama_penerima'] ?? '');
                     $telepon = $isObj ? $order->no_telepon : ($order['no_telepon'] ?? '');
                     $kelurahan = $isObj ? $order->nama_kelurahan : ($order['nama_kelurahan'] ?? '');
-
-$item = null;
+                    $item = null;
+                    $otherCount = 0;
                     if($isObj && $order->detailPesanan->isNotEmpty()){
                         $item = $order->detailPesanan->first();
+                        $otherCount = $order->detailPesanan->count() - 1;
                     } elseif(!$isObj && !empty($order['detail_pesanan'])) {
                         $item = (object)$order['detail_pesanan'][0];
+                        $otherCount = count($order['detail_pesanan']) - 1;
                     }
                     $productName = $item ? ($item->produk->nama_produk ?? 'Produk') : 'Produk';
                     $supplierName = $item && $item->produk && $item->produk->supplier ? $item->produk->supplier->nama_supplier : 'Non-Supplier';
+                    $qty = $item->quantity ?? 1;
+                    $price = $item->harga_satuan ?? 0;
+                    $unit = $item->satuan ?? 'Unit';
 
                     $img = $item->gambar ?? '';
                     $src = asset('images/default-product.png');
@@ -524,8 +591,25 @@ $item = null;
                         </div>
                          <div class="order-product-details flex-grow-1">
                             <h6>{{ $productName }}</h6>
-                             <div class="fw-bold text-danger mt-1">
-                                <span>Total: Rp {{ number_format($total, 0, ',', '.') }}</span>
+                            <p class="mb-1 text-muted small">{{ $qty }} x Rp {{ number_format($price, 0, ',', '.') }} / {{ $unit }}</p>
+
+                            @if($otherCount > 0)
+                            <div class="produk-lain mb-2">+ {{ $otherCount }} produk lain</div>
+                            @endif
+
+                            <div class="border-top mt-2 pt-2 small text-muted">
+                                <div class="d-flex justify-content-between">
+                                    <span>Subtotal:</span>
+                                    <span>Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Ongkir:</span>
+                                    <span>Rp {{ number_format($ongkir, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between fw-bold text-danger mt-1">
+                                    <span>Total:</span>
+                                    <span>Rp {{ number_format($total, 0, ',', '.') }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>

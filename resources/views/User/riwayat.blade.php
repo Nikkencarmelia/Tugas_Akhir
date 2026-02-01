@@ -400,8 +400,7 @@ let searchTimeout;
                         $('#panel-dikirim').html(data.dikirim);
                         $('#panel-selesai').html(data.selesai);
                         $('#panel-dibatalkan').html(data.dibatalkan);
-
-}
+                    }
                 });
             }
 

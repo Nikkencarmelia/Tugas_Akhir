@@ -236,10 +236,6 @@
                         <input type="text" class="form-control" id="kendaraan" disabled>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" placeholder="Kosongkan jika tidak diubah" disabled>
-                    </div>
-                    <div class="mb-3">
                         <label class="form-label">Status Online</label>
                         <select class="form-select" id="statusOnline" disabled>
                             <option value="Aktif">Aktif</option>
@@ -265,6 +261,25 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    
+    function showToast(message, type = 'success') {
+        const toastContainer = document.createElement('div');
+        toastContainer.className = `toast align-items-center text-white bg-${type} border-0 position-fixed top-0 end-0 m-3`;
+        toastContainer.style.zIndex = 2000;
+        toastContainer.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body fw-semibold">
+                <i class="fa-solid fa-circle-${type === 'success' ? 'check' : 'xmark'} me-2"></i>
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+        `;
+        document.body.appendChild(toastContainer);
+        const toast = new bootstrap.Toast(toastContainer, { delay: 3000 });
+        toast.show();
+        toastContainer.addEventListener('hidden.bs.toast', () => toastContainer.remove());
+    }
 
     const searchInput = document.getElementById('searchKurir');
     searchInput.addEventListener('input', function() {
@@ -372,26 +387,51 @@ fetch(`/super_admin/manajemen_kurir/${id}`, {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert(data.message);
                 const row = document.querySelector(`tr[data-id="${id}"]`);
                 if (row) {
-
-                    row.dataset.role = formData.role;
-
-                    const roleClass = formData.role.toLowerCase().replace(/ /g, '-').replace('_','-');
-                    row.querySelector('td:nth-child(5) span').className = `badge badge-role-${roleClass}`;
-                    row.querySelector('td:nth-child(5) span').textContent = formData.role;
+                    if (formData.role.toLowerCase() !== 'kurir') {
+                        // Remove row if no longer a courier
+                        row.remove();
+                        // Re-index remaining rows
+                        const rows = document.querySelectorAll('#tableKurir tbody tr:not(.no-results-row)');
+                        rows.forEach((r, i) => {
+                            r.querySelector('td:first-child').textContent = i + 1;
+                        });
+                        
+                        // Check if empty
+                        if (rows.length === 0) {
+                            const tableBody = document.querySelector('#tableKurir tbody');
+                            tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted no-results-row">Belum ada data kurir.</td></tr>`;
+                        }
+                    } else {
+                        row.dataset.role = formData.role;
+                        const roleClass = formData.role.toLowerCase().replace(/ /g, '-').replace('_','-');
+                        const badge = row.querySelector('td:nth-child(5) span');
+                        if (badge) {
+                            badge.className = `badge badge-role-${roleClass}`;
+                            badge.textContent = formData.role;
+                        }
+                    }
                 }
-                const modal = bootstrap.Modal.getInstance(document.getElementById('modalKurir'));
-                modal.hide();
-                window.location.reload();
+                const modalEl = document.getElementById('modalKurir');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+
+                // Cleanup backdrop explicitly
+                setTimeout(() => {
+                    document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style.paddingRight = '';
+                }, 100);
+                
+                showToast(data.message || 'Role berhasil diubah!', 'success');
             } else {
-                alert('Gagal update: ' + data.message);
+                showToast('Gagal update: ' + (data.message || 'Server error'), 'danger');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Terjadi kesalahan.');
+            showToast('Terjadi kesalahan saat menyimpan data.', 'danger');
         });
     });
 

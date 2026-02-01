@@ -112,13 +112,13 @@
                     Masuk
                 </button>
 
-                <p class="text-center text-muted small">Atau masuk dengan</p>
+                <!-- <p class="text-center text-muted small">Atau masuk dengan</p>
 
                 <div class="d-flex justify-content-center mb-3">
                     <a href="{{ route('auth.google') }}">
                         <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" width="24">
                     </a>
-                </div>
+                </div> -->
 
                 <p class="text-center small">
                     Belum punya akun?

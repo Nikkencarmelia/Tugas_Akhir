@@ -75,20 +75,16 @@
             margin-right: 4px !important;
         }
 
-.status-menunggu_konfirmasi { background: #f1f3f5 !important; color: #495057 !important; }
+        .status-menunggu_konfirmasi { background: #f1f3f5 !important; color: #495057 !important; }
         .status-menunggu_pembayaran { background: #fff4e6 !important; color: #d9480f !important; }
         .status-diproses { background: #fef9c3 !important; color: #854d0e !important; }
         .status-dikirim { background: #e0f2fe !important; color: #0369a1 !important; }
         .status-selesai { background: #dcfce7 !important; color: #166534 !important; }
         .status-dibatalkan { background: #fee2e2 !important; color: #991b1b !important; }
-        .status-menunggu_konfirmasi_pembayaran { background: #fff7ed !important; color: #9a3412 !important; }
-        .status-sedang_diantar { background: #e0f2fe !important; color: #0369a1 !important; }
+        .status-verif { background: #fff7ed !important; color: #9a3412 !important; }
+        .status-menunggu_konfirmasi_kurir { background: #fef9c3 !important; color: #854d0e !important; }
         .status-siap_diambil { background: #d4edda !important; color: #155724 !important; border: 1px solid #c3e6cb !important; }
         .status-pesanan_telah_diambil { background: #e0f2fe !important; color: #0369a1 !important; border: 1px solid #bae6fd !important; }
-        .status-menunggu_konfirmasi_kurir { background: #fef9c3 !important; color: #854d0e !important; }
-        .status-ditolak_kurir { background: #fee2e2 !important; color: #991b1b !important; }
-        .status-ditolak_staff { background: #fee2e2 !important; color: #991b1b !important; }
-        .status-ditolak_staff_diambil { background: #fee2e2 !important; color: #991b1b !important; }
         .extra-small { font-size: 0.75rem !important; }
 
         .orders-tabs{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;}
@@ -197,9 +193,19 @@
                             <td>{{ $item['kode_pesanan'] }}</td>
                             <td class="product-cell">
                                 <div class="d-flex align-items-center">
-                                    @if(isset($item['gambar']) && $item['gambar'])
+                                    @php
+                                        $imagePath = $item['gambar'] ?? '';
+                                        if (str_starts_with($imagePath, 'images/')) {
+                                            $src = asset($imagePath);
+                                        } elseif (!str_contains($imagePath, 'http') && !str_starts_with($imagePath, 'storage/') && $imagePath) {
+                                            $src = asset('storage/' . $imagePath);
+                                        } else {
+                                            $src = $imagePath ? asset($imagePath) : asset('images/default-produk.png');
+                                        }
+                                    @endphp
+                                    @if($imagePath)
                                         <div class="position-relative me-3">
-                                            <img src="{{ asset($item['gambar']) }}" alt="{{ $item['nama_produk'] ?? '' }}" class="product-img">
+                                            <img src="{{ $src }}" alt="{{ $item['nama_produk'] ?? '' }}" class="product-img">
                                             @if($item['nama_supplier'])
                                             <span class="position-absolute top-0 start-100 translate-middle badge-supplier" style="font-size: 0.6rem;">
                                                 {{ $item['nama_supplier'] }}
@@ -216,7 +222,7 @@
                             <td><span class="badge-kategori">{{ $item['nama_kategori'] ?? '-' }}</span></td>
                             <td>{{ $item['jumlah_dibeli'] ?? '' }}</td>
                             <td>
-                                <span class="{{ ($item['harga_normal'] > $item['harga_saat_ini']) ? 'text-decoration-line-through text-muted' : '' }}">
+                                <span class="{{ ((($item['harga_normal'] ?? 0) > ($item['harga_saat_ini'] ?? 0))) ? 'text-decoration-line-through text-muted' : '' }}">
                                     Rp {{ number_format($item['harga_normal'] ?? 0, 0, ',', '.') }}
                                 </span>
                             </td>
@@ -276,29 +282,38 @@
                             <td>
                                 @php
                                     $status = $item['status_pesanan'] ?? 'selesai';
-
                                     $statusClass = 'status-' . $status;
-                                    if(in_array($status, ['dibatalkan', 'ditolak_staff', 'ditolak_kurir', 'ditolak_staff_diambil'])) $statusClass = 'status-dibatalkan';
-                                    elseif($status == 'menunggu_konfirmasi_pembayaran') $statusClass = 'status-menunggu_konfirmasi_pembayaran';
-                                    elseif(in_array($status, ['menunggu_cari_kurir', 'menunggu_konfirmasi_kurir'])) $statusClass = 'status-diproses';
-                                    elseif(in_array($status, ['menunggu_konfirmasi'])) $statusClass = 'status-menunggu_konfirmasi';
-                                    elseif(in_array($status, ['dikirim', 'sedang_diantar'])) $statusClass = 'status-dikirim';
-
                                     $statusLabel = ucwords(str_replace('_', ' ', $status));
-                                    if($status == 'ditolak_staff') $statusLabel = 'Ditolak Staff';
-                                    elseif($status == 'ditolak_kurir') $statusLabel = 'Ditolak Kurir';
-                                    elseif($status == 'menunggu_konfirmasi_pembayaran') $statusLabel = 'Menunggu Konfirmasi Pembayaran';
-                                    elseif(in_array($status, ['dikirim', 'sedang_diantar'])) $statusLabel = 'Dikirim';
-                                    elseif(in_array($status, ['menunggu_konfirmasi'])) $statusLabel = 'Menunggu Konfirmasi';
-                                    elseif(in_array($status, ['menunggu_cari_kurir', 'menunggu_konfirmasi_kurir'])) $statusLabel = 'Diproses';
-                                    elseif($status == 'pesanan_telah_diambil') $statusLabel = 'Pesanan Telah Diambil';
 
-$icon = 'fa-box';
+                                    if(in_array($status, ['dibatalkan', 'ditolak_staff', 'ditolak_kurir', 'ditolak_staff_diambil'])) {
+                                        $statusClass = 'status-dibatalkan';
+                                        $statusLabel = 'Dibatalkan';
+                                        if($status == 'ditolak_kurir') $statusLabel = 'Ditolak Kurir';
+                                        elseif($status == 'ditolak_staff') $statusLabel = 'Ditolak Staff';
+                                    }
+                                    elseif(in_array($status, ['menunggu_konfirmasi_pembayaran', 'menunggu_verifikasi_pembayaran', 'menunggu_pembayaran_diverifikasi'])) {
+                                        $statusClass = 'status-verif';
+                                        $statusLabel = 'Menunggu Verifikasi';
+                                    }
+                                    elseif($status == 'menunggu_konfirmasi_kurir') {
+                                        $statusClass = 'status-menunggu_konfirmasi_kurir';
+                                        $statusLabel = 'Menunggu Konfirmasi Kurir';
+                                    }
+                                    elseif(in_array($status, ['menunggu_cari_kurir', 'menunggu_konfirmasi'])) {
+                                        $statusClass = 'status-menunggu_konfirmasi';
+                                        $statusLabel = ($status == 'menunggu_cari_kurir') ? 'Menunggu Cari Kurir' : 'Menunggu Konfirmasi';
+                                    }
+                                    elseif(in_array($status, ['dikirim', 'sedang_diantar'])) {
+                                        $statusClass = 'status-dikirim';
+                                        $statusLabel = 'Dikirim';
+                                    }
+
+                                    $icon = 'fa-box';
                                     if($status == 'selesai') $icon = 'fa-check-circle';
                                     elseif($statusClass == 'status-dibatalkan') $icon = 'fa-times-circle';
-                                    elseif($statusClass == 'status-dikirim') $icon = 'fa-truck';
-                                    elseif($statusClass == 'status-menunggu_konfirmasi' || $statusClass == 'status-diproses') $icon = 'fa-hourglass-half';
-                                    elseif($statusClass == 'status-menunggu_konfirmasi_pembayaran') $icon = 'fa-clock';
+                                    elseif(in_array($status, ['dikirim', 'sedang_diantar'])) $icon = 'fa-truck';
+                                    elseif($statusClass == 'status-menunggu_konfirmasi' || $statusClass == 'status-menunggu_konfirmasi_kurir') $icon = 'fa-hourglass-half';
+                                    elseif($statusClass == 'status-verif') $icon = 'fa-clock';
                                     elseif($status == 'menunggu_pembayaran') $icon = 'fa-wallet';
                                     elseif($status == 'siap_diambil') $icon = 'fa-box-open';
                                     elseif($status == 'pesanan_telah_diambil') $icon = 'fa-check-double';
@@ -345,9 +360,19 @@ $icon = 'fa-box';
                         <tr data-produk="{{ strtolower($item['nama_produk'] ?? '') }}" data-date="{{ strtotime($item['tanggal_update'] ?? '') }}">
                             <td class="product-cell">
                                 <div class="d-flex align-items-center">
-                                    @if(isset($item['gambar']) && $item['gambar'])
+                                    @php
+                                        $imagePath = $item['gambar'] ?? '';
+                                        if (str_starts_with($imagePath, 'images/')) {
+                                            $src = asset($imagePath);
+                                        } elseif (!str_contains($imagePath, 'http') && !str_starts_with($imagePath, 'storage/') && $imagePath) {
+                                            $src = asset('storage/' . $imagePath);
+                                        } else {
+                                            $src = $imagePath ? asset($imagePath) : asset('images/default-produk.png');
+                                        }
+                                    @endphp
+                                    @if($imagePath)
                                         <div class="position-relative me-3">
-                                            <img src="{{ asset($item['gambar']) }}" alt="{{ $item['nama_produk'] ?? '' }}" class="product-img">
+                                            <img src="{{ $src }}" alt="{{ $item['nama_produk'] ?? '' }}" class="product-img">
                                             @if($item['nama_supplier'])
                                             <span class="position-absolute top-0 start-100 translate-middle badge-supplier" style="font-size: 0.6rem;">
                                                 {{ $item['nama_supplier'] }}
@@ -409,13 +434,32 @@ $icon = 'fa-box';
                     </thead>
                     <tbody>
                         @forelse($terlaris as $index => $item)
+                        @php
+                            $rank = ($terlaris->currentPage() - 1) * $terlaris->perPage() + $index + 1;
+                        @endphp
                         <tr data-produk="{{ strtolower($item['nama_produk'] ?? '') }}">
-                            <td>{{ $index + 1 }}</td>
+                            <td>
+                                @if($rank <= 3)
+                                    <span class="badge bg-warning text-dark rounded-circle p-2" style="width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center;">{{ $rank }}</span>
+                                @else
+                                    <span class="text-muted">{{ $rank }}</span>
+                                @endif
+                            </td>
                             <td class="product-cell">
                                 <div class="d-flex align-items-center">
-                                    @if(isset($item['gambar']) && $item['gambar'])
+                                    @php
+                                        $imagePath = $item['gambar'] ?? '';
+                                        if (str_starts_with($imagePath, 'images/')) {
+                                            $src = asset($imagePath);
+                                        } elseif (!str_contains($imagePath, 'http') && !str_starts_with($imagePath, 'storage/') && $imagePath) {
+                                            $src = asset('storage/' . $imagePath);
+                                        } else {
+                                            $src = $imagePath ? asset($imagePath) : asset('images/default-produk.png');
+                                        }
+                                    @endphp
+                                    @if($imagePath)
                                         <div class="position-relative me-3">
-                                            <img src="{{ asset($item['gambar']) }}" alt="{{ $item['nama_produk'] ?? '' }}" class="product-img">
+                                            <img src="{{ $src }}" alt="{{ $item['nama_produk'] ?? '' }}" class="product-img">
                                             @if($item['nama_supplier'])
                                             <span class="position-absolute top-0 start-100 translate-middle badge-supplier" style="font-size: 0.6rem;">
                                                 {{ $item['nama_supplier'] }}
@@ -456,6 +500,7 @@ $icon = 'fa-box';
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');

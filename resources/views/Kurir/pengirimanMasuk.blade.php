@@ -194,6 +194,26 @@ $status = $order->status_pesanan;
 
 </div>
 
+  <!-- Modal Konfirmasi Bulk Action -->
+
+  <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Konfirmasi</h5>
+          <button type="button" class="btn-close" id="btnCloseModal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="modalBody">
+          Apakah Anda yakin?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelModal">Batal</button>
+          <button type="button" class="btn btn-success" id="btnConfirmAction">Ya, Lanjutkan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded',()=>{
@@ -230,16 +250,43 @@ document.addEventListener('DOMContentLoaded',()=>{
       cb.addEventListener('change', updateButtons);
   });
 
-btnTerimaDipilih.addEventListener('click', (e) => {
+  const confirmationModalEl = document.getElementById('confirmationModal');
+  const confirmationModal = new bootstrap.Modal(confirmationModalEl);
+  const modalTitle = document.getElementById('modalTitle');
+  const modalBody = document.getElementById('modalBody');
+  const btnConfirmAction = document.getElementById('btnConfirmAction');
+  const btnCloseModal = document.getElementById('btnCloseModal');
+  const btnCancelModal = document.getElementById('btnCancelModal');
+  let currentAction = '';
+
+  function hideModal() {
+      confirmationModal.hide();
+  }
+
+  btnCloseModal.addEventListener('click', hideModal);
+  btnCancelModal.addEventListener('click', hideModal);
+
+  btnTerimaDipilih.addEventListener('click', (e) => {
       e.preventDefault();
-      bulkActionForm.action = "{{ route('kurir.terima_dipilih') }}";
-      if(confirm('Terima pesanan yang dipilih?')) bulkActionForm.submit();
+      modalTitle.textContent = 'Konfirmasi Terima';
+      modalBody.textContent = 'Apakah Anda yakin ingin menerima semua pesanan yang dipilih?';
+      currentAction = "{{ route('kurir.terima_dipilih') }}";
+      confirmationModal.show();
   });
 
   btnTolakDipilih.addEventListener('click', (e) => {
       e.preventDefault();
-      bulkActionForm.action = "{{ route('kurir.tolak_dipilih') }}";
-      if(confirm('Tolak pesanan yang dipilih?')) bulkActionForm.submit();
+      modalTitle.textContent = 'Konfirmasi Tolak';
+      modalBody.textContent = 'Apakah Anda yakin ingin menolak semua pesanan yang dipilih?';
+      currentAction = "{{ route('kurir.tolak_dipilih') }}";
+      confirmationModal.show();
+  });
+
+  btnConfirmAction.addEventListener('click', () => {
+    if(currentAction) {
+        bulkActionForm.action = currentAction;
+        bulkActionForm.submit();
+    }
   });
 
 if({{ session('success') ? 'true' : 'false' }}) toastSuccess.show();

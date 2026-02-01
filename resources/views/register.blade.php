@@ -124,12 +124,12 @@
                     </div>
                 </div>
                 <button type="submit" class="btn w-100 mb-3 text-white" style="background-color: #2A522A">Daftar</button>
-                <p class="text-center small text-muted">Atau Daftar dengan</p>
+                <!-- <p class="text-center small text-muted">Atau Daftar dengan</p>
                 <div class="d-flex justify-content-center gap-3 mb-3">
                     <a href="{{ route('auth.google') }}">
                         <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" width="24" alt="Google" class="google-icon">
                     </a>
-                </div>
+                </div> -->
                 <p class="text-center small">Sudah Punya Akun? <a href="{{ route('login') }}" class="text-decoration-none fw-bold" style="color: #2A522A">Masuk</a></p>
                 </form>
             </div>

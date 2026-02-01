@@ -223,7 +223,7 @@
         Menampilkan hasil pencarian untuk: <strong id="searchTerm"></strong>
     </div>
 
-<div id="produkContainer">
+    <div id="produkContainer">
         @if($produks->isEmpty())
             <div class="no-produk">
                 <h3>Belum Ada Produk Tersedia</h3>
@@ -231,18 +231,13 @@
             </div>
         @else
             @foreach($produksGrouped as $kategori => $items)
-                <div class="category-section" data-kategori="{{ Str::slug($kategori) }}">
+                <div class="category-section">
                     <div class="text-start mb-4">
                         <h2 class="category-title">{{ $kategori }}</h2>
                     </div>
                     <div class="row g-4 mb-5 justify-content-start produk-row">
                         @foreach($items as $produk)
-                            <div class="col-6 col-sm-4 col-md-3 col-lg-2 produk-item"
-                                 data-id="{{ $produk['id'] }}"
-                                 data-nama="{{ strtolower($produk['nama_produk']) }}"
-                                 data-supplier="{{ strtolower($produk['supplier']) }}"
-                                 data-kategori="{{ strtolower($produk['kategori']) }}"
-                                 data-deskripsi="{{ strtolower($produk['deskripsi']) }}">
+                            <div class="col-6 col-sm-4 col-md-3 col-lg-2 produk-item">
                                 <div class="produk-card text-center d-flex flex-column justify-content-between">
                                     @if($produk['is_diskon'])
                                         <span class="badge-diskon">-{{ $produk['persen_diskon'] }}%</span>
@@ -320,95 +315,72 @@
         const searchTermEl = document.getElementById('searchTerm');
         const noResult = document.getElementById('noResult');
         const noResultTerm = document.getElementById('noResultTerm');
-        const produkItems = document.querySelectorAll('.produk-item');
-        const categorySections = document.querySelectorAll('.category-section');
 
-        function escapeRegExp(string) {
-            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        }
+        let searchTimeout;
+        function fetchFilteredData() {
+            const search = searchInput.value;
 
-        function highlightText(text, term) {
-            if (!term) return text;
-            const regex = new RegExp(`(${escapeRegExp(term)})`, 'gi');
-            return text.replace(regex, '<span class="highlight">$1</span>');
-        }
+            // Visual loading state
+            const container = document.getElementById('produkContainer');
+            if (container) container.style.opacity = '0.5';
 
-        function filterProduk() {
-            const term = searchInput.value.trim();
-            const termLower = term.toLowerCase();
-            let visibleCount = 0;
-            let visibleCategories = new Set();
-
-            document.querySelectorAll('.produk-nama, .supplier-name').forEach(el => {
-                const original = el.dataset.original || el.textContent.trim();
-                if (!el.dataset.original) el.dataset.original = original;
-                el.innerHTML = original;
-            });
-
-            if (term === '') {
-                searchInfo.style.display = 'none';
-                noResult.style.display = 'none';
-                searchClear.style.display = 'none';
-                categorySections.forEach(sec => sec.style.display = 'block');
-                produkItems.forEach(item => item.style.display = 'block');
-                return;
-            }
-
-            searchClear.style.display = 'block';
-            categorySections.forEach(sec => sec.style.display = 'none');
-
-            produkItems.forEach(item => {
-                const nama = item.dataset.nama || '';
-                const supplier = item.dataset.supplier || '';
-                const kategori = item.dataset.kategori || '';
-                const deskripsi = item.dataset.deskripsi || '';
-
-                const matches = nama.includes(termLower) || supplier.includes(termLower) || kategori.includes(termLower) || deskripsi.includes(termLower);
-
-                if (matches) {
-                    item.style.display = 'block';
-                    visibleCount++;
-                    visibleCategories.add(item.dataset.kategori);
-
-                    if (nama.includes(termLower)) {
-                        const namaEl = item.querySelector('.produk-nama');
-                        if (namaEl) namaEl.innerHTML = highlightText(namaEl.dataset.original, term);
-                    }
-                    if (supplier.includes(termLower)) {
-                        const suppEl = item.querySelector('.supplier-name');
-                        if (suppEl) suppEl.innerHTML = highlightText(suppEl.dataset.original, term);
-                    }
-                } else {
-                    item.style.display = 'none';
+            fetch('{{ route('produk') }}?search=' + encodeURIComponent(search), {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
+            })
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newContent = doc.getElementById('produkContainer');
+                
+                if (newContent) {
+                    $('#produkContainer').html(newContent.innerHTML);
+                    
+                    // Simple count check based on visibility in the returned HTML
+                    const hasProduk = newContent.querySelectorAll('.produk-item').length > 0;
+
+                    if (search.trim() !== '') {
+                        searchInfo.style.display = 'block';
+                        searchTermEl.textContent = search;
+                        searchClear.style.display = 'block';
+                        
+                        if (!hasProduk) {
+                            noResult.style.display = 'block';
+                            noResultTerm.textContent = search;
+                            searchInfo.style.display = 'none';
+                        } else {
+                            noResult.style.display = 'none';
+                        }
+                    } else {
+                        searchInfo.style.display = 'none';
+                        noResult.style.display = 'none';
+                        searchClear.style.display = 'none';
+                    }
+                }
+
+                if (container) container.style.opacity = '1';
+            })
+            .catch(err => {
+                console.error('Fetch error:', err);
+                if (container) container.style.opacity = '1';
             });
-
-            visibleCategories.forEach(kat => {
-
-                const slug = kat.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-                const section = document.querySelector(`.category-section[data-kategori="${slug}"]`);
-                if (section) section.style.display = 'block';
-            });
-
-            searchTermEl.textContent = term;
-            searchInfo.style.display = visibleCount > 0 ? 'block' : 'none';
-            noResult.style.display = visibleCount === 0 ? 'block' : 'none';
-            if (visibleCount === 0) noResultTerm.textContent = term;
         }
 
-        searchInput.addEventListener('input', filterProduk);
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                fetchFilteredData();
+            }, 500);
+        });
+
         searchClear.addEventListener('click', () => {
             searchInput.value = '';
-            filterProduk();
+            fetchFilteredData();
             searchInput.focus();
         });
         searchBtn.addEventListener('click', () => searchInput.focus());
-
-        document.querySelectorAll('.produk-nama').forEach(el => {
-            el.dataset.original = el.textContent.trim();
-        });
-
-        filterProduk();
 
 const toastEl = document.getElementById('addToCartToast');
         const toast = new bootstrap.Toast(toastEl, {
@@ -428,9 +400,7 @@ function updateCartBadge(count) {
             }
         }
 
-        document.querySelectorAll('.add-to-cart').forEach(button => {
-            button.addEventListener('click', function() {
-
+        $(document).on('click', '.add-to-cart', function() {
                 const isAuthenticated = {{ Auth::check() ? 'true' : 'false' }};
                 if (!isAuthenticated) {
                     window.location.href = "{{ route('login') }}";
@@ -485,7 +455,6 @@ function updateCartBadge(count) {
                     btn.disabled = false;
                     btn.innerHTML = originalContent;
                 });
-            });
         });
     });
 </script>

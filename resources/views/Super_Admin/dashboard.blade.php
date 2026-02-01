@@ -163,7 +163,7 @@
         <div class="stats-grid">
             <div class="stat-card user">
                 <div class="stat-header">
-                    <div class="stat-label">Total User</div>
+                    <div class="stat-label">Total Pengguna</div>
                     <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
                 </div>
                 <div class="stat-value">{{ $total_user }}</div>

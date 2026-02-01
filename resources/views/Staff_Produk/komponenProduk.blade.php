@@ -202,49 +202,51 @@
                     <i class="bi bi-plus-circle"></i> Tambah Kategori
                 </button>
             </div>
-            <form action="{{ route('produk.komponen.index') }}" method="GET" class="search-controls mb-3">
+            <form class="search-controls mb-3" onsubmit="return false;">
                 <input type="hidden" name="tab" value="kategori">
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <input type="text" name="search_kategori" class="form-control" placeholder="Cari kategori..." value="{{ request('search_kategori') }}">
-                    <button type="submit" class="btn btn-outline-secondary">Cari</button>
+                    <input type="text" name="search_kategori" id="searchKategori" class="form-control" placeholder="Cari kategori..." value="{{ request('search_kategori') }}" autocomplete="off">
+                    <button type="button" class="btn btn-outline-secondary">Cari</button>
                 </div>
             </form>
-            <div class="table-responsive">
-                <table class="table table-bordered align-middle" id="tableKategori">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width: 60px">No</th>
-                            <th>Nama Kategori</th>
-                            <th>Jumlah Produk</th>
-                            <th style="width: 140px">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($kategori as $index => $kat)
-                            <tr data-id="{{ $kat->id }}">
-                                <td>{{ $kategori->firstItem() + $index }}</td>
-                                <td>{{ $kat->nama_kategori }}</td>
-                                <td><span class="badge bg-success">{{ $kat->produk_count }}</span></td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm btn-edit-kat" data-bs-toggle="modal" data-bs-target="#editModalKategori" data-id="{{ $kat->id }}" data-nama="{{ $kat->nama_kategori }}">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-delete-kat" data-id="{{ $kat->id }}" data-nama="{{ $kat->nama_kategori }}" data-count="{{ $kat->produk_count }}" data-destroy-url="{{ route('produk.komponen.kategori.destroy', $kat->id) }}" data-type="kategori">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        @empty
+            <div id="containerKategori">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle" id="tableKategori">
+                        <thead class="table-light">
                             <tr>
-                                <td colspan="4" class="text-center py-3 text-muted">Tidak ada data kategori.</td>
+                                <th style="width: 60px">No</th>
+                                <th>Nama Kategori</th>
+                                <th>Jumlah Produk</th>
+                                <th style="width: 140px">Aksi</th>
                             </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            <div class="d-flex justify-content-center mt-3">
-                {{ $kategori->links('pagination::bootstrap-5') }}
+                        </thead>
+                        <tbody>
+                            @forelse($kategori as $index => $kat)
+                                <tr data-id="{{ $kat->id }}">
+                                    <td>{{ $kategori->firstItem() + $index }}</td>
+                                    <td>{{ $kat->nama_kategori }}</td>
+                                    <td><span class="badge bg-success">{{ $kat->produk_count }}</span></td>
+                                    <td>
+                                        <button class="btn btn-warning btn-sm btn-edit-kat" data-bs-toggle="modal" data-bs-target="#editModalKategori" data-id="{{ $kat->id }}" data-nama="{{ $kat->nama_kategori }}">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm btn-delete-kat" data-id="{{ $kat->id }}" data-nama="{{ $kat->nama_kategori }}" data-count="{{ $kat->produk_count }}" data-destroy-url="{{ route('produk.komponen.kategori.destroy', $kat->id) }}" data-type="kategori">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center py-3 text-muted">Tidak ada data kategori.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $kategori->links('pagination::bootstrap-5') }}
+                </div>
             </div>
         </div>
 
@@ -255,49 +257,51 @@
                     <i class="bi bi-plus-circle"></i> Tambah Satuan
                 </button>
             </div>
-            <form action="{{ route('produk.komponen.index') }}" method="GET" class="search-controls mb-3">
+            <form class="search-controls mb-3" onsubmit="return false;">
                 <input type="hidden" name="tab" value="satuan">
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <input type="text" name="search_satuan" class="form-control" placeholder="Cari satuan..." value="{{ request('search_satuan') }}">
-                    <button type="submit" class="btn btn-outline-secondary">Cari</button>
+                    <input type="text" name="search_satuan" id="searchSatuan" class="form-control" placeholder="Cari satuan..." value="{{ request('search_satuan') }}" autocomplete="off">
+                    <button type="button" class="btn btn-outline-secondary">Cari</button>
                 </div>
             </form>
-            <div class="table-responsive">
-                <table class="table table-bordered align-middle" id="tableSatuan">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width: 60px">No</th>
-                            <th>Nama Satuan</th>
-                            <th>Jumlah Produk</th>
-                            <th style="width: 140px">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($satuan as $index => $sat)
-                            <tr data-id="{{ $sat->id }}">
-                                <td>{{ $satuan->firstItem() + $index }}</td>
-                                <td>{{ $sat->nama_satuan }}</td>
-                                <td><span class="badge bg-info">{{ $sat->produk_count }}</span></td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm btn-edit-sat" data-bs-toggle="modal" data-bs-target="#editModalSatuan" data-id="{{ $sat->id }}" data-nama="{{ $sat->nama_satuan }}">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-delete-sat" data-id="{{ $sat->id }}" data-nama="{{ $sat->nama_satuan }}" data-count="{{ $sat->produk_count }}" data-destroy-url="{{ route('produk.komponen.satuan.destroy', $sat->id) }}" data-type="satuan">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        @empty
+            <div id="containerSatuan">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle" id="tableSatuan">
+                        <thead class="table-light">
                             <tr>
-                                <td colspan="4" class="text-center py-3 text-muted">Tidak ada data satuan.</td>
+                                <th style="width: 60px">No</th>
+                                <th>Nama Satuan</th>
+                                <th>Jumlah Produk</th>
+                                <th style="width: 140px">Aksi</th>
                             </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            <div class="d-flex justify-content-center mt-3">
-                {{ $satuan->links('pagination::bootstrap-5') }}
+                        </thead>
+                        <tbody>
+                            @forelse($satuan as $index => $sat)
+                                <tr data-id="{{ $sat->id }}">
+                                    <td>{{ $satuan->firstItem() + $index }}</td>
+                                    <td>{{ $sat->nama_satuan }}</td>
+                                    <td><span class="badge bg-info">{{ $sat->produk_count }}</span></td>
+                                    <td>
+                                        <button class="btn btn-warning btn-sm btn-edit-sat" data-bs-toggle="modal" data-bs-target="#editModalSatuan" data-id="{{ $sat->id }}" data-nama="{{ $sat->nama_satuan }}">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm btn-delete-sat" data-id="{{ $sat->id }}" data-nama="{{ $sat->nama_satuan }}" data-count="{{ $sat->produk_count }}" data-destroy-url="{{ route('produk.komponen.satuan.destroy', $sat->id) }}" data-type="satuan">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center py-3 text-muted">Tidak ada data satuan.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $satuan->links('pagination::bootstrap-5') }}
+                </div>
             </div>
         </div>
 
@@ -308,49 +312,51 @@
                     <i class="bi bi-plus-circle"></i> Tambah Supplier
                 </button>
             </div>
-            <form action="{{ route('produk.komponen.index') }}" method="GET" class="search-controls mb-3">
+            <form class="search-controls mb-3" onsubmit="return false;">
                 <input type="hidden" name="tab" value="supplier">
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <input type="text" name="search_supplier" class="form-control" placeholder="Cari supplier..." value="{{ request('search_supplier') }}">
-                    <button type="submit" class="btn btn-outline-secondary">Cari</button>
+                    <input type="text" name="search_supplier" id="searchSupplier" class="form-control" placeholder="Cari supplier..." value="{{ request('search_supplier') }}" autocomplete="off">
+                    <button type="button" class="btn btn-outline-secondary">Cari</button>
                 </div>
             </form>
-            <div class="table-responsive">
-                <table class="table table-bordered align-middle" id="tableSupplier">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width: 60px">No</th>
-                            <th>Nama Supplier</th>
-                            <th>Jumlah Produk</th>
-                            <th style="width: 140px">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($supplier as $index => $sup)
-                            <tr data-id="{{ $sup->id }}">
-                                <td>{{ $supplier->firstItem() + $index }}</td>
-                                <td>{{ $sup->nama_supplier }}</td>
-                                <td><span class="badge bg-primary">{{ $sup->produk_count }}</span></td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm btn-edit-sup" data-bs-toggle="modal" data-bs-target="#editModalSupplier" data-id="{{ $sup->id }}" data-nama="{{ $sup->nama_supplier }}">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-delete-sup" data-id="{{ $sup->id }}" data-nama="{{ $sup->nama_supplier }}" data-count="{{ $sup->produk_count }}" data-destroy-url="{{ route('produk.komponen.supplier.destroy', $sup->id) }}" data-type="supplier">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        @empty
+            <div id="containerSupplier">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle" id="tableSupplier">
+                        <thead class="table-light">
                             <tr>
-                                <td colspan="4" class="text-center py-3 text-muted">Tidak ada data supplier.</td>
+                                <th style="width: 60px">No</th>
+                                <th>Nama Supplier</th>
+                                <th>Jumlah Produk</th>
+                                <th style="width: 140px">Aksi</th>
                             </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            <div class="d-flex justify-content-center mt-3">
-                {{ $supplier->links('pagination::bootstrap-5') }}
+                        </thead>
+                        <tbody>
+                            @forelse($supplier as $index => $sup)
+                                <tr data-id="{{ $sup->id }}">
+                                    <td>{{ $supplier->firstItem() + $index }}</td>
+                                    <td>{{ $sup->nama_supplier }}</td>
+                                    <td><span class="badge bg-primary">{{ $sup->produk_count }}</span></td>
+                                    <td>
+                                        <button class="btn btn-warning btn-sm btn-edit-sup" data-bs-toggle="modal" data-bs-target="#editModalSupplier" data-id="{{ $sup->id }}" data-nama="{{ $sup->nama_supplier }}">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm btn-delete-sup" data-id="{{ $sup->id }}" data-nama="{{ $sup->nama_supplier }}" data-count="{{ $sup->produk_count }}" data-destroy-url="{{ route('produk.komponen.supplier.destroy', $sup->id) }}" data-type="supplier">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center py-3 text-muted">Tidak ada data supplier.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $supplier->links('pagination::bootstrap-5') }}
+                </div>
             </div>
         </div>
     </div>
@@ -693,40 +699,123 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-document.querySelectorAll('.btn-edit-kat').forEach(btn => {
-        btn.addEventListener('click', () => {
+    // Use event delegation for buttons since tables are dynamic
+    document.addEventListener('click', function(e) {
+        // Edit Kategori
+        if (e.target.closest('.btn-edit-kat')) {
+            const btn = e.target.closest('.btn-edit-kat');
             const id = btn.dataset.id;
             const nama = btn.dataset.nama;
             document.getElementById('editNamaKategori').textContent = nama;
             document.getElementById('editNamaKategoriInput').value = nama;
             document.getElementById('formEditKategori').action = "{{ url('/staff_produk/komponen/kategori') }}/" + id;
-        });
-    });
+        }
 
-document.querySelectorAll('.btn-edit-sat').forEach(btn => {
-        btn.addEventListener('click', () => {
+        // Edit Satuan
+        if (e.target.closest('.btn-edit-sat')) {
+            const btn = e.target.closest('.btn-edit-sat');
             const id = btn.dataset.id;
             const nama = btn.dataset.nama;
             document.getElementById('editNamaSatuan').textContent = nama;
             document.getElementById('editNamaSatuanInput').value = nama;
             document.getElementById('formEditSatuan').action = "{{ url('/staff_produk/komponen/satuan') }}/" + id;
-        });
-    });
+        }
 
-document.querySelectorAll('.btn-edit-sup').forEach(btn => {
-        btn.addEventListener('click', () => {
+        // Edit Supplier
+        if (e.target.closest('.btn-edit-sup')) {
+            const btn = e.target.closest('.btn-edit-sup');
             const id = btn.dataset.id;
             const nama = btn.dataset.nama;
             document.getElementById('editNamaSupplier').textContent = nama;
             document.getElementById('editNamaSupplierInput').value = nama;
             document.getElementById('formEditSupplier').action = "{{ url('/staff_produk/komponen/supplier') }}/" + id;
-        });
+        }
+
+        // Delete Buttons
+        if (e.target.closest('.btn-delete-kat')) {
+            handleDelete('kategori', e.target.closest('.btn-delete-kat'));
+        }
+        if (e.target.closest('.btn-delete-sat')) {
+            handleDelete('satuan', e.target.closest('.btn-delete-sat'));
+        }
+        if (e.target.closest('.btn-delete-sup')) {
+            handleDelete('supplier', e.target.closest('.btn-delete-sup'));
+        }
+
+        // AJAX Pagination
+        if (e.target.closest('.pagination a')) {
+            e.preventDefault();
+            const link = e.target.closest('.pagination a');
+            const url = new URL(link.href);
+            const tab = url.searchParams.get('tab') || 'kategori';
+            const containerId = `container${tab.charAt(0).toUpperCase() + tab.slice(1)}`;
+            
+            fetch(url, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newContent = doc.getElementById(containerId);
+                const container = document.getElementById(containerId);
+                if (container && newContent) {
+                    container.innerHTML = newContent.innerHTML;
+                }
+                window.history.pushState({}, '', url);
+            });
+        }
     });
 
-@if(session('success'))
+    // Debounce function
+    function debounce(func, wait) {
+        let timeout;
+        return function() {
+            const context = this, args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+    }
+
+    // Live Search Function
+    function initLiveSearch(inputId, containerId, paramName) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+
+        input.addEventListener('input', debounce(function() {
+            const query = this.value;
+            const baseUrl = "{{ route('produk.komponen.index') }}";
+            const url = new URL(baseUrl);
+            const tab = paramName.split('_')[1];
+            url.searchParams.set('tab', tab);
+            url.searchParams.set(paramName, query);
+
+            fetch(url, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newContent = doc.getElementById(containerId);
+                const container = document.getElementById(containerId);
+                if (container && newContent) {
+                    container.innerHTML = newContent.innerHTML;
+                }
+            });
+        }, 500));
+    }
+
+    initLiveSearch('searchKategori', 'containerKategori', 'search_kategori');
+    initLiveSearch('searchSatuan', 'containerSatuan', 'search_satuan');
+    initLiveSearch('searchSupplier', 'containerSupplier', 'search_supplier');
+
+    @if(session('success'))
         const toastEl = document.getElementById('toastSuccess');
-        const toast = new bootstrap.Toast(toastEl);
-        toast.show();
+        if (toastEl) {
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
     @endif
 
 function capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
@@ -809,15 +898,6 @@ new bootstrap.Modal(document.getElementById('modalDeleteConfirm')).show();
         }
     }
 
-document.querySelectorAll('.btn-delete-kat').forEach(btn => {
-        btn.addEventListener('click', () => handleDelete('kategori', btn));
-    });
-    document.querySelectorAll('.btn-delete-sat').forEach(btn => {
-        btn.addEventListener('click', () => handleDelete('satuan', btn));
-    });
-    document.querySelectorAll('.btn-delete-sup').forEach(btn => {
-        btn.addEventListener('click', () => handleDelete('supplier', btn));
-    });
 
 document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
         const url = this.dataset.url;

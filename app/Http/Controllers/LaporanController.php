@@ -42,8 +42,10 @@ class LaporanController extends Controller
             ->where('status_pesanan', 'selesai')
             ->whereYear('created_at', date('Y'))
             ->groupBy('month')
-            ->orderBy('month')
-            ->get();
+            ->orderByDesc('month')
+            ->take(6)
+            ->get()
+            ->reverse();
 
         $month_names = [
             1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
@@ -68,9 +70,11 @@ class LaporanController extends Controller
     {
         $month = $request->query('month', date('m'));
         $year = $request->query('year', date('Y'));
-        $sort = $request->query('sort', 'desc');
+        $sort = $request->query('sort', 'asc');
+        $search = $request->query('search');
 
-        $penjualan = DetailPesanan::whereHas('pemesanan', function ($q) use ($month, $year) {
+        // 1. Penjualan
+        $penjualanQuery = DetailPesanan::whereHas('pemesanan', function ($q) use ($month, $year) {
             $q->where('status_pesanan', 'selesai')
                 ->whereMonth('created_at', $month)
                 ->whereYear('created_at', $year);
@@ -95,17 +99,42 @@ class LaporanController extends Controller
                 'detail_pesanans.harga_total as total_harga',
                 'kategoris.nama_kategori',
                 'suppliers.nama_supplier'
-            )
-            ->orderBy('pemesanans.created_at', $sort)
-            ->paginate(10, ['*'], 'penjualan_page');
+            );
 
-        $pesanan = Pemesanan::with(['user', 'detailPesanan.batch'])
+        if ($search) {
+            $penjualanQuery->where(function ($q) use ($search) {
+                $q->where('detail_pesanans.nama_produk', 'LIKE', "%{$search}%")
+                    ->orWhere('pemesanans.kode_pesanan', 'LIKE', "%{$search}%")
+                    ->orWhere('batches.kode_batch', 'LIKE', "%{$search}%")
+                    ->orWhere('kategoris.nama_kategori', 'LIKE', "%{$search}%")
+                    ->orWhere('suppliers.nama_supplier', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $penjualan = $penjualanQuery->orderBy('pemesanans.created_at', $sort)
+            ->paginate(10, ['*'], 'penjualan_page')
+            ->withQueryString();
+
+        // 2. Pesanan
+        $pesananQuery = Pemesanan::with(['user', 'detailPesanan.batch'])
             ->whereMonth('created_at', $month)
-            ->whereYear('created_at', $year)
-            ->orderBy('created_at', $sort)
-            ->paginate(10, ['*'], 'pesanan_page')
-            ->through(function ($p) {
+            ->whereYear('created_at', $year);
 
+        if ($search) {
+            $pesananQuery->where(function ($q) use ($search) {
+                $q->where('kode_pesanan', 'LIKE', "%{$search}%")
+                    ->orWhere('nama_penerima', 'LIKE', "%{$search}%")
+                    ->orWhere('status_pesanan', 'LIKE', "%{$search}%")
+                    ->orWhereHas('user', function ($uq) use ($search) {
+                        $uq->where('nama_lengkap', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        $pesanan = $pesananQuery->orderBy('created_at', $sort)
+            ->paginate(10, ['*'], 'pesanan_page')
+            ->withQueryString()
+            ->through(function ($p) {
                 $normal_subtotal = $p->detailPesanan->sum(function ($detail) {
                     $harga_normal = $detail->batch ? $detail->batch->harga_normal : ($detail->harga_satuan ?? 0);
 
@@ -128,8 +157,27 @@ class LaporanController extends Controller
                 ];
             });
 
-        $stok = Produk::with(['batch', 'rusak' => fn ($q) => $q->select('id_produk', 'jumlah_rusak'), 'supplier', 'satuan', 'kategori'])
-            ->paginate(10, ['*'], 'stok_page')
+        // 3. Stok
+        $stokQuery = Produk::with(['batch', 'rusak' => fn ($q) => $q->select('id_produk', 'jumlah_rusak'), 'supplier', 'satuan', 'kategori']);
+
+        if ($search) {
+            $stokQuery->where(function ($q) use ($search) {
+                $q->where('nama_produk', 'LIKE', "%{$search}%")
+                    ->orWhere('kode_produk', 'LIKE', "%{$search}%")
+                    ->orWhereHas('supplier', function ($sq) use ($search) {
+                        $sq->where('nama_supplier', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('kategori', function ($kq) use ($search) {
+                        $kq->where('nama_kategori', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('batch', function ($bq) use ($search) {
+                        $bq->where('kode_batch', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        $stok = $stokQuery->paginate(10, ['*'], 'stok_page')
+            ->withQueryString()
             ->through(function ($p) use ($month, $year) {
                 $all_batches = $p->batch;
                 $total_batch = $all_batches->count();
@@ -187,7 +235,8 @@ class LaporanController extends Controller
                 ->whereYear('created_at', $year);
         })->sum('harga_total');
 
-        $terlaris = DetailPesanan::select('id_produk', DB::raw('sum(quantity) as jumlah_terjual'), DB::raw('sum(harga_total) as total_pendapatan'))
+        // 4. Terlaris
+        $terlarisQuery = DetailPesanan::select('id_produk', DB::raw('sum(quantity) as jumlah_terjual'), DB::raw('sum(harga_total) as total_pendapatan'))
             ->whereHas('pemesanan', function ($q) use ($month, $year) {
                 $q->where('status_pesanan', 'selesai')
                     ->whereMonth('created_at', $month)
@@ -195,10 +244,21 @@ class LaporanController extends Controller
             })
             ->with(['produk' => function ($q) {
                 $q->with(['supplier', 'satuan'])->orderBy('created_at', 'asc');
-            }])
-            ->groupBy('id_produk')
-            ->orderBy('jumlah_terjual', 'asc')
+            }]);
+
+        if ($search) {
+            $terlarisQuery->whereHas('produk', function ($q) use ($search) {
+                $q->where('nama_produk', 'LIKE', "%{$search}%")
+                    ->orWhereHas('supplier', function ($sq) use ($search) {
+                        $sq->where('nama_supplier', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        $terlaris = $terlarisQuery->groupBy('id_produk')
+            ->orderBy('jumlah_terjual', 'desc')
             ->paginate(10, ['*'], 'terlaris_page')
+            ->withQueryString()
             ->through(function ($item) use ($total_all_sales) {
                 return [
                     'nama_produk' => $item->produk->nama_produk,
@@ -211,6 +271,7 @@ class LaporanController extends Controller
                     'persentase_penjualan' => $total_all_sales > 0 ? round(($item->total_pendapatan / $total_all_sales) * 100, 1) : 0,
                 ];
             });
+
 
         return view('Super_Admin.laporan', compact('penjualan', 'pesanan', 'stok', 'terlaris', 'month', 'year', 'sort'));
     }
